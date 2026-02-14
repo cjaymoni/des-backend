@@ -37,7 +37,13 @@ export class CompanyController {
 
   @Get()
   @Roles('system_admin')
-  findAll(@Query() pagination: PaginationDto): Promise<PaginatedResult<Company>> {
+  findAll(
+    @Query() pagination: PaginationDto,
+    @Req() req: { user: { role: string } },
+  ): Promise<PaginatedResult<Company>> {
+    if (req.user.role !== 'system_admin') {
+      throw new ForbiddenException('Only system admins can view all companies');
+    }
     return this.companyService.findAll(pagination);
   }
 

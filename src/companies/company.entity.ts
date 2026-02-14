@@ -1,11 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 @Entity({ schema: 'public' })
+@Index(['appSubdomain'])
 export class Company {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ unique: true })
+  @Index()
   appSubdomain: string; // Used as tenant identifier
 
   @Column()

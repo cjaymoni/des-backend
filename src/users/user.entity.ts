@@ -4,14 +4,18 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity('users')
+@Index(['email'])
+@Index(['role'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ unique: true })
+  @Index()
   email: string;
 
   @Column()

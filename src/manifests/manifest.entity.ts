@@ -1,6 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 @Entity('manifests')
+@Index(['manifestNumber'])
+@Index(['status'])
+@Index(['type'])
+@Index(['masterManifestId'])
 export class Manifest {
   @PrimaryGeneratedColumn('uuid')
   id: string;

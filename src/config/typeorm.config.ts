@@ -12,5 +12,7 @@ export default new DataSource({
   database: process.env.DB_NAME,
   entities: ['src/**/*.entity.ts'],
   migrations: ['src/migrations/*.ts'],
+  migrationsTableName: 'migrations',
+  schema: 'public',
   ssl: { rejectUnauthorized: false },
 });

@@ -8,6 +8,7 @@ import { Repository, DataSource } from 'typeorm';
 import { Company } from './company.entity';
 import { TENANT_SCHEMA_SQL } from '../config/tenant-schema.sql';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
+import { TenantService } from '../tenant/tenant.service';
 
 @Injectable()
 export class CompanyService {
@@ -15,6 +16,7 @@ export class CompanyService {
     @InjectRepository(Company)
     private companyRepo: Repository<Company>,
     private dataSource: DataSource,
+    private tenantService: TenantService,
   ) {}
 
   async create(data: Partial<Company>): Promise<Company> {
@@ -59,13 +61,16 @@ export class CompanyService {
   async update(id: string, data: Partial<Company>): Promise<Company> {
     const company = await this.findOne(id);
     Object.assign(company, data);
-    return this.companyRepo.save(company);
+    const updated = await this.companyRepo.save(company);
+    await this.tenantService.clearCache(company.appSubdomain);
+    return updated;
   }
 
   async delete(id: string): Promise<void> {
     const company = await this.findOne(id);
     await this.deleteTenantSchema(company.appSubdomain);
     await this.companyRepo.remove(company);
+    await this.tenantService.clearCache(company.appSubdomain);
   }
 
   private async createTenantSchema(subdomain: string): Promise<void> {

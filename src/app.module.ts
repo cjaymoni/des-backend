@@ -1,6 +1,7 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
 import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
 import { TenantModule } from './tenant/tenant.module';
 import { TenantMiddleware } from './tenant/tenant.middleware';
@@ -9,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { ManifestsModule } from './manifests/manifests.module';
 import { CompanyModule } from './companies/company.module';
 import { AdminModule } from './admin/admin.module';
+import { UsersModule } from './users/users.module';
 import { HealthModule } from './health/health.module';
 import { WarmupInterceptor } from './health/warmup.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
@@ -20,6 +22,7 @@ import { getDatabaseConfig } from './config/database.config';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    CacheModule.register({ isGlobal: true, ttl: 0 }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: getDatabaseConfig,
@@ -31,6 +34,7 @@ import { getDatabaseConfig } from './config/database.config';
     AuthModule,
     ManifestsModule,
     AdminModule,
+    UsersModule,
   ],
   providers: [
     {

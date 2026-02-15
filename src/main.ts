@@ -16,7 +16,11 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const port = process.env.PORT || 6000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
+
   winstonConfig.log(`Server running on http://localhost:${port}`);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
@@ -99,5 +99,24 @@ export class AuthService {
         lastLogin: user.lastLogin || new Date(),
       },
     };
+  }
+
+  async getUserById(userId: string) {
+    // Try system admin first (public schema)
+    const systemUser = await this.connection.getRepository(User).findOne({ where: { id: userId } });
+    if (systemUser && systemUser.role === 'system_admin') {
+      const { password, ...userWithoutPassword } = systemUser;
+      return userWithoutPassword;
+    }
+
+    // Try tenant user
+    const manager = await this.tenantService.getEntityManager();
+    const user = await manager.findOne(User, { where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 }

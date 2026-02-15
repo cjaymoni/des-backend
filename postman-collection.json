@@ -10,6 +10,11 @@
       "type": "string"
     },
     {
+      "key": "renderBaseUrl",
+      "value": "https://des-backend-jaji.onrender.com",
+      "type": "string"
+    },
+    {
       "key": "token",
       "value": "",
       "type": "string"
@@ -187,6 +192,33 @@
               "path": [
                 "auth",
                 "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "acme",
+                "description": "Optional for system admin"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
               ]
             }
           }

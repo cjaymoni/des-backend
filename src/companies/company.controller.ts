@@ -22,20 +22,26 @@ import { TenantContext } from '../tenant/tenant.context';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
 
 @Controller('companies')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class CompanyController {
   constructor(
     private companyService: CompanyService,
     private tenantContext: TenantContext,
   ) {}
 
+  @Get('subdomain/:subdomain')
+  async findBySubdomain(@Param('subdomain') subdomain: string) {
+    return this.companyService.findBySubdomainPublic(subdomain);
+  }
+
   @Post()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('system_admin')
   create(@Body() data: CreateCompanyDto): Promise<Company> {
     return this.companyService.create(data);
   }
 
   @Get()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('system_admin')
   findAll(
     @Query() pagination: PaginationDto,
@@ -48,11 +54,13 @@ export class CompanyController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Company> {
     return this.companyService.findOne(id);
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('company_admin', 'system_admin')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -70,6 +78,7 @@ export class CompanyController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('system_admin')
   delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.companyService.delete(id);

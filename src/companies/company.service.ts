@@ -58,6 +58,15 @@ export class CompanyService {
     return company;
   }
 
+  async findBySubdomainPublic(subdomain: string) {
+    const company = await this.companyRepo.findOne({
+      where: { appSubdomain: subdomain },
+      select: ['id', 'appSubdomain', 'companyName', 'logo'],
+    });
+    if (!company) throw new NotFoundException('Company not found');
+    return company;
+  }
+
   async update(id: string, data: Partial<Company>): Promise<Company> {
     const company = await this.findOne(id);
     Object.assign(company, data);

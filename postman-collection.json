@@ -326,6 +326,25 @@
       "name": "Companies",
       "item": [
         {
+          "name": "Get Company by Subdomain (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/companies/subdomain/acme",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "companies",
+                "subdomain",
+                "acme"
+              ]
+            },
+            "description": "Public endpoint that returns basic company info (id, subdomain, name, logo)"
+          }
+        },
+        {
           "name": "Create Company (System Admin)",
           "request": {
             "method": "POST",

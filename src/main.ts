@@ -9,13 +9,13 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://localhost:3000', /\.vercel\.app$/],
+    origin: ['http://acme.localhost:3000', /\.vercel\.app$/],
     credentials: true,
   });
 
   app.useGlobalPipes(new ValidationPipe());
 
-  const port = process.env.PORT || 6000;
+  const port = process.env.PORT || 5059;
   await app.listen(port, '0.0.0.0');
 
   winstonConfig.log(`Server running on http://localhost:${port}`);

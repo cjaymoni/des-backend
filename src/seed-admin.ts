@@ -11,7 +11,7 @@ async function bootstrap() {
   const hashedPassword = await bcrypt.hash('admin123', 10);
 
   const user = dataSource.getRepository(User).create({
-    email: 'admin@system.com',
+    email: 'admin1@system.com',
     password: hashedPassword,
     firstName: 'System',
     lastName: 'Admin',
@@ -19,7 +19,7 @@ async function bootstrap() {
   });
 
   await dataSource.getRepository(User).save(user);
-  console.log('System admin created: admin@system.com / admin123');
+  console.log('System admin created: admin1@system.com / admin123');
 
   await app.close();
 }

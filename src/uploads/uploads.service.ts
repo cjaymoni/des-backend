@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class UploadsService {
@@ -16,25 +17,37 @@ export class UploadsService {
       throw new Error('No file provided');
     }
 
-    const result = await cloudinary.uploader.upload(file.path, {
-      folder: `des/${orgName}`,
-      resource_type: 'auto',
-    });
+    try {
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: `des/${orgName}`,
+        resource_type: 'auto',
+      });
 
-    return {
-      success: true,
-      data: {
-        url: result.secure_url,
-        publicId: result.public_id,
-        format: result.format,
-        width: result.width,
-        height: result.height,
-      },
-    };
+      return {
+        success: true,
+        data: {
+          url: result.secure_url,
+          publicId: result.public_id,
+          format: result.format,
+          width: result.width,
+          height: result.height,
+        },
+      };
+    } finally {
+      try {
+        unlinkSync(file.path);
+      } catch {
+        /* already deleted or never written */
+      }
+    }
   }
 
   async deleteImage(publicId: string) {
-    await cloudinary.uploader.destroy(publicId);
-    return { success: true };
+    console.log('Attempting to delete from Cloudinary:', publicId);
+    const result = await cloudinary.uploader.destroy(publicId, {
+      invalidate: true,
+    });
+    console.log('Cloudinary delete response:', result);
+    return { success: true, result };
   }
 }

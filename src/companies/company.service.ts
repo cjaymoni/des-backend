@@ -79,11 +79,27 @@ export class CompanyService {
 
   async uploadLogo(id: string, file: any): Promise<Company> {
     const company = await this.findOne(id);
+    
+    // Delete old logo from Cloudinary if exists
+    if (company.logo) {
+      const publicId = this.extractPublicId(company.logo);
+      console.log('Deleting old logo with publicId:', publicId);
+      if (publicId) {
+        const result = await this.uploadsService.deleteImage(publicId);
+        console.log('Delete result:', result);
+      }
+    }
+    
     const result = await this.uploadsService.uploadImage(file, company.appSubdomain);
     company.logo = result.data.url;
     const updated = await this.companyRepo.save(company);
     await this.tenantService.clearCache(company.appSubdomain);
     return updated;
+  }
+
+  private extractPublicId(url: string): string | null {
+    const match = url.match(/\/upload\/(?:v\d+\/)?(.*?)(?:\.[^.]+)?$/);
+    return match ? match[1] : null;
   }
 
   async delete(id: string): Promise<void> {

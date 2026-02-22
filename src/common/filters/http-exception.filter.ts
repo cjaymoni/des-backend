@@ -19,10 +19,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message =
-      exception instanceof HttpException
-        ? exception.message
-        : 'Internal server error';
+    let message = 'Internal server error';
+    let errors: any[] | undefined;
+
+    if (exception instanceof HttpException) {
+      const response = exception.getResponse();
+      if (typeof response === 'object' && response !== null) {
+        const res = response as any;
+        // ValidationPipe puts per-field errors in res.message as an array
+        if (Array.isArray(res.message)) {
+          message = 'Validation failed';
+          errors = res.message;
+        } else {
+          message = res.message ?? exception.message;
+        }
+      } else {
+        message = exception.message;
+      }
+    }
 
     const errorResponse: ServiceResponseDto<null> = {
       state: false,
@@ -30,6 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message,
       statusCode: status,
       error: exception instanceof Error ? exception.message : 'Unknown error',
+      ...(errors ? { errors } : {}),
     };
 
     response.status(status).json(errorResponse);

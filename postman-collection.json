@@ -6,7 +6,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:6000",
+      "value": "http://localhost:5050",
       "type": "string"
     },
     {
@@ -319,6 +319,31 @@
               ]
             }
           }
+        },
+        {
+          "name": "Run Tenant Migration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/migrations/tenant/acme",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "migrations",
+                "tenant",
+                "acme"
+              ]
+            },
+            "description": "Run database migration to create/update tables for a tenant schema. Use this to add new manifest tables to existing tenants."
+          }
         }
       ]
     },
@@ -422,13 +447,19 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/companies/1",
+              "raw": "{{baseUrl}}/companies/:id",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "companies",
-                "1"
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
               ]
             }
           }
@@ -456,15 +487,65 @@
               "raw": "{\n  \"companyName\": \"Acme Corporation\",\n  \"telephone\": \"+233987654321\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/companies/1",
+              "raw": "{{baseUrl}}/companies/:id",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "companies",
-                "1"
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
               ]
             }
+          }
+        },
+        {
+          "name": "Upload Company Logo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "acme"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/companies/:id/logo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "companies",
+                ":id",
+                "logo"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Upload company logo image (multipart/form-data)"
           }
         },
         {
@@ -478,15 +559,99 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/companies/1",
+              "raw": "{{baseUrl}}/companies/:id",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "companies",
-                "1"
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
               ]
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Uploads",
+      "item": [
+        {
+          "name": "Upload Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "acme"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Image file to upload"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/uploads/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "image"
+              ]
+            },
+            "description": "Upload image to Cloudinary. Returns: { url, publicId, width, height }"
+          }
+        },
+        {
+          "name": "Delete Image",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "acme"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"publicId\": \"your-cloudinary-public-id\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/uploads/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "image"
+              ]
+            },
+            "description": "Delete image from Cloudinary by publicId"
           }
         }
       ]
@@ -657,161 +822,506 @@
       "name": "Manifests",
       "item": [
         {
-          "name": "Get All Manifests",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "acme"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/manifests?page=1&limit=10",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "manifests"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1",
-                  "description": "Page number (default: 1)"
-                },
-                {
-                  "key": "limit",
-                  "value": "10",
-                  "description": "Items per page (default: 10, max: 100)"
+          "name": "Master Manifests",
+          "item": [
+            {
+              "name": "Get All Master Manifests",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/master?page=1&limit=10&blNo=&vessel=&shippingLine=&containerNo=&shipper=",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "master"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "blNo",
+                      "value": "",
+                      "description": "Filter by BL number"
+                    },
+                    {
+                      "key": "vessel",
+                      "value": "",
+                      "description": "Filter by vessel name"
+                    },
+                    {
+                      "key": "shippingLine",
+                      "value": "",
+                      "description": "Filter by shipping line"
+                    },
+                    {
+                      "key": "containerNo",
+                      "value": "",
+                      "description": "Filter by container number"
+                    },
+                    {
+                      "key": "shipper",
+                      "value": "",
+                      "description": "Filter by shipper"
+                    }
+                  ]
                 }
-              ]
+              }
             },
-            "description": "Returns paginated manifests. Response: { data: { items: [...], meta: { total, page, limit, totalPages } } }"
-          }
-        },
-        {
-          "name": "Get Manifest by ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "acme"
+            {
+              "name": "Get Master Manifest by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/master/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "master",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
               }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/manifests/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "manifests",
-                "1"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Create Manifest",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "x-org-name",
-                "value": "acme"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Sample Manifest\",\n  \"description\": \"Test manifest data\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/manifests",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "manifests"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Manifest",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "x-org-name",
-                "value": "acme"
+            {
+              "name": "Create Master Manifest",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"blNo\": \"BL123456\",\n  \"containerNo\": \"CONT123456\",\n  \"vessel\": \"MAERSK VESSEL\",\n  \"voyage\": \"V001\",\n  \"arrivalDate\": \"2024-01-15\",\n  \"rotationDate\": \"2024-01-14\",\n  \"destination\": \"TEMA\",\n  \"portLoad\": \"SHANGHAI\",\n  \"shippingLine\": \"MAERSK\",\n  \"shipper\": \"ABC COMPANY\",\n  \"cntSize\": \"40FT\",\n  \"sealNo\": \"SEAL123\",\n  \"consignType\": \"FCL\",\n  \"rptNo\": \"RPT001\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/master",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "master"
+                  ]
+                }
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated Manifest\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/manifests/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "manifests",
-                "1"
-              ]
+            {
+              "name": "Update Master Manifest",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"vessel\": \"UPDATED VESSEL\",\n  \"arrivalDate\": \"2024-01-20\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/master/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "master",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Master Manifest",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/master/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "master",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
             }
-          }
+          ]
         },
         {
-          "name": "Delete Manifest",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "acme"
+          "name": "House Manifests",
+          "item": [
+            {
+              "name": "Get All House Manifests",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/house?page=1&limit=10&hblNo=&consignee=&masterManifestId=",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "house"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "hblNo",
+                      "value": "",
+                      "description": "Filter by HBL number"
+                    },
+                    {
+                      "key": "consignee",
+                      "value": "",
+                      "description": "Filter by consignee"
+                    },
+                    {
+                      "key": "masterManifestId",
+                      "value": "",
+                      "description": "Filter by master manifest ID"
+                    }
+                  ]
+                }
               }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/manifests/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "manifests",
-                "1"
-              ]
+            },
+            {
+              "name": "Get House Manifest by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/house/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "house",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create House Manifest",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"masterManifestId\": \"master-uuid-here\",\n  \"hblNo\": \"HBL123456\",\n  \"shipper\": \"EXPORTER NAME\",\n  \"consignee\": \"IMPORTER NAME\",\n  \"description\": \"ELECTRONICS\",\n  \"noPkg\": 50,\n  \"weight\": 2500,\n  \"totalCBM\": 15.5,\n  \"marksNum\": \"AS ADDRESSED\",\n  \"remark\": \"FRAGILE\",\n  \"hblType\": \"ORIGINAL\",\n  \"fileDate\": \"2024-01-15\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/house",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "house"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update House Manifest",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"weight\": 3000,\n  \"releaseStatus\": true,\n  \"releaseDate\": \"2024-01-20\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/house/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "house",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete House Manifest",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/house/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "house",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
             }
-          }
+          ]
+        },
+        {
+          "name": "Weight Charges",
+          "item": [
+            {
+              "name": "Get All Weight Charges",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/charges",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "charges"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create Weight Charge",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"weightFrom\": 0,\n  \"weightTo\": 1000,\n  \"charges\": 50.00\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/charges",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "charges"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Weight Charge",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "acme"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/manifests/charges/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "manifests",
+                    "charges",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            }
+          ]
         }
       ]
     }

@@ -11,8 +11,11 @@ import {
   ForbiddenException,
   Req,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
 import { CompanyService } from './company.service';
@@ -75,6 +78,38 @@ export class CompanyController {
       }
     }
     return this.companyService.update(id, data);
+  }
+
+  @Post(':id/logo')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('company_admin', 'system_admin')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: require('multer').diskStorage({
+        destination: './temp-uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `${uniqueSuffix}-${file.originalname}`);
+        },
+      }),
+    }),
+  )
+  async uploadLogo(
+    @Param('id', ParseUUIDPipe) id: string,
+    @UploadedFile() file: any,
+    @Req() req: any,
+  ): Promise<Company> {
+    console.log('Received file:', file);
+
+    if (req.user.role === 'company_admin') {
+      const company = await this.companyService.findOne(id);
+      const currentTenant = this.tenantContext.getTenant();
+      if (company.appSubdomain !== currentTenant) {
+        throw new ForbiddenException('Cannot modify other companies');
+      }
+    }
+    return this.companyService.uploadLogo(id, file);
   }
 
   @Delete(':id')

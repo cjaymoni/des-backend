@@ -9,6 +9,7 @@ import { Company } from './company.entity';
 import { TENANT_SCHEMA_SQL } from '../config/tenant-schema.sql';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
 import { TenantService } from '../tenant/tenant.service';
+import { UploadsService } from '../uploads/uploads.service';
 
 @Injectable()
 export class CompanyService {
@@ -17,6 +18,7 @@ export class CompanyService {
     private companyRepo: Repository<Company>,
     private dataSource: DataSource,
     private tenantService: TenantService,
+    private uploadsService: UploadsService,
   ) {}
 
   async create(data: Partial<Company>): Promise<Company> {
@@ -70,6 +72,15 @@ export class CompanyService {
   async update(id: string, data: Partial<Company>): Promise<Company> {
     const company = await this.findOne(id);
     Object.assign(company, data);
+    const updated = await this.companyRepo.save(company);
+    await this.tenantService.clearCache(company.appSubdomain);
+    return updated;
+  }
+
+  async uploadLogo(id: string, file: any): Promise<Company> {
+    const company = await this.findOne(id);
+    const result = await this.uploadsService.uploadImage(file, company.appSubdomain);
+    company.logo = result.data.url;
     const updated = await this.companyRepo.save(company);
     await this.tenantService.clearCache(company.appSubdomain);
     return updated;

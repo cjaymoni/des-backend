@@ -9,8 +9,13 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://acme.localhost:3000', /\.vercel\.app$/],
+    origin: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-org-name'],
+    exposedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   app.useGlobalPipes(new ValidationPipe());

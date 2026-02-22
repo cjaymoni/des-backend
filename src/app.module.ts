@@ -12,6 +12,7 @@ import { CompanyModule } from './companies/company.module';
 import { AdminModule } from './admin/admin.module';
 import { UsersModule } from './users/users.module';
 import { HealthModule } from './health/health.module';
+import { UploadsModule } from './uploads/uploads.module';
 import { WarmupInterceptor } from './health/warmup.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -35,6 +36,7 @@ import { getDatabaseConfig } from './config/database.config';
     ManifestsModule,
     AdminModule,
     UsersModule,
+    UploadsModule,
   ],
   providers: [
     {
@@ -67,7 +69,7 @@ export class AppModule implements NestModule {
 
     consumer
       .apply(TenantMiddleware)
-      .exclude('admin/*path', 'auth/*path', 'health', 'companies/*path')
+      .exclude('admin/*path', 'auth/*path', 'health', 'companies/*path', 'uploads/*path')
       .forRoutes('*');
   }
 }

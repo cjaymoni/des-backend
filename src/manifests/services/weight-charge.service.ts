@@ -7,18 +7,29 @@ export class WeightChargeService {
   constructor(private tenantService: TenantService) {}
 
   async findAll(): Promise<WeightCharge[]> {
-    const manager = await this.tenantService.getEntityManager();
-    return manager.find(WeightCharge, { order: { weightFrom: 'ASC' } });
+    return this.tenantService.withManager((manager) =>
+      manager.find(WeightCharge, { order: { weightFrom: 'ASC' } }),
+    );
   }
 
-  async create(weightFrom: number, weightTo: number, charges: number): Promise<WeightCharge> {
-    const manager = await this.tenantService.getEntityManager();
-    const charge = manager.create(WeightCharge, { weightFrom, weightTo, charges });
-    return manager.save(charge);
+  async create(
+    weightFrom: number,
+    weightTo: number,
+    charges: number,
+  ): Promise<WeightCharge> {
+    return this.tenantService.withManager(async (manager) => {
+      const charge = manager.create(WeightCharge, {
+        weightFrom,
+        weightTo,
+        charges,
+      });
+      return manager.save(charge);
+    });
   }
 
   async delete(id: string): Promise<void> {
-    const manager = await this.tenantService.getEntityManager();
-    await manager.delete(WeightCharge, id);
+    await this.tenantService.withManager((manager) =>
+      manager.delete(WeightCharge, id),
+    );
   }
 }

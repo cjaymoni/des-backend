@@ -38,18 +38,17 @@ export class AuthService {
     }
 
     // Tenant user registration (user or company_admin only)
-    const manager = await this.tenantService.getEntityManager();
-    const user = manager.create(User, {
-      email,
-      password: hashedPassword,
-      firstName,
-      lastName,
-      role: role === 'company_admin' ? 'company_admin' : 'user',
+    return this.tenantService.withManager(async (manager) => {
+      const user = manager.create(User, {
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        role: role === 'company_admin' ? 'company_admin' : 'user',
+      });
+      await manager.save(user);
+      return this.generateToken(user);
     });
-
-    await manager.save(user);
-
-    return this.generateToken(user);
   }
 
   async login(email: string, password: string): Promise<AuthResponseDto> {
@@ -70,20 +69,21 @@ export class AuthService {
     }
 
     // Try tenant user
-    const manager = await this.tenantService.getEntityManager();
-    const user = await manager.findOne(User, { where: { email } });
+    return this.tenantService.withManager(async (manager) => {
+      const user = await manager.findOne(User, { where: { email } });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
-    const currentLogin = new Date();
-    const previousLogin = user.lastLogin || currentLogin;
-    user.lastLogin = currentLogin;
-    await manager.save(user);
-    const response = this.generateToken(user);
-    response.user.lastLogin = previousLogin;
-    return response;
+      const currentLogin = new Date();
+      const previousLogin = user.lastLogin || currentLogin;
+      user.lastLogin = currentLogin;
+      await manager.save(user);
+      const response = this.generateToken(user);
+      response.user.lastLogin = previousLogin;
+      return response;
+    });
   }
 
   private generateToken(user: User): AuthResponseDto {
@@ -110,13 +110,11 @@ export class AuthService {
     }
 
     // Try tenant user
-    const manager = await this.tenantService.getEntityManager();
-    const user = await manager.findOne(User, { where: { id: userId } });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return this.tenantService.withManager(async (manager) => {
+      const user = await manager.findOne(User, { where: { id: userId } });
+      if (!user) throw new NotFoundException('User not found');
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    });
   }
 }

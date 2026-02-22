@@ -17,6 +17,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { unlinkSync } from 'fs';
+import { fileFilter } from '../../common/utils/file-filter.util';
 import { HouseManifestService } from '../services/house-manifest.service';
 import { UploadsService } from '../../uploads/uploads.service';
 import {
@@ -66,6 +67,7 @@ export class HouseManifestController {
         },
       }),
       limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter,
     }),
   )
   async create(
@@ -103,11 +105,46 @@ export class HouseManifestController {
   }
 
   @Put(':id')
-  update(
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      storage: diskStorage({
+        destination: './temp-uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter,
+    }),
+  )
+  async update(
     @Param('id') id: string,
     @Body() data: UpdateHouseManifestDto,
+    @UploadedFiles() files: Express.Multer.File[],
     @Req() req,
   ): Promise<HouseManifest> {
+    if (files && files.length > 0) {
+      const orgName = this.tenantContext.getTenant();
+      const attachments: { url: string; publicId: string; filename: string }[] = [];
+      try {
+        for (const file of files) {
+          const result = await this.uploadsService.uploadImage(file, orgName);
+          attachments.push({
+            url: result.data.url,
+            publicId: result.data.publicId,
+            filename: file.originalname,
+          });
+        }
+      } catch (err) {
+        for (const file of files) {
+          try { unlinkSync(file.path); } catch { /* already deleted */ }
+        }
+        throw err;
+      }
+      return this.service.addAttachments(id, attachments, req.user.id);
+    }
     return this.service.update(id, data, req.user.id);
   }
 

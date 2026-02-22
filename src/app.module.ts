@@ -2,7 +2,8 @@ import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
-import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_INTERCEPTOR, APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { TenantModule } from './tenant/tenant.module';
 import { TenantMiddleware } from './tenant/tenant.middleware';
 import { OptionalTenantMiddleware } from './tenant/optional-tenant.middleware';
@@ -24,6 +25,7 @@ import { getDatabaseConfig } from './config/database.config';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     CacheModule.register({ isGlobal: true, ttl: 0 }),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 60 }]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: getDatabaseConfig,
@@ -39,6 +41,10 @@ import { getDatabaseConfig } from './config/database.config';
     UploadsModule,
   ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: AuditInterceptor,
@@ -69,7 +75,7 @@ export class AppModule implements NestModule {
 
     consumer
       .apply(TenantMiddleware)
-      .exclude('admin/*path', 'auth/*path', 'health', 'companies/*path', 'uploads/*path')
+      .exclude('admin/*path', 'auth/*path', 'health', 'companies/*path')
       .forRoutes('*');
   }
 }

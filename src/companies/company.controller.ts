@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { fileFilter } from '../common/utils/file-filter.util';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
 import { CompanyService } from './company.service';
@@ -93,6 +94,7 @@ export class CompanyController {
           cb(null, `${uniqueSuffix}-${file.originalname}`);
         },
       }),
+      fileFilter,
     }),
   )
   async uploadLogo(

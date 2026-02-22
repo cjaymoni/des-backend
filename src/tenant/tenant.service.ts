@@ -8,8 +8,6 @@ import { Company } from '../companies/company.entity';
 
 @Injectable()
 export class TenantService {
-  private queryRunnerCache = new Map<string, EntityManager>();
-
   constructor(
     @InjectRepository(Company)
     private companyRepo: Repository<Company>,
@@ -18,18 +16,17 @@ export class TenantService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async getEntityManager(): Promise<EntityManager> {
+  /**
+   * Runs a callback with a fresh tenant-scoped EntityManager.
+   * The QueryRunner is always released after the callback, ensuring no connection leaks.
+   */
+  async withManager<T>(
+    callback: (manager: EntityManager) => Promise<T>,
+  ): Promise<T> {
     const subdomain = this.tenantContext.getTenant();
 
-    // Check manager cache
-    if (this.queryRunnerCache.has(subdomain)) {
-      return this.queryRunnerCache.get(subdomain)!;
-    }
-
-    // Validate company exists (cached)
     const cacheKey = `company:${subdomain}`;
     let company = await this.cacheManager.get<Company>(cacheKey);
-    
     if (!company) {
       const found = await this.companyRepo.findOne({
         where: { appSubdomain: subdomain },
@@ -44,16 +41,41 @@ export class TenantService {
 
     const schemaName = `tenant_${subdomain}`;
     const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
     await queryRunner.query(`SET search_path TO "${schemaName}"`);
-    const manager = queryRunner.manager;
-    this.queryRunnerCache.set(subdomain, manager);
-    return manager;
+    try {
+      return await callback(queryRunner.manager);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /** @deprecated Use withManager instead */
+  async getEntityManager(): Promise<EntityManager> {
+    const subdomain = this.tenantContext.getTenant();
+    const cacheKey = `company:${subdomain}`;
+    let company = await this.cacheManager.get<Company>(cacheKey);
+    if (!company) {
+      const found = await this.companyRepo.findOne({
+        where: { appSubdomain: subdomain },
+      });
+      if (!found)
+        throw new NotFoundException(
+          `Company with subdomain '${subdomain}' not found`,
+        );
+      company = found;
+      await this.cacheManager.set(cacheKey, company);
+    }
+    const schemaName = `tenant_${subdomain}`;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.query(`SET search_path TO "${schemaName}"`);
+    return queryRunner.manager;
   }
 
   async validateTenant(subdomain: string): Promise<Company> {
     const cacheKey = `company:${subdomain}`;
     let company = await this.cacheManager.get<Company>(cacheKey);
-    
     if (!company) {
       const found = await this.companyRepo.findOne({
         where: { appSubdomain: subdomain },
@@ -71,9 +93,9 @@ export class TenantService {
   async clearCache(subdomain?: string) {
     if (subdomain) {
       await this.cacheManager.del(`company:${subdomain}`);
-      this.queryRunnerCache.delete(subdomain);
     } else {
-      this.queryRunnerCache.clear();
+      // cache-manager v5 does not expose reset(); deletion must be per-key
+      // Callers should pass a subdomain for targeted invalidation
     }
   }
 }

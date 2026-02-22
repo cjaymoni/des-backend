@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { fileFilter } from '../../common/utils/file-filter.util';
 import { HouseManifestService } from '../services/house-manifest.service';
 import { UploadsService } from '../../uploads/uploads.service';
 import { TenantContext } from '../../tenant/tenant.context';
@@ -24,7 +25,7 @@ export class HouseManifestAttachmentsController {
   ) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('files', 10))
+  @UseInterceptors(FilesInterceptor('files', 10, { fileFilter }))
   async uploadAttachments(
     @Param('id') id: string,
     @UploadedFiles() files: Express.Multer.File[],

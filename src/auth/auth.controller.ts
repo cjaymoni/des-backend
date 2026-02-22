@@ -1,5 +1,15 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Get, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  Get,
+  Request,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle } from '@nestjs/throttler';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
 import { AuthService } from './auth.service';
@@ -24,7 +34,9 @@ export class AuthController {
   @Post('register-system-admin')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('system_admin')
-  async registerSystemAdmin(@Body() body: Omit<RegisterDto, 'role'>): Promise<AuthResponseDto> {
+  async registerSystemAdmin(
+    @Body() body: Omit<RegisterDto, 'role'>,
+  ): Promise<AuthResponseDto> {
     return this.authService.register(
       body.email,
       body.password,
@@ -35,6 +47,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @HttpCode(HttpStatus.OK)
   async login(@Body() body: LoginDto): Promise<AuthResponseDto> {
     return this.authService.login(body.email, body.password);
@@ -43,6 +56,6 @@ export class AuthController {
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
   async getCurrentUser(@Request() req) {
-    return this.authService.getUserById(req.user.userId);
+    return this.authService.getUserById(req.user.id);
   }
 }

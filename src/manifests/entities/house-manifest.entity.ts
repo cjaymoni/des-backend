@@ -38,10 +38,28 @@ export class HouseManifest {
   @Column({ type: 'int', default: 0 })
   noPkg: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   weight: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   totalCBM: number;
 
   @Column({ length: 225, nullable: true })
@@ -53,7 +71,16 @@ export class HouseManifest {
   @Column({ length: 100, nullable: true })
   remark: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   handCharge: number;
 
   @Column({ length: 50, nullable: true })

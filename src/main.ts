@@ -12,7 +12,27 @@ async function bootstrap() {
   app.use(helmet());
 
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      const allowedPatterns: RegExp[] = [
+        /^https?:\/\/([a-z0-9-]+\.)*optimumitsolutiongh\.com$/,
+        /^http:\/\/localhost:3000$/,
+        ...(process.env.ALLOWED_ORIGINS?.split(',').map(
+          (o: string) =>
+            new RegExp(`^${o.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
+        ) || []),
+      ];
+
+      if (allowedPatterns.some((pattern) => pattern.test(origin))) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-org-name'],
     exposedHeaders: ['Content-Type', 'Authorization'],
@@ -21,10 +41,12 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+    }),
+  );
 
   const port = process.env.PORT || 5059;
   await app.listen(port, '0.0.0.0');

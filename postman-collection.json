@@ -1324,6 +1324,332 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Importer Exporters",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/importer-exporters?page=1&limit=10&ieName=&code=",
+              "host": ["{{baseUrl}}"],
+              "path": ["importer-exporters"],
+              "query": [
+                {"key": "page","value": "1"},
+                {"key": "limit","value": "10"},
+                {"key": "ieName","value": "","description": "Filter by name (partial match)"},
+                {"key": "code","value": "","description": "Filter by code (exact match)"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/importer-exporters/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["importer-exporters",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"IE001\",\n  \"ieName\": \"ACME IMPORTS LTD\",\n  \"address\": \"123 Trade Street, Accra\",\n  \"telephone\": \"+233201234567\",\n  \"email\": \"imports@acme.com\",\n  \"tin\": \"C0012345678\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/importer-exporters","host": ["{{baseUrl}}"],"path": ["importer-exporters"]}
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ieName\": \"ACME IMPORTS & EXPORTS LTD\",\n  \"telephone\": \"+233209876543\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/importer-exporters/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["importer-exporters",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/importer-exporters/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["importer-exporters",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Manifest Jobs",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/manifest-jobs?page=1&limit=10&jobNo=&hblNo=&consigneeDetails=&custRefNo=&houseManifestId=&paidStatus=",
+              "host": ["{{baseUrl}}"],
+              "path": ["manifest-jobs"],
+              "query": [
+                {"key": "page","value": "1"},
+                {"key": "limit","value": "10"},
+                {"key": "jobNo","value": ""},
+                {"key": "hblNo","value": ""},
+                {"key": "consigneeDetails","value": ""},
+                {"key": "custRefNo","value": ""},
+                {"key": "houseManifestId","value": ""},
+                {"key": "paidStatus","value": "","description": "true or false"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/manifest-jobs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["manifest-jobs",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobNo\": \"MAN-2024-001\",\n  \"hblNo\": \"HBL123456\",\n  \"houseManifestId\": \"house-manifest-uuid-here\",\n  \"consigneeDetails\": \"IMPORTER NAME\",\n  \"noPkg\": 50,\n  \"custRefNo\": \"REF001\",\n  \"handCharge\": 500.00,\n  \"netHandCharge\": 446.43,\n  \"grandHandCharge\": 500.00,\n  \"vatAmt\": 37.50,\n  \"nhilAmt\": 11.25,\n  \"gfdAmt\": 5.00,\n  \"covidAmt\": 0,\n  \"totalCBM\": 15.5,\n  \"weight\": 2500,\n  \"fileDate\": \"2024-01-15\",\n  \"agentName\": \"AGENT NAME\",\n  \"agentTel\": \"+233201234567\",\n  \"hblType\": \"ORIGINAL\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/manifest-jobs","host": ["{{baseUrl}}"],"path": ["manifest-jobs"]}
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paidStatus\": true,\n  \"paidDate\": \"2024-01-20\",\n  \"releaseStatus\": true,\n  \"releaseDate\": \"2024-01-21\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/manifest-jobs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["manifest-jobs",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/manifest-jobs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["manifest-jobs",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Income Expenditures",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/income-expenditures?page=1&limit=10&transRemarks=&transType=&consignee=&hbl=&strMonth=&dateYear=",
+              "host": ["{{baseUrl}}"],
+              "path": ["income-expenditures"],
+              "query": [
+                {"key": "page","value": "1"},
+                {"key": "limit","value": "10"},
+                {"key": "transRemarks","value": "","description": "Filter by job number"},
+                {"key": "transType","value": "","description": "INCOME or EXPENSE"},
+                {"key": "consignee","value": ""},
+                {"key": "hbl","value": ""},
+                {"key": "strMonth","value": "","description": "e.g. JAN"},
+                {"key": "dateYear","value": "","description": "e.g. 2024"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/income-expenditures/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["income-expenditures",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transRemarks\": \"MAN-2024-001\",\n  \"transType\": \"INCOME\",\n  \"purposeCode\": \"1\",\n  \"detailCode\": \"2\",\n  \"incomeAmt\": 500.00,\n  \"netIncome\": 446.43,\n  \"netIncVat\": 53.57,\n  \"vatNhilStatus\": \"1\",\n  \"consignee\": \"IMPORTER NAME\",\n  \"hbl\": \"HBL123456\",\n  \"agentDetails\": \"AGENT NAME\",\n  \"transactionDate\": \"2024-01-20\",\n  \"strMonth\": \"JAN\",\n  \"dateYear\": \"2024\",\n  \"transBy\": \"admin\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/income-expenditures","host": ["{{baseUrl}}"],"path": ["income-expenditures"]}
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"incomeAmt\": 600.00,\n  \"netIncome\": 535.71,\n  \"netIncVat\": 64.29\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/income-expenditures/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["income-expenditures",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/income-expenditures/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["income-expenditures",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/jobs?page=1&limit=10&jobNo=&ie=&custRefNo=&blNo=&gcnetJob=&strMonth=&strYear=&paidStatus=",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs"],
+              "query": [
+                {"key": "page","value": "1"},
+                {"key": "limit","value": "10"},
+                {"key": "jobNo","value": ""},
+                {"key": "ie","value": "","description": "Importer/Exporter name"},
+                {"key": "custRefNo","value": ""},
+                {"key": "blNo","value": ""},
+                {"key": "gcnetJob","value": ""},
+                {"key": "strMonth","value": "","description": "e.g. JAN"},
+                {"key": "strYear","value": "","description": "e.g. 2024"},
+                {"key": "paidStatus","value": "","description": "true or false"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobNo\": \"JOB-2024-001\",\n  \"ie\": \"ACME IMPORTS LTD\",\n  \"custRefNo\": \"REF001\",\n  \"vesselName\": \"MAERSK VESSEL\",\n  \"vesselEta\": \"2024-01-15\",\n  \"invoiceNo\": \"INV-001\",\n  \"totDuty\": 15000.00,\n  \"qtyDescription\": \"50 CARTONS OF ELECTRONICS\",\n  \"destination\": \"TEMA\",\n  \"fileDate\": \"2024-01-10\",\n  \"blNo\": \"BL123456\",\n  \"transType\": \"IMPORT\",\n  \"agencyFee\": 1200.00,\n  \"jobStatus\": \"ACTIVE\",\n  \"jobFinanceeType\": \"CASH\",\n  \"jobFinanceeName\": \"ACME IMPORTS LTD\",\n  \"jobFinanceeAmount\": 15000.00,\n  \"vatNhilStatus\": \"1\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/jobs","host": ["{{baseUrl}}"],"path": ["jobs"]}
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobStatus\": \"CLEARED\",\n  \"boeNo\": \"BOE-2024-001\",\n  \"paidStatus\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs",":id"],
+              "variable": [{"key": "id","value": ""}]
+            }
+          }
+        }
+      ]
     }
   ]
 }

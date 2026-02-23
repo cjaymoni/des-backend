@@ -25,13 +25,20 @@ import {
   UpdateHouseManifestDto,
   SearchHouseManifestDto,
 } from '../dto/house/house-manifest.dto';
-import {
-  PaginationDto,
-  PaginatedResult,
-} from '../../common/dto/pagination.dto';
+import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
 import { HouseManifest } from '../entities/house-manifest.entity';
-
 import { TenantContext } from '../../tenant/tenant.context';
+
+const multerOptions = {
+  storage: diskStorage({
+    destination: './temp-uploads',
+    filename: (req, file, cb) => {
+      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`);
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter,
+};
 
 @Controller('manifests/house')
 @UseGuards(AuthGuard('jwt'))
@@ -56,92 +63,28 @@ export class HouseManifestController {
   }
 
   @Post()
-  @UseInterceptors(
-    FilesInterceptor('files', 10, {
-      storage: diskStorage({
-        destination: './temp-uploads',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
-        },
-      }),
-      limits: { fileSize: 5 * 1024 * 1024 },
-      fileFilter,
-    }),
-  )
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions))
   async create(
     @Body() data: CreateHouseManifestDto,
     @UploadedFiles() files: Express.Multer.File[],
     @Req() req: { user: { id: string } },
   ): Promise<HouseManifest> {
-    let attachments: { url: string; publicId: string; filename: string }[] = [];
-
-    if (files && files.length > 0) {
-      const orgName = this.tenantContext.getTenant();
-      try {
-        for (const file of files) {
-          const result = await this.uploadsService.uploadImage(file, orgName);
-          attachments.push({
-            url: result.data.url,
-            publicId: result.data.publicId,
-            filename: file.originalname,
-          });
-        }
-      } catch (err) {
-        // Clean up any temp files not yet processed by uploadImage
-        for (const file of files) {
-          try {
-            unlinkSync(file.path);
-          } catch {
-            /* already deleted */
-          }
-        }
-        throw err;
-      }
-    }
-
+    const attachments = await this.uploadFiles(files);
     return this.service.create({ ...data, attachments }, req.user.id);
   }
 
   @Put(':id')
-  @UseInterceptors(
-    FilesInterceptor('files', 10, {
-      storage: diskStorage({
-        destination: './temp-uploads',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
-        },
-      }),
-      limits: { fileSize: 5 * 1024 * 1024 },
-      fileFilter,
-    }),
-  )
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions))
   async update(
     @Param('id') id: string,
     @Body() data: UpdateHouseManifestDto,
     @UploadedFiles() files: Express.Multer.File[],
-    @Req() req,
+    @Req() req: { user: { id: string } },
   ): Promise<HouseManifest> {
     if (files && files.length > 0) {
-      const orgName = this.tenantContext.getTenant();
-      const attachments: { url: string; publicId: string; filename: string }[] = [];
-      try {
-        for (const file of files) {
-          const result = await this.uploadsService.uploadImage(file, orgName);
-          attachments.push({
-            url: result.data.url,
-            publicId: result.data.publicId,
-            filename: file.originalname,
-          });
-        }
-      } catch (err) {
-        for (const file of files) {
-          try { unlinkSync(file.path); } catch { /* already deleted */ }
-        }
-        throw err;
+      const attachments = await this.uploadFiles(files);
+      if (Object.keys(data).length > 0) {
+        await this.service.update(id, data, req.user.id);
       }
       return this.service.addAttachments(id, attachments, req.user.id);
     }
@@ -151,5 +94,23 @@ export class HouseManifestController {
   @Delete(':id')
   delete(@Param('id') id: string): Promise<void> {
     return this.service.delete(id);
+  }
+
+  private async uploadFiles(files: Express.Multer.File[]): Promise<{ url: string; publicId: string; filename: string }[]> {
+    if (!files || files.length === 0) return [];
+    const orgName = this.tenantContext.getTenant();
+    const attachments: { url: string; publicId: string; filename: string }[] = [];
+    try {
+      for (const file of files) {
+        const result = await this.uploadsService.uploadImage(file, orgName);
+        attachments.push({ url: result.data.url, publicId: result.data.publicId, filename: file.originalname });
+      }
+    } catch (err) {
+      for (const file of files) {
+        try { unlinkSync(file.path); } catch { /* already deleted */ }
+      }
+      throw new Error(typeof err === 'object' ? (err as any).message ?? JSON.stringify(err) : String(err));
+    }
+    return attachments;
   }
 }

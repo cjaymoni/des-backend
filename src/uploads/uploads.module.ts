@@ -18,7 +18,7 @@ import { TenantModule } from '../tenant/tenant.module';
           cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
         },
       }),
-      limits: { fileSize: 5 * 1024 * 1024 },
+      limits: { fileSize: 10 * 1024 * 1024 },
     }),
   ],
   controllers: [UploadsController],

@@ -6,6 +6,9 @@ import { HouseManifest } from '../manifests/entities/house-manifest.entity';
 import { WeightCharge } from '../manifests/entities/weight-charge.entity';
 import { Job } from '../jobs/job.entity';
 import { Company } from '../companies/company.entity';
+import { ImporterExporter } from '../importer-exporter/importer-exporter.entity';
+import { ManifestJob } from '../manifest-jobs/manifest-job.entity';
+import { IncomeExpenditure } from '../income-expenditure/income-expenditure.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -16,7 +19,7 @@ export const getDatabaseConfig = (
   username: configService.get('DB_USERNAME'),
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
-  entities: [User, MasterManifest, HouseManifest, WeightCharge, Job, Company],
+  entities: [User, MasterManifest, HouseManifest, WeightCharge, Job, Company, ImporterExporter, ManifestJob, IncomeExpenditure],
   synchronize: false,
   // schema: 'public',
   ssl: { rejectUnauthorized: false },

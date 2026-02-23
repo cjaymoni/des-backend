@@ -21,6 +21,9 @@ export class UploadsService {
       const result = await cloudinary.uploader.upload(file.path, {
         folder: `des/${orgName}`,
         resource_type: 'auto',
+        type: 'upload',
+        access_control: [{ access_type: 'anonymous' }],
+        chunk_size: 10 * 1024 * 1024,
       });
 
       return {
@@ -29,6 +32,7 @@ export class UploadsService {
           url: result.secure_url,
           publicId: result.public_id,
           format: result.format,
+          resourceType: result.resource_type, // 'image' | 'raw' | 'video'
           width: result.width,
           height: result.height,
         },
@@ -42,10 +46,19 @@ export class UploadsService {
     }
   }
 
-  async deleteImage(publicId: string) {
-    console.log('Attempting to delete from Cloudinary:', publicId);
+  async deleteImage(
+    publicId: string,
+    resourceType: 'image' | 'raw' | 'video' = 'image',
+  ) {
+    console.log(
+      'Attempting to delete from Cloudinary:',
+      publicId,
+      'type:',
+      resourceType,
+    );
     const result = await cloudinary.uploader.destroy(publicId, {
       invalidate: true,
+      resource_type: resourceType,
     });
     console.log('Cloudinary delete response:', result);
     return { success: true, result };

@@ -9,6 +9,8 @@ import { Company } from '../companies/company.entity';
 import { ImporterExporter } from '../importer-exporter/importer-exporter.entity';
 import { ManifestJob } from '../manifest-jobs/manifest-job.entity';
 import { IncomeExpenditure } from '../income-expenditure/income-expenditure.entity';
+import { BankAccount } from 'src/bank-transactions/bank-account.entity';
+import { BankTransaction } from 'src/bank-transactions/bank-transaction.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -19,7 +21,19 @@ export const getDatabaseConfig = (
   username: configService.get('DB_USERNAME'),
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
-  entities: [User, MasterManifest, HouseManifest, WeightCharge, Job, Company, ImporterExporter, ManifestJob, IncomeExpenditure],
+  entities: [
+    User,
+    MasterManifest,
+    HouseManifest,
+    WeightCharge,
+    Job,
+    Company,
+    ImporterExporter,
+    ManifestJob,
+    IncomeExpenditure,
+    BankAccount,
+    BankTransaction,
+  ],
   synchronize: false,
   // schema: 'public',
   ssl: { rejectUnauthorized: false },

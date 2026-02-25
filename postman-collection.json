@@ -1650,6 +1650,179 @@
           }
         }
       ]
+    },
+    {
+      "name": "Bank Transactions",
+      "item": [
+        {
+          "name": "Accounts",
+          "item": [
+            {
+              "name": "Get All Accounts",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+                "url": {"raw": "{{baseUrl}}/bank-transactions/accounts","host": ["{{baseUrl}}"],"path": ["bank-transactions","accounts"]}
+              }
+            },
+            {
+              "name": "Get Account by ID",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/accounts/:id",
+                  "host": ["{{baseUrl}}"],"path": ["bank-transactions","accounts",":id"],
+                  "variable": [{"key": "id","value": ""}]
+                }
+              }
+            },
+            {
+              "name": "Get Account Summary",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/accounts/:acctNumber/summary",
+                  "host": ["{{baseUrl}}"],"path": ["bank-transactions","accounts",":acctNumber","summary"],
+                  "variable": [{"key": "acctNumber","value": "1234567890"}]
+                },
+                "description": "Returns current balance and total bank charges for the account"
+              }
+            },
+            {
+              "name": "Create Account",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bankCode\": \"GCB\",\n  \"acctNumber\": \"1234567890\",\n  \"branchName\": \"ACCRA MAIN\",\n  \"acctType\": \"CURRENT\",\n  \"currencyCode\": \"GHS\",\n  \"balance\": 0,\n  \"address\": \"High Street, Accra\",\n  \"bankTel\": \"+233302123456\",\n  \"email\": \"gcb@gcb.com.gh\"\n}"
+                },
+                "url": {"raw": "{{baseUrl}}/bank-transactions/accounts","host": ["{{baseUrl}}"],"path": ["bank-transactions","accounts"]}
+              }
+            },
+            {
+              "name": "Update Account",
+              "request": {
+                "method": "PUT",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"branchName\": \"TEMA BRANCH\",\n  \"bankTel\": \"+233303456789\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/accounts/:id",
+                  "host": ["{{baseUrl}}"],"path": ["bank-transactions","accounts",":id"],
+                  "variable": [{"key": "id","value": ""}]
+                }
+              }
+            },
+            {
+              "name": "Delete Account",
+              "request": {
+                "method": "DELETE",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/accounts/:id",
+                  "host": ["{{baseUrl}}"],"path": ["bank-transactions","accounts",":id"],
+                  "variable": [{"key": "id","value": ""}]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Transactions",
+          "item": [
+            {
+              "name": "Get All Transactions",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions?page=1&limit=10&bankCode=&acctNumber=&currencyCode=&strYear=",
+                  "host": ["{{baseUrl}}"],"path": ["bank-transactions"],
+                  "query": [
+                    {"key": "page","value": "1"},
+                    {"key": "limit","value": "10"},
+                    {"key": "bankCode","value": "","description": "Filter by bank code"},
+                    {"key": "acctNumber","value": "","description": "Filter by account number"},
+                    {"key": "currencyCode","value": "","description": "Filter by currency e.g. GHS, USD"},
+                    {"key": "strYear","value": "","description": "Filter by year e.g. 2024"}
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Transaction by ID",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/:id",
+                  "host": ["{{baseUrl}}"],"path": ["bank-transactions",":id"],
+                  "variable": [{"key": "id","value": ""}]
+                }
+              }
+            },
+            {
+              "name": "Create Deposit",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bankCode\": \"GCB\",\n  \"acctNumber\": \"1234567890\",\n  \"transPurpose\": \"CLIENT PAYMENT\",\n  \"chequeNo\": \"CHQ-001\",\n  \"currencyCode\": \"GHS\",\n  \"transactionType\": \"Deposit\",\n  \"transactionAmount\": 5000.00,\n  \"bankCharges\": 10.00,\n  \"transactionDate\": \"2024-01-20\",\n  \"transactionBy\": \"John Doe\",\n  \"remarks\": \"Payment for services\"\n}"
+                },
+                "url": {"raw": "{{baseUrl}}/bank-transactions","host": ["{{baseUrl}}"],"path": ["bank-transactions"]},
+                "description": "Creates a deposit. Account balance is automatically increased."
+              }
+            },
+            {
+              "name": "Create Withdrawal",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bankCode\": \"GCB\",\n  \"acctNumber\": \"1234567890\",\n  \"transPurpose\": \"OFFICE EXPENSES\",\n  \"chequeNo\": \"CHQ-002\",\n  \"currencyCode\": \"GHS\",\n  \"transactionType\": \"Withdrawal\",\n  \"transactionAmount\": 1500.00,\n  \"bankCharges\": 5.00,\n  \"transactionDate\": \"2024-01-21\",\n  \"transactionBy\": \"Jane Doe\",\n  \"remarks\": \"Monthly office expenses\"\n}"
+                },
+                "url": {"raw": "{{baseUrl}}/bank-transactions","host": ["{{baseUrl}}"],"path": ["bank-transactions"]},
+                "description": "Creates a withdrawal. Account balance is automatically decreased."
+              }
+            },
+            {
+              "name": "Update Transaction",
+              "request": {
+                "method": "PUT",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "Content-Type","value": "application/json"},{"key": "x-org-name","value": "acme"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"remarks\": \"Updated remarks\",\n  \"bankCharges\": 15.00\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/:id",
+                  "host": ["{{baseUrl}}"],"path": ["bank-transactions",":id"],
+                  "variable": [{"key": "id","value": ""}]
+                }
+              }
+            },
+            {
+              "name": "Delete Transaction",
+              "request": {
+                "method": "DELETE",
+                "header": [{"key": "Authorization","value": "Bearer {{token}}"},{"key": "x-org-name","value": "acme"}],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/:id",
+                  "host": ["{{baseUrl}}"],"path": ["bank-transactions",":id"],
+                  "variable": [{"key": "id","value": ""}]
+                }
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

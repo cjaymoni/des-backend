@@ -18,6 +18,7 @@ import { ImporterExporterModule } from './importer-exporter/importer-exporter.mo
 import { ManifestJobModule } from './manifest-jobs/manifest-job.module';
 import { IncomeExpenditureModule } from './income-expenditure/income-expenditure.module';
 import { JobsModule } from './jobs/jobs.module';
+import { BankTransactionsModule } from './bank-transactions/bank-transactions.module';
 import { WarmupInterceptor } from './health/warmup.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -47,6 +48,7 @@ import { getDatabaseConfig } from './config/database.config';
     ManifestJobModule,
     IncomeExpenditureModule,
     JobsModule,
+    BankTransactionsModule,
   ],
   providers: [
     {

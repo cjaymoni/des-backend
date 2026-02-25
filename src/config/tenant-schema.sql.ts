@@ -234,6 +234,54 @@ CREATE INDEX IF NOT EXISTS "idx_jobs_jobNo" ON "jobs" ("jobNo");
 CREATE INDEX IF NOT EXISTS "idx_jobs_ie" ON "jobs" ("ie");
 CREATE INDEX IF NOT EXISTS "idx_jobs_blNo" ON "jobs" ("blNo");
 
+-- Bank Accounts table
+CREATE TABLE IF NOT EXISTS "bank_accounts" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "bankCode" varchar(50) NOT NULL,
+  "acctNumber" varchar(20) NOT NULL UNIQUE,
+  "branchName" varchar(50),
+  "acctType" varchar(20) NOT NULL,
+  "currencyCode" varchar(20) NOT NULL,
+  "balance" decimal(14,2) NOT NULL DEFAULT 0,
+  "address" varchar(255),
+  "bankTel" varchar(30),
+  "email" varchar(100),
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+CREATE INDEX IF NOT EXISTS "idx_bank_accounts_bankCode" ON "bank_accounts" ("bankCode");
+
+-- Bank Transactions table
+CREATE TABLE IF NOT EXISTS "bank_transactions" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "bankCode" varchar(50) NOT NULL,
+  "acctNumber" varchar(20) NOT NULL,
+  "transPurpose" varchar(50) NOT NULL,
+  "chequeNo" varchar(50),
+  "currencyCode" varchar(20),
+  "transactionType" varchar(20) NOT NULL,
+  "creditAmt" decimal(12,2) NOT NULL DEFAULT 0,
+  "debitAmt" decimal(12,2) NOT NULL DEFAULT 0,
+  "bankCharges" decimal(12,2) NOT NULL DEFAULT 0,
+  "balance" decimal(14,2) NOT NULL DEFAULT 0,
+  "transactionDate" date NOT NULL,
+  "transactionBy" varchar(50) NOT NULL,
+  "remarks" text,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+CREATE INDEX IF NOT EXISTS "idx_bank_transactions_bankCode" ON "bank_transactions" ("bankCode");
+CREATE INDEX IF NOT EXISTS "idx_bank_transactions_acctNumber" ON "bank_transactions" ("acctNumber");
+CREATE INDEX IF NOT EXISTS "idx_bank_transactions_transactionDate" ON "bank_transactions" ("transactionDate");
+
 -- Migrate existing jobs table from stub schema to full schema
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='jobs' AND column_name='jobNumber') THEN

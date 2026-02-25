@@ -15,6 +15,22 @@ export class AuthService {
     @InjectConnection() private connection: Connection,
   ) {}
 
+  private async findPublicUser(field: 'email' | 'id', value: string): Promise<User | null> {
+    const col = field === 'email' ? 'email' : 'id';
+    const rows: User[] = await this.connection.query(
+      `SELECT * FROM public.users WHERE "${col}" = $1 LIMIT 1`,
+      [value],
+    );
+    return rows[0] ?? null;
+  }
+
+  private async savePublicUser(user: User): Promise<void> {
+    await this.connection.query(
+      `UPDATE public.users SET "lastLogin" = $1 WHERE id = $2`,
+      [user.lastLogin, user.id],
+    );
+  }
+
   async register(
     email: string,
     password: string,
@@ -24,20 +40,16 @@ export class AuthService {
   ): Promise<AuthResponseDto> {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // System admin registration (public schema) - only via internal method
     if (role === 'system_admin') {
-      const user = this.connection.getRepository(User).create({
-        email,
-        password: hashedPassword,
-        firstName,
-        lastName,
-        role: 'system_admin',
-      });
-      await this.connection.getRepository(User).save(user);
-      return this.generateToken(user);
+      const rows: User[] = await this.connection.query(
+        `INSERT INTO public.users (id, email, password, "firstName", "lastName", role, "isActive", "createdAt", "updatedAt")
+         VALUES (gen_random_uuid(), $1, $2, $3, $4, 'system_admin', true, NOW(), NOW())
+         RETURNING *`,
+        [email, hashedPassword, firstName, lastName],
+      );
+      return this.generateToken(rows[0]);
     }
 
-    // Tenant user registration (user or company_admin only)
     return this.tenantService.withManager(async (manager) => {
       const user = manager.create(User, {
         email,
@@ -52,23 +64,21 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<AuthResponseDto> {
-    // Try system admin first (public schema)
-    const systemUser = await this.connection.getRepository(User).findOne({ where: { email } });
-    
+    const systemUser = await this.findPublicUser('email', email);
+
     if (systemUser && systemUser.role === 'system_admin') {
-      if (await bcrypt.compare(password, systemUser.password)) {
-        const currentLogin = new Date();
-        const previousLogin = systemUser.lastLogin || currentLogin;
-        systemUser.lastLogin = currentLogin;
-        await this.connection.getRepository(User).save(systemUser);
-        const response = this.generateToken(systemUser);
-        response.user.lastLogin = previousLogin;
-        return response;
+      if (!(await bcrypt.compare(password, systemUser.password))) {
+        throw new UnauthorizedException('Invalid credentials');
       }
-      throw new UnauthorizedException('Invalid credentials');
+      const currentLogin = new Date();
+      const previousLogin = systemUser.lastLogin || currentLogin;
+      systemUser.lastLogin = currentLogin;
+      await this.savePublicUser(systemUser);
+      const response = this.generateToken(systemUser);
+      response.user.lastLogin = previousLogin;
+      return response;
     }
 
-    // Try tenant user
     return this.tenantService.withManager(async (manager) => {
       const user = await manager.findOne(User, { where: { email } });
 
@@ -102,14 +112,12 @@ export class AuthService {
   }
 
   async getUserById(userId: string) {
-    // Try system admin first (public schema)
-    const systemUser = await this.connection.getRepository(User).findOne({ where: { id: userId } });
+    const systemUser = await this.findPublicUser('id', userId);
     if (systemUser && systemUser.role === 'system_admin') {
       const { password, ...userWithoutPassword } = systemUser;
       return userWithoutPassword;
     }
 
-    // Try tenant user
     return this.tenantService.withManager(async (manager) => {
       const user = await manager.findOne(User, { where: { id: userId } });
       if (!user) throw new NotFoundException('User not found');

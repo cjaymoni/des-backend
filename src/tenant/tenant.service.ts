@@ -46,6 +46,7 @@ export class TenantService {
     try {
       return await callback(queryRunner.manager);
     } finally {
+      await queryRunner.query(`SET search_path TO public`);
       await queryRunner.release();
     }
   }

@@ -6,7 +6,9 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   Index,
+  OneToMany,
 } from 'typeorm';
+import { CifValue } from '../cif-values/cif-value.entity';
 
 @Entity('jobs')
 @Index(['jobNo'], { unique: true })
@@ -128,6 +130,9 @@ export class Job {
 
   @Column({ default: false })
   paidStatus: boolean;
+
+  @OneToMany(() => CifValue, (c) => c.job)
+  cifValues: CifValue[];
 
   @CreateDateColumn()
   createdAt: Date;

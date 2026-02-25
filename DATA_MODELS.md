@@ -19,6 +19,7 @@ src/
 ├── importer-exporter/      # Consignee/shipper master data
 ├── income-expenditure/     # Financial transactions linked to jobs
 ├── bank-transactions/      # Bank accounts & standalone bank transactions
+├── cif-values/             # CIF settings & per-shipment CIF line items
 ├── uploads/                # File attachment handling
 ├── admin/                  # System admin & migrations
 └── health/                 # Health check endpoint
@@ -73,8 +74,15 @@ src/
     │                                             creditAmt, debitAmt, bankCharges
     │                                             balance (running total)
     │
-    └── [WeightCharge]  (lookup table — no FK)
-            weightFrom, weightTo, charges
+    ├── [WeightCharge]  (lookup table — no FK)
+    │       weightFrom, weightTo, charges
+    │
+    ├── [CifSettings]  (single-row global rates — no FK)
+    │       fobValue, frtValue, insValue
+    │
+    └── [CifValue]  (per-shipment line items — logical link to Job)
+            refNo (= jobNo), cifValue
+            fobValue, fobP, frtValue, frtP, insValue, insP
 ```
 
 ---
@@ -88,6 +96,7 @@ src/
 | `Job` | `IncomeExpenditure` | Logical (no FK) | `income_expenditures.transRemarks = jobs.jobNo` |
 | `Job` | `ImporterExporter` | Logical (no FK) | `jobs.ie` matches `importer_exporters.ieName` |
 | `BankAccount` | `BankTransaction` | One-to-Many | `bank_transactions.acctNumber` |
+| `CifValue` | `Job` | Logical (no FK) | `cif_values.refNo = jobs.jobNo` |
 | `Company` | all tenant tables | Logical | `company.appSubdomain` → schema name |
 
 > **Logical links** are intentional — they mirror the VB6 design where cross-table references were done by matching string values rather than foreign keys. This avoids cascade complexity and keeps modules independently deployable.
@@ -136,6 +145,13 @@ Create BankTransaction (Deposit/Withdrawal, amount)
         Withdrawal: balance = balance - transactionAmount
 ```
 
+### 4. CIF Calculation
+```
+frtValue  = fobValue × frtP / 100
+insValue  = (fobValue + frtValue) × insP / 100
+cifValue  = fobValue + frtValue + insValue
+```
+
 ---
 
 ## Schema per Entity
@@ -153,6 +169,8 @@ Create BankTransaction (Deposit/Withdrawal, amount)
 | `income_expenditures` | `tenant_{org}` | Financial records linked to jobs |
 | `bank_accounts` | `tenant_{org}` | Bank account master |
 | `bank_transactions` | `tenant_{org}` | Deposits & withdrawals |
+| `cif_settings` | `tenant_{org}` | Single-row global FOB/freight/insurance rates |
+| `cif_values` | `tenant_{org}` | Per-shipment CIF line items, logical link to jobs |
 
 ---
 
@@ -172,6 +190,8 @@ Create BankTransaction (Deposit/Withdrawal, amount)
 | Income/Expenditure | `GET/POST/PUT/DELETE /income-expenditure` | JWT |
 | Bank Accounts | `GET/POST/PUT/DELETE /bank-transactions/accounts` | JWT |
 | Bank Transactions | `GET/POST/PUT/DELETE /bank-transactions` | JWT |
+| CIF Settings | `GET /cif-values/settings`, `POST /cif-values/settings` | JWT |
+| CIF Values | `GET/POST/PUT/DELETE /cif-values` | JWT |
 | Uploads | `POST /uploads`, `DELETE /uploads/:publicId` | JWT |
 | Health | `GET /health` | Public |
 | Tenants | `POST/DELETE /admin/tenants` | JWT (system_admin) |

@@ -282,6 +282,40 @@ CREATE INDEX IF NOT EXISTS "idx_bank_transactions_bankCode" ON "bank_transaction
 CREATE INDEX IF NOT EXISTS "idx_bank_transactions_acctNumber" ON "bank_transactions" ("acctNumber");
 CREATE INDEX IF NOT EXISTS "idx_bank_transactions_transactionDate" ON "bank_transactions" ("transactionDate");
 
+-- CIF Settings table (global FOB/freight/insurance rates)
+CREATE TABLE IF NOT EXISTS "cif_settings" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "fobValue" decimal(12,2) NOT NULL DEFAULT 0,
+  "frtValue" decimal(12,2) NOT NULL DEFAULT 0,
+  "insValue" decimal(12,2) NOT NULL DEFAULT 0,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "updatedBy" varchar
+);
+
+-- CIF Values table (per-shipment line items)
+CREATE TABLE IF NOT EXISTS "cif_values" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "jobId" uuid,
+  "refNo" varchar(100) NOT NULL,
+  "cifValue" decimal(12,2) NOT NULL DEFAULT 0,
+  "fobValue" decimal(12,2) NOT NULL DEFAULT 0,
+  "fobP" decimal(5,2) NOT NULL DEFAULT 0,
+  "frtValue" decimal(12,2) NOT NULL DEFAULT 0,
+  "frtP" decimal(5,2) NOT NULL DEFAULT 0,
+  "insValue" decimal(12,2) NOT NULL DEFAULT 0,
+  "insP" decimal(5,2) NOT NULL DEFAULT 0,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar,
+  FOREIGN KEY ("jobId") REFERENCES "jobs"("id") ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS "idx_cif_values_refNo" ON "cif_values" ("refNo");
+CREATE INDEX IF NOT EXISTS "idx_cif_values_jobId" ON "cif_values" ("jobId");
+
 -- Migrate existing jobs table from stub schema to full schema
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='jobs' AND column_name='jobNumber') THEN

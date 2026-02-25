@@ -11,6 +11,8 @@ import { ManifestJob } from '../manifest-jobs/manifest-job.entity';
 import { IncomeExpenditure } from '../income-expenditure/income-expenditure.entity';
 import { BankAccount } from 'src/bank-transactions/bank-account.entity';
 import { BankTransaction } from 'src/bank-transactions/bank-transaction.entity';
+import { CifValue } from 'src/cif-values/cif-value.entity';
+import { CifSettings } from 'src/cif-values/cif-settings.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -33,6 +35,8 @@ export const getDatabaseConfig = (
     IncomeExpenditure,
     BankAccount,
     BankTransaction,
+    CifValue,
+    CifSettings,
   ],
   synchronize: false,
   // schema: 'public',

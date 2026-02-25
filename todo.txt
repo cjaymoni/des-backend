@@ -1,0 +1,1 @@
+1. manage how to send admin request, whether to use company name as public or a differnt approach

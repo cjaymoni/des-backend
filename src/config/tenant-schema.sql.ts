@@ -93,7 +93,6 @@ CREATE TABLE IF NOT EXISTS "importer_exporters" (
   "address" varchar(200),
   "telephone" varchar(50),
   "email" varchar(100),
-  "tin" varchar(20),
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "updatedAt" timestamp NOT NULL DEFAULT now(),
   "deletedAt" timestamp,

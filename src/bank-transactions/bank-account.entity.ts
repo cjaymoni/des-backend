@@ -32,6 +32,9 @@ export class BankAccount extends BaseEntity {
   @Column({ length: 30, nullable: true })
   bankTel: string;
 
+  @Column({ length: 100, nullable: true })
+  email: string;
+
   @DeleteDateColumn()
   deletedAt: Date;
 }

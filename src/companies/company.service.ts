@@ -28,12 +28,12 @@ export class CompanyService {
     if (exists) throw new ConflictException('Company subdomain already exists');
 
     const company = this.companyRepo.create(data);
-    await this.companyRepo.save(company);
+    const saved = await this.companyRepo.save(company);
 
     // Create tenant schema
-    await this.createTenantSchema(company.appSubdomain);
+    await this.createTenantSchema(saved.appSubdomain);
 
-    return company;
+    return saved;
   }
 
   async findAll(pagination: PaginationDto): Promise<PaginatedResult<Company>> {

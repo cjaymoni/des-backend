@@ -1,18 +1,10 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseEntity } from '../common/entities/base.entity';
 
 @Entity('users')
 @Index(['email'])
 @Index(['role'])
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class User extends BaseEntity {
 
   @Column({ unique: true })
   @Index()
@@ -35,16 +27,4 @@ export class User {
 
   @Column({ type: 'timestamp', nullable: true })
   lastLogin: Date;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @Column({ nullable: true })
-  createdBy: string;
-
-  @Column({ nullable: true })
-  updatedBy: string;
 }

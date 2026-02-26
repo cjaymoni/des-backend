@@ -9,7 +9,7 @@ export class OptionalTenantMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const orgName = req.headers['x-org-name'] as string;
 
-    if (orgName) {
+    if (orgName && orgName !== 'system') {
       this.tenantContext.setTenant(orgName);
     }
 

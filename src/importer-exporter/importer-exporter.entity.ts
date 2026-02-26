@@ -1,19 +1,10 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, Column, Index, DeleteDateColumn } from 'typeorm';
+import { BaseEntity } from '../common/entities/base.entity';
 
 @Entity('importer_exporters')
 @Index(['ieName'])
 @Index(['code'])
-export class ImporterExporter {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class ImporterExporter extends BaseEntity {
 
   @Column({ unique: true })
   code: string;
@@ -30,21 +21,6 @@ export class ImporterExporter {
   @Column({ length: 100, nullable: true })
   email: string;
 
-  @Column({ length: 20, nullable: true })
-  tin: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @Column({ nullable: true })
-  createdBy: string;
-
-  @Column({ nullable: true })
-  updatedBy: string;
 }

@@ -63,8 +63,10 @@ export class AuthService {
     });
   }
 
-  async login(email: string, password: string): Promise<AuthResponseDto> {
+  async login(email: string, password: string, orgName?: string): Promise<AuthResponseDto> {
+    console.log('[DEBUG] Login attempt:', { email, orgName });
     const systemUser = await this.findPublicUser('email', email);
+    console.log('[DEBUG] System user found:', systemUser ? { email: systemUser.email, role: systemUser.role } : null);
 
     if (systemUser && systemUser.role === 'system_admin') {
       if (!(await bcrypt.compare(password, systemUser.password))) {
@@ -77,6 +79,14 @@ export class AuthService {
       const response = this.generateToken(systemUser);
       response.user.lastLogin = previousLogin;
       return response;
+    }
+
+    if (orgName === 'system') {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!orgName) {
+      throw new UnauthorizedException('Organization header (x-org-name) is required for login');
     }
 
     return this.tenantService.withManager(async (manager) => {

@@ -1,10 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseEntity } from '../common/entities/base.entity';
 
 @Entity({ schema: 'public' })
 @Index(['appSubdomain'])
-export class Company {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class Company extends BaseEntity {
 
   @Column({ unique: true })
   @Index()
@@ -63,16 +62,4 @@ export class Company {
 
   @Column({ nullable: true })
   logo: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @Column({ nullable: true })
-  createdBy: string;
-
-  @Column({ nullable: true })
-  updatedBy: string;
 }

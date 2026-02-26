@@ -1,23 +1,12 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Index,
-  DeleteDateColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, Index, DeleteDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { BaseEntity } from '../../common/entities/base.entity';
 import { MasterManifest } from './master-manifest.entity';
 
 @Entity('house_manifests')
 @Index(['hblNo'])
 @Index(['consignee'])
 @Index(['masterManifestId'])
-export class HouseManifest {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class HouseManifest extends BaseEntity {
 
   @Column({ type: 'uuid' })
   masterManifestId: string;
@@ -98,18 +87,6 @@ export class HouseManifest {
   @Column({ type: 'jsonb', nullable: true })
   attachments: { url: string; publicId: string; filename: string }[];
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @Column({ nullable: true })
-  createdBy: string;
-
-  @Column({ nullable: true })
-  updatedBy: string;
 }

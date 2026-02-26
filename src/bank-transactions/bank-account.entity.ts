@@ -1,16 +1,12 @@
-import {
-  Entity, Column, PrimaryGeneratedColumn,
-  CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Index,
-} from 'typeorm';
+import { Entity, Column, Index, DeleteDateColumn } from 'typeorm';
+import { BaseEntity } from '../common/entities/base.entity';
 
 const decimalTransformer = { to: (v: any) => v, from: (v: any) => v === null ? null : parseFloat(v) };
 
 @Entity('bank_accounts')
 @Index(['acctNumber'], { unique: true })
 @Index(['bankCode'])
-export class BankAccount {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class BankAccount extends BaseEntity {
 
   @Column({ length: 50 })
   bankCode: string;
@@ -36,21 +32,6 @@ export class BankAccount {
   @Column({ length: 30, nullable: true })
   bankTel: string;
 
-  @Column({ length: 100, nullable: true })
-  email: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @Column({ nullable: true })
-  createdBy: string;
-
-  @Column({ nullable: true })
-  updatedBy: string;
 }

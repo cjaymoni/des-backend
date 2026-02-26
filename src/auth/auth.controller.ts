@@ -49,8 +49,9 @@ export class AuthController {
   @Post('login')
   @Throttle({ default: { ttl: 60000, limit: 5 } })
   @HttpCode(HttpStatus.OK)
-  async login(@Body() body: LoginDto): Promise<AuthResponseDto> {
-    return this.authService.login(body.email, body.password);
+  async login(@Body() body: LoginDto, @Request() req): Promise<AuthResponseDto> {
+    const orgName = req.headers['x-org-name'] as string;
+    return this.authService.login(body.email, body.password, orgName);
   }
 
   @Get('me')

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index, DeleteDateColumn, OneToMany } from 'typeorm';
+import { Entity, Column, Index, DeleteDateColumn, OneToMany } from 'typeorm';
+import { BaseEntity } from '../../common/entities/base.entity';
 import { HouseManifest } from './house-manifest.entity';
 
 @Entity('master_manifests')
@@ -6,9 +7,7 @@ import { HouseManifest } from './house-manifest.entity';
 @Index(['vessel'])
 @Index(['shippingLine'])
 @Index(['containerNo'])
-export class MasterManifest {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class MasterManifest extends BaseEntity {
 
   @Column({ length: 20 })
   blNo: string;
@@ -55,18 +54,6 @@ export class MasterManifest {
   @OneToMany(() => HouseManifest, house => house.masterManifest)
   houseManifests: HouseManifest[];
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @Column({ nullable: true })
-  createdBy: string;
-
-  @Column({ nullable: true })
-  updatedBy: string;
 }

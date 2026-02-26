@@ -1,22 +1,12 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
-  Index,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, Index, DeleteDateColumn, OneToMany } from 'typeorm';
+import { BaseEntity } from '../common/entities/base.entity';
 import { CifValue } from '../cif-values/cif-value.entity';
 
 @Entity('jobs')
 @Index(['jobNo'], { unique: true })
 @Index(['ie'])
 @Index(['blNo'])
-export class Job {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class Job extends BaseEntity {
 
   @Column({ unique: true })
   jobNo: string;
@@ -134,18 +124,6 @@ export class Job {
   @OneToMany(() => CifValue, (c) => c.job)
   cifValues: CifValue[];
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @Column({ nullable: true })
-  createdBy: string;
-
-  @Column({ nullable: true })
-  updatedBy: string;
 }

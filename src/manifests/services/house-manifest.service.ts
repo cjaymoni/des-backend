@@ -123,9 +123,13 @@ export class HouseManifestService {
     userId: string,
   ): Promise<HouseManifest> {
     return this.tenantService.withManager(async (manager) => {
+      // Lock the row to prevent concurrent attachment modifications
       const manifest = await manager
         .getRepository(HouseManifest)
-        .findOne({ where: { id } });
+        .createQueryBuilder('hm')
+        .setLock('pessimistic_write')
+        .where('hm.id = :id', { id })
+        .getOne();
       if (!manifest) throw new NotFoundException('House manifest not found');
       const updatedAttachments = [
         ...(manifest.attachments || []),
@@ -144,9 +148,13 @@ export class HouseManifestService {
     userId: string,
   ): Promise<HouseManifest> {
     return this.tenantService.withManager(async (manager) => {
+      // Lock the row to prevent concurrent attachment modifications
       const manifest = await manager
         .getRepository(HouseManifest)
-        .findOne({ where: { id } });
+        .createQueryBuilder('hm')
+        .setLock('pessimistic_write')
+        .where('hm.id = :id', { id })
+        .getOne();
       if (!manifest) throw new NotFoundException('House manifest not found');
       const updatedAttachments = (manifest.attachments || []).filter(
         (a) => a.publicId !== publicId,

@@ -32,9 +32,15 @@ export class CompanyController {
     private tenantContext: TenantContext,
   ) {}
 
-  @Get('subdomain/:subdomain')
-  async findBySubdomain(@Param('subdomain') subdomain: string) {
+  @Get('subdomain/:subdomain/public')
+  async findBySubdomainPublic(@Param('subdomain') subdomain: string) {
     return this.companyService.findBySubdomainPublic(subdomain);
+  }
+
+  @Get('subdomain/:subdomain')
+  @UseGuards(AuthGuard('jwt'))
+  async findBySubdomain(@Param('subdomain') subdomain: string): Promise<Company> {
+    return this.companyService.findBySubdomain(subdomain);
   }
 
   @Post()

@@ -12,7 +12,7 @@ export class TenantService {
     @InjectRepository(Company)
     private companyRepo: Repository<Company>,
     private readonly dataSource: DataSource,
-    private readonly tenantContext: TenantContext,
+    public readonly tenantContext: TenantContext,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -42,36 +42,18 @@ export class TenantService {
     const schemaName = `tenant_${subdomain}`;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.query(`SET search_path TO "${schemaName}"`);
+    await queryRunner.startTransaction();
+    await queryRunner.query(`SET LOCAL search_path TO "${schemaName}"`);
     try {
-      return await callback(queryRunner.manager);
+      const result = await callback(queryRunner.manager);
+      await queryRunner.commitTransaction();
+      return result;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
     } finally {
-      await queryRunner.query(`SET search_path TO public`);
       await queryRunner.release();
     }
-  }
-
-  /** @deprecated Use withManager instead */
-  async getEntityManager(): Promise<EntityManager> {
-    const subdomain = this.tenantContext.getTenant();
-    const cacheKey = `company:${subdomain}`;
-    let company = await this.cacheManager.get<Company>(cacheKey);
-    if (!company) {
-      const found = await this.companyRepo.findOne({
-        where: { appSubdomain: subdomain },
-      });
-      if (!found)
-        throw new NotFoundException(
-          `Company with subdomain '${subdomain}' not found`,
-        );
-      company = found;
-      await this.cacheManager.set(cacheKey, company);
-    }
-    const schemaName = `tenant_${subdomain}`;
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.query(`SET search_path TO "${schemaName}"`);
-    return queryRunner.manager;
   }
 
   async validateTenant(subdomain: string): Promise<Company> {

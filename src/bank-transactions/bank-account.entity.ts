@@ -1,13 +1,21 @@
-import { Entity, Column, Index, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  Index,
+  DeleteDateColumn,
+  VersionColumn,
+} from 'typeorm';
 import { BaseEntity } from '../common/entities/base.entity';
 
-const decimalTransformer = { to: (v: any) => v, from: (v: any) => v === null ? null : parseFloat(v) };
+const decimalTransformer = {
+  to: (v: any) => v,
+  from: (v: any) => (v === null ? null : parseFloat(v)),
+};
 
 @Entity('bank_accounts')
 @Index(['acctNumber'], { unique: true })
 @Index(['bankCode'])
 export class BankAccount extends BaseEntity {
-
   @Column({ length: 50 })
   bankCode: string;
 
@@ -23,7 +31,13 @@ export class BankAccount extends BaseEntity {
   @Column({ length: 20 })
   currencyCode: string;
 
-  @Column({ type: 'decimal', precision: 14, scale: 2, default: 0, transformer: decimalTransformer })
+  @Column({
+    type: 'decimal',
+    precision: 14,
+    scale: 2,
+    default: 0,
+    transformer: decimalTransformer,
+  })
   balance: number;
 
   @Column({ length: 255, nullable: true })
@@ -34,6 +48,9 @@ export class BankAccount extends BaseEntity {
 
   @Column({ length: 100, nullable: true })
   email: string;
+
+  @VersionColumn()
+  version: number;
 
   @DeleteDateColumn()
   deletedAt: Date;

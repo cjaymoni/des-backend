@@ -1,4 +1,12 @@
-import { Entity, Column, Index, DeleteDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  Index,
+  DeleteDateColumn,
+  ManyToOne,
+  JoinColumn,
+  VersionColumn,
+} from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { MasterManifest } from './master-manifest.entity';
 
@@ -7,7 +15,6 @@ import { MasterManifest } from './master-manifest.entity';
 @Index(['consignee'])
 @Index(['masterManifestId'])
 export class HouseManifest extends BaseEntity {
-
   @Column({ type: 'uuid' })
   masterManifestId: string;
 
@@ -86,6 +93,9 @@ export class HouseManifest extends BaseEntity {
 
   @Column({ type: 'jsonb', nullable: true })
   attachments: { url: string; publicId: string; filename: string }[];
+
+  @VersionColumn()
+  version: number;
 
   @DeleteDateColumn()
   deletedAt: Date;

@@ -128,6 +128,11 @@ export class AuthService {
       return userWithoutPassword;
     }
 
+    const tenantName = this.tenantService.tenantContext.getTenant();
+    if (!tenantName) {
+      throw new NotFoundException('User not found');
+    }
+
     return this.tenantService.withManager(async (manager) => {
       const user = await manager.findOne(User, { where: { id: userId } });
       if (!user) throw new NotFoundException('User not found');

@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  VersionColumn,
   Index,
   ManyToOne,
   JoinColumn,
@@ -40,31 +41,112 @@ export class ManifestJob {
   @Column({ length: 100, nullable: true })
   custRefNo: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   handCharge: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   netHandCharge: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   grandHandCharge: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   vatAmt: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   nhilAmt: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   gfdAmt: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   covidAmt: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   totalCBM: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   weight: number;
 
   @Column({ type: 'date', nullable: true })
@@ -117,6 +199,9 @@ export class ManifestJob {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @VersionColumn()
+  version: number;
 
   @DeleteDateColumn()
   deletedAt: Date;

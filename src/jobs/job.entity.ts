@@ -1,4 +1,11 @@
-import { Entity, Column, Index, DeleteDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  Index,
+  DeleteDateColumn,
+  OneToMany,
+  VersionColumn,
+} from 'typeorm';
 import { BaseEntity } from '../common/entities/base.entity';
 import { CifValue } from '../cif-values/cif-value.entity';
 
@@ -7,7 +14,6 @@ import { CifValue } from '../cif-values/cif-value.entity';
 @Index(['ie'])
 @Index(['blNo'])
 export class Job extends BaseEntity {
-
   @Column({ unique: true })
   jobNo: string;
 
@@ -28,8 +34,14 @@ export class Job extends BaseEntity {
   invoiceNo: string;
 
   @Column({
-    type: 'decimal', precision: 12, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   totDuty: number;
 
@@ -74,30 +86,78 @@ export class Job extends BaseEntity {
   jobFinanceeName: string;
 
   @Column({
-    type: 'decimal', precision: 12, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   jobFinanceeAmount: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   agencyFee: number;
 
   @Column({ length: 50, nullable: true })
   jobStatus: string;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   vatPer: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   nhilPer: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   gfdPer: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0, transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) } })
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
+  })
   covidPer: number;
 
   @Column({ type: 'text', nullable: true })
@@ -123,6 +183,9 @@ export class Job extends BaseEntity {
 
   @OneToMany(() => CifValue, (c) => c.job)
   cifValues: CifValue[];
+
+  @VersionColumn()
+  version: number;
 
   @DeleteDateColumn()
   deletedAt: Date;

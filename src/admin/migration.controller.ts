@@ -1,4 +1,10 @@
-import { Controller, Post, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Param,
+  UseGuards,
+  BadRequestException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
@@ -13,15 +19,28 @@ export class MigrationController {
 
   @Post('tenant/:subdomain')
   async runTenantMigration(@Param('subdomain') subdomain: string) {
+    if (!/^[a-z0-9][a-z0-9_-]{0,62}$/i.test(subdomain)) {
+      throw new BadRequestException('Invalid subdomain format');
+    }
     const schemaName = `tenant_${subdomain}`;
-    
-    await this.dataSource.query(`SET search_path TO "${schemaName}"`);
-    await this.dataSource.query(TENANT_SCHEMA_SQL);
-    await this.dataSource.query(`SET search_path TO public`);
-    
-    return { 
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.query(`SET LOCAL search_path TO "${schemaName}"`);
+      await queryRunner.query(TENANT_SCHEMA_SQL);
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+
+    return {
       message: `Migration completed for tenant: ${subdomain}`,
-      schema: schemaName 
+      schema: schemaName,
     };
   }
 }

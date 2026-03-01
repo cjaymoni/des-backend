@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS "house_manifests" (
   "releaseStatus" boolean NOT NULL DEFAULT false,
   "releaseDate" date,
   "attachments" jsonb,
+  "version" int NOT NULL DEFAULT 1,
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "updatedAt" timestamp NOT NULL DEFAULT now(),
   "deletedAt" timestamp,
@@ -136,6 +137,7 @@ CREATE TABLE IF NOT EXISTS "manifest_jobs" (
   "agentDetails" varchar(200),
   "agentName" varchar(100),
   "agentTel" varchar(50),
+  "version" int NOT NULL DEFAULT 1,
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "updatedAt" timestamp NOT NULL DEFAULT now(),
   "deletedAt" timestamp,
@@ -222,6 +224,7 @@ CREATE TABLE IF NOT EXISTS "jobs" (
   "strYear" varchar(4),
   "vatNhilStatus" varchar(10) NOT NULL DEFAULT '0',
   "paidStatus" boolean NOT NULL DEFAULT false,
+  "version" int NOT NULL DEFAULT 1,
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "updatedAt" timestamp NOT NULL DEFAULT now(),
   "deletedAt" timestamp,
@@ -245,6 +248,7 @@ CREATE TABLE IF NOT EXISTS "bank_accounts" (
   "address" varchar(255),
   "bankTel" varchar(30),
   "email" varchar(100),
+  "version" int NOT NULL DEFAULT 1,
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "updatedAt" timestamp NOT NULL DEFAULT now(),
   "deletedAt" timestamp,
@@ -368,4 +372,10 @@ DO $$ BEGIN
       DROP COLUMN IF EXISTS "status";
   END IF;
 END $$;
+
+-- Add version columns for optimistic locking (safe for existing tenants)
+ALTER TABLE IF EXISTS "jobs" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
+ALTER TABLE IF EXISTS "bank_accounts" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
+ALTER TABLE IF EXISTS "house_manifests" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
+ALTER TABLE IF EXISTS "manifest_jobs" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
 `;

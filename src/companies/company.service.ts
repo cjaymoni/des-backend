@@ -22,24 +22,39 @@ export class CompanyService {
   ) {}
 
   async create(data: Partial<Company>): Promise<Company> {
-    const exists = await this.companyRepo.findOne({
-      where: { appSubdomain: data.appSubdomain },
-    });
-    if (exists) throw new ConflictException('Company subdomain already exists');
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const exists = await queryRunner.manager.findOne(Company, {
+        where: { appSubdomain: data.appSubdomain },
+      });
+      if (exists)
+        throw new ConflictException('Company subdomain already exists');
 
-    const company = this.companyRepo.create(data);
-    const saved = await this.companyRepo.save(company);
+      const company = queryRunner.manager.create(Company, data);
+      const saved = await queryRunner.manager.save(company);
+      await queryRunner.commitTransaction();
 
-    // Create tenant schema
-    await this.createTenantSchema(saved.appSubdomain);
+      // Create tenant schema (uses its own QueryRunner internally)
+      await this.createTenantSchema(saved.appSubdomain);
 
-    return saved;
+      return saved;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findAll(pagination: PaginationDto): Promise<PaginatedResult<Company>> {
     const { page, limit } = pagination;
     const skip = (page - 1) * limit;
-    const [items, total] = await this.companyRepo.findAndCount({ skip, take: limit });
+    const [items, total] = await this.companyRepo.findAndCount({
+      skip,
+      take: limit,
+    });
     return {
       items,
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
@@ -79,7 +94,7 @@ export class CompanyService {
 
   async uploadLogo(id: string, file: any): Promise<Company> {
     const company = await this.findOne(id);
-    
+
     // Delete old logo from Cloudinary if exists
     if (company.logo) {
       const publicId = this.extractPublicId(company.logo);
@@ -89,8 +104,11 @@ export class CompanyService {
         console.log('Delete result:', result);
       }
     }
-    
-    const result = await this.uploadsService.uploadImage(file, company.appSubdomain);
+
+    const result = await this.uploadsService.uploadImage(
+      file,
+      company.appSubdomain,
+    );
     company.logo = result.data.url;
     const updated = await this.companyRepo.save(company);
     await this.tenantService.clearCache(company.appSubdomain);
@@ -110,17 +128,37 @@ export class CompanyService {
   }
 
   private async createTenantSchema(subdomain: string): Promise<void> {
+    if (!/^[a-z0-9][a-z0-9_-]{0,62}$/i.test(subdomain)) {
+      throw new ConflictException('Invalid subdomain format');
+    }
     const schemaName = `tenant_${subdomain}`;
-    await this.dataSource.query(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`);
-    await this.dataSource.query(`SET search_path TO "${schemaName}"`);
-    await this.dataSource.query(TENANT_SCHEMA_SQL);
-    await this.dataSource.query(`SET search_path TO public`);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.query(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`);
+      await queryRunner.query(`SET LOCAL search_path TO "${schemaName}"`);
+      await queryRunner.query(TENANT_SCHEMA_SQL);
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   private async deleteTenantSchema(subdomain: string): Promise<void> {
+    if (!/^[a-z0-9][a-z0-9_-]{0,62}$/i.test(subdomain)) {
+      throw new ConflictException('Invalid subdomain format');
+    }
     const schemaName = `tenant_${subdomain}`;
-    await this.dataSource.query(
-      `DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`,
-    );
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    try {
+      await queryRunner.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`);
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { TenantService } from '../tenant/tenant.service';
 import { ImporterExporter } from './importer-exporter.entity';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
@@ -24,9 +28,10 @@ export class ImporterExporterService {
         .createQueryBuilder('ie');
 
       if (search.ieName)
-        qb.andWhere('ie.ieName ILIKE :ieName', { ieName: `%${search.ieName}%` });
-      if (search.code)
-        qb.andWhere('ie.code = :code', { code: search.code });
+        qb.andWhere('ie.ieName ILIKE :ieName', {
+          ieName: `%${search.ieName}%`,
+        });
+      if (search.code) qb.andWhere('ie.code = :code', { code: search.code });
 
       const [items, total] = await qb
         .skip(skip)
@@ -51,19 +56,36 @@ export class ImporterExporterService {
     });
   }
 
-  async create(data: CreateImporterExporterDto, userId: string): Promise<ImporterExporter> {
+  async create(
+    data: CreateImporterExporterDto,
+    userId: string,
+  ): Promise<ImporterExporter> {
     return this.tenantService.withManager(async (manager) => {
       const existing = await manager
         .getRepository(ImporterExporter)
         .findOne({ where: { code: data.code } });
-      if (existing) throw new ConflictException(`Code "${data.code}" already exists`);
+      if (existing)
+        throw new ConflictException(`Code "${data.code}" already exists`);
 
-      const ie = manager.create(ImporterExporter, { ...data, createdBy: userId });
-      return manager.save(ie);
+      const ie = manager.create(ImporterExporter, {
+        ...data,
+        createdBy: userId,
+      });
+      try {
+        return await manager.save(ie);
+      } catch (err: any) {
+        if (err.code === '23505')
+          throw new ConflictException(`Code "${data.code}" already exists`);
+        throw err;
+      }
     });
   }
 
-  async update(id: string, data: UpdateImporterExporterDto, userId: string): Promise<ImporterExporter> {
+  async update(
+    id: string,
+    data: UpdateImporterExporterDto,
+    userId: string,
+  ): Promise<ImporterExporter> {
     return this.tenantService.withManager(async (manager) => {
       const existing = await manager
         .getRepository(ImporterExporter)
@@ -74,7 +96,9 @@ export class ImporterExporterService {
         .getRepository(ImporterExporter)
         .update(id, { ...data, updatedBy: userId });
 
-      return manager.getRepository(ImporterExporter).findOne({ where: { id } }) as Promise<ImporterExporter>;
+      return manager
+        .getRepository(ImporterExporter)
+        .findOne({ where: { id } }) as Promise<ImporterExporter>;
     });
   }
 

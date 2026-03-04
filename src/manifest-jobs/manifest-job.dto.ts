@@ -110,14 +110,14 @@ export class CreateManifestJobDto {
   releaseDate?: Date;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  calcStatus?: string;
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  calcStatus?: boolean;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  incvatStatus?: string;
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  incvatStatus?: boolean;
 
   @IsOptional()
   @IsString()
@@ -256,14 +256,14 @@ export class UpdateManifestJobDto {
   releaseDate?: Date;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  calcStatus?: string;
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  calcStatus?: boolean;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  incvatStatus?: string;
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  incvatStatus?: boolean;
 
   @IsOptional()
   @IsString()

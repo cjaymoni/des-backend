@@ -164,11 +164,11 @@ export class ManifestJob {
   @Column({ type: 'date', nullable: true })
   releaseDate: Date;
 
-  @Column({ length: 10, nullable: true })
-  calcStatus: string;
+  @Column({ default: false })
+  calcStatus: boolean;
 
-  @Column({ length: 10, nullable: true })
-  incvatStatus: string;
+  @Column({ default: false })
+  incvatStatus: boolean;
 
   @Column({ type: 'text', nullable: true })
   description: string;

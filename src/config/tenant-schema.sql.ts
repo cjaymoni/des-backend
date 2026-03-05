@@ -15,6 +15,19 @@ CREATE TABLE IF NOT EXISTS "users" (
   "updatedBy" varchar
 );
 
+-- Shipping Lines table
+CREATE TABLE IF NOT EXISTS "shipping_lines" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(100) NOT NULL UNIQUE,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+CREATE INDEX IF NOT EXISTS "idx_shipping_lines_name" ON "shipping_lines" ("name");
+
 -- Master Manifests table
 CREATE TABLE IF NOT EXISTS "master_manifests" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -26,8 +39,7 @@ CREATE TABLE IF NOT EXISTS "master_manifests" (
   "rotationDate" date,
   "destination" varchar(50),
   "portLoad" varchar(50),
-  "shippingLine" varchar(50),
-  "shipper" varchar(100),
+  "shippingLineId" uuid,
   "cntSize" varchar(50),
   "sealNo" varchar(50),
   "consignType" varchar(20),
@@ -36,13 +48,18 @@ CREATE TABLE IF NOT EXISTS "master_manifests" (
   "updatedAt" timestamp NOT NULL DEFAULT now(),
   "deletedAt" timestamp,
   "createdBy" varchar,
-  "updatedBy" varchar
+  "updatedBy" varchar,
+  FOREIGN KEY ("shippingLineId") REFERENCES "shipping_lines"("id") ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS "idx_master_manifests_blNo" ON "master_manifests" ("blNo");
 CREATE INDEX IF NOT EXISTS "idx_master_manifests_vessel" ON "master_manifests" ("vessel");
-CREATE INDEX IF NOT EXISTS "idx_master_manifests_shippingLine" ON "master_manifests" ("shippingLine");
 CREATE INDEX IF NOT EXISTS "idx_master_manifests_containerNo" ON "master_manifests" ("containerNo");
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='master_manifests' AND column_name='shippingLineId') THEN
+    CREATE INDEX IF NOT EXISTS "idx_master_manifests_shippingLineId" ON "master_manifests" ("shippingLineId");
+  END IF;
+END $$;
 
 -- House Manifests table
 CREATE TABLE IF NOT EXISTS "house_manifests" (
@@ -319,17 +336,45 @@ CREATE TABLE IF NOT EXISTS "cif_values" (
 CREATE INDEX IF NOT EXISTS "idx_cif_values_refNo" ON "cif_values" ("refNo");
 CREATE INDEX IF NOT EXISTS "idx_cif_values_jobId" ON "cif_values" ("jobId");
 
+-- Migrate shippingLine string column to shippingLineId FK
+DO $$ BEGIN
+  -- Create shipping_lines entries from existing data
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='master_manifests' AND column_name='shippingLine') THEN
+    INSERT INTO "shipping_lines" ("name")
+    SELECT DISTINCT UPPER(TRIM("shippingLine"))
+    FROM "master_manifests"
+    WHERE "shippingLine" IS NOT NULL AND TRIM("shippingLine") <> ''
+    ON CONFLICT ("name") DO NOTHING;
+
+    ALTER TABLE "master_manifests" ADD COLUMN IF NOT EXISTS "shippingLineId" uuid;
+
+    UPDATE "master_manifests" mm
+    SET "shippingLineId" = sl.id
+    FROM "shipping_lines" sl
+    WHERE UPPER(TRIM(mm."shippingLine")) = sl."name"
+      AND mm."shippingLine" IS NOT NULL;
+
+    ALTER TABLE "master_manifests" DROP COLUMN "shippingLine";
+
+    ALTER TABLE "master_manifests"
+    ADD CONSTRAINT "fk_master_manifests_shippingLineId"
+    FOREIGN KEY ("shippingLineId") REFERENCES "shipping_lines"("id") ON DELETE SET NULL;
+
+    CREATE INDEX IF NOT EXISTS "idx_master_manifests_shippingLineId" ON "master_manifests" ("shippingLineId");
+  END IF;
+END $$;
+
 -- Migrate existing jobs table from stub schema to full schema
 DO $$ BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='jobs' AND column_name='jobNumber') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='jobs' AND column_name='jobNumber') THEN
     ALTER TABLE "jobs" RENAME COLUMN "jobNumber" TO "jobNo";
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='jobs' AND column_name='jobNo') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='jobs' AND column_name='jobNo') THEN
     ALTER TABLE "jobs" ADD COLUMN "jobNo" varchar UNIQUE;
   END IF;
 END $$;
 DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='jobs' AND column_name='ie') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='jobs' AND column_name='ie') THEN
     ALTER TABLE "jobs"
       ADD COLUMN IF NOT EXISTS "ie" varchar(200),
       ADD COLUMN IF NOT EXISTS "custRefNo" varchar(100),

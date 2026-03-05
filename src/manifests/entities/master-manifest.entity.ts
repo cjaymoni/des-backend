@@ -1,11 +1,12 @@
-import { Entity, Column, Index, DeleteDateColumn, OneToMany } from 'typeorm';
+import { Entity, Column, Index, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { HouseManifest } from './house-manifest.entity';
+import { ShippingLine } from '../../shipping-lines/shipping-line.entity';
 
 @Entity('master_manifests')
 @Index(['blNo'])
 @Index(['vessel'])
-@Index(['shippingLine'])
+@Index(['shippingLineId'])
 @Index(['containerNo'])
 export class MasterManifest extends BaseEntity {
 
@@ -33,8 +34,12 @@ export class MasterManifest extends BaseEntity {
   @Column({ length: 50, nullable: true })
   portLoad: string;
 
-  @Column({ length: 50, nullable: true })
-  shippingLine: string;
+  @Column({ nullable: true })
+  shippingLineId: string;
+
+  @ManyToOne(() => ShippingLine, { nullable: true, eager: false })
+  @JoinColumn({ name: 'shippingLineId' })
+  shippingLineRef: ShippingLine;
 
   @Column({ length: 100, nullable: true })
   shipper: string;

@@ -31,9 +31,9 @@ export class MasterManifestService {
         qb.andWhere('master.blNo = :blNo', { blNo: search.blNo });
       if (search.vessel)
         qb.andWhere('master.vessel = :vessel', { vessel: search.vessel });
-      if (search.shippingLine)
-        qb.andWhere('master.shippingLine = :shippingLine', {
-          shippingLine: search.shippingLine,
+      if (search.shippingLineId)
+        qb.andWhere('master.shippingLineId = :shippingLineId', {
+          shippingLineId: search.shippingLineId,
         });
       if (search.containerNo)
         qb.andWhere('master.containerNo = :containerNo', {
@@ -42,6 +42,7 @@ export class MasterManifestService {
       if (search.shipper)
         qb.andWhere('master.shipper = :shipper', { shipper: search.shipper });
       const [items, total] = await qb
+        .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
         .skip(skip)
         .take(limit)
         .orderBy('master.createdAt', 'DESC')
@@ -126,6 +127,7 @@ export class MasterManifestService {
       .getRepository(MasterManifest)
       .createQueryBuilder('master')
       .leftJoinAndSelect('master.houseManifests', 'house')
+      .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
       .where('master.id = :id', { id })
       .getOne();
     if (!manifest) throw new NotFoundException('Master manifest not found');

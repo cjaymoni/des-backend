@@ -46,9 +46,8 @@ export class CreateMasterManifestDto {
   portLoad?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(50)
-  shippingLine?: string;
+  @IsUUID()
+  shippingLineId?: string;
 
   @IsOptional()
   @IsString()
@@ -118,9 +117,8 @@ export class UpdateMasterManifestDto {
   portLoad?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(50)
-  shippingLine?: string;
+  @IsUUID()
+  shippingLineId?: string;
 
   @IsOptional()
   @IsString()
@@ -160,9 +158,9 @@ export class SearchMasterManifestDto {
   vessel?: string;
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
   @Transform(({ value }) => value || undefined)
-  shippingLine?: string;
+  shippingLineId?: string;
 
   @IsOptional()
   @IsString()

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { TenantService } from '../../tenant/tenant.service';
 import { MasterManifest } from '../entities/master-manifest.entity';
 import { HouseManifest } from '../entities/house-manifest.entity';
+import { ManifestJob } from '../../manifest-jobs/manifest-job.entity';
 import {
   PaginationDto,
   PaginatedResult,
@@ -32,9 +33,9 @@ export class MasterManifestService {
       if (search.vessel)
         qb.andWhere('master.vessel = :vessel', { vessel: search.vessel });
       if (search.shippingLineId)
-        qb.andWhere('master.shippingLineId = :shippingLineId', {
-          shippingLineId: search.shippingLineId,
-        });
+        qb.andWhere('master.shippingLineId = :shippingLineId', { shippingLineId: search.shippingLineId });
+      if (search.shipperId)
+        qb.andWhere('master.shipperId = :shipperId', { shipperId: search.shipperId });
       if (search.containerNo)
         qb.andWhere('master.containerNo = :containerNo', {
           containerNo: search.containerNo,
@@ -43,6 +44,7 @@ export class MasterManifestService {
         qb.andWhere('master.shipper = :shipper', { shipper: search.shipper });
       const [items, total] = await qb
         .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
+        .leftJoinAndSelect('master.shipperRef', 'shipper')
         .skip(skip)
         .take(limit)
         .orderBy('master.createdAt', 'DESC')
@@ -112,9 +114,16 @@ export class MasterManifestService {
         .getRepository(MasterManifest)
         .findOne({ where: { id } });
       if (!existing) throw new NotFoundException('Master manifest not found');
-      await manager
+
+      const houseIds = await manager
         .getRepository(HouseManifest)
-        .softDelete({ masterManifestId: id });
+        .find({ where: { masterManifestId: id }, select: ['id'] })
+        .then((rows) => rows.map((r) => r.id));
+
+      if (houseIds.length > 0) {
+        await manager.getRepository(ManifestJob).softDelete({ houseManifestId: houseIds as any });
+      }
+      await manager.getRepository(HouseManifest).softDelete({ masterManifestId: id });
       await manager.getRepository(MasterManifest).softDelete(id);
     });
   }
@@ -128,6 +137,7 @@ export class MasterManifestService {
       .createQueryBuilder('master')
       .leftJoinAndSelect('master.houseManifests', 'house')
       .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
+      .leftJoinAndSelect('master.shipperRef', 'shipper')
       .where('master.id = :id', { id })
       .getOne();
     if (!manifest) throw new NotFoundException('Master manifest not found');

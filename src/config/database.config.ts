@@ -14,6 +14,7 @@ import { BankTransaction } from 'src/bank-transactions/bank-transaction.entity';
 import { CifValue } from 'src/cif-values/cif-value.entity';
 import { CifSettings } from 'src/cif-values/cif-settings.entity';
 import { ShippingLine } from '../shipping-lines/shipping-line.entity';
+import { Shipper } from '../shippers/shipper.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -39,6 +40,7 @@ export const getDatabaseConfig = (
     CifValue,
     CifSettings,
     ShippingLine,
+    Shipper,
   ],
   synchronize: false,
   // schema: 'public',

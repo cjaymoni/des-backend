@@ -21,6 +21,7 @@ import { JobsModule } from './jobs/jobs.module';
 import { BankTransactionsModule } from './bank-transactions/bank-transactions.module';
 import { CifValuesModule } from './cif-values/cif-values.module';
 import { ShippingLineModule } from './shipping-lines/shipping-line.module';
+import { ShipperModule } from './shippers/shipper.module';
 import { WarmupInterceptor } from './health/warmup.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -53,6 +54,7 @@ import { getDatabaseConfig } from './config/database.config';
     BankTransactionsModule,
     CifValuesModule,
     ShippingLineModule,
+    ShipperModule,
   ],
   providers: [
     {

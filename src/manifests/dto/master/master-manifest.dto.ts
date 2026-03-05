@@ -50,9 +50,8 @@ export class CreateMasterManifestDto {
   shippingLineId?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  shipper?: string;
+  @IsUUID()
+  shipperId?: string;
 
   @IsOptional()
   @IsString()
@@ -121,9 +120,8 @@ export class UpdateMasterManifestDto {
   shippingLineId?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  shipper?: string;
+  @IsUUID()
+  shipperId?: string;
 
   @IsOptional()
   @IsString()
@@ -161,6 +159,11 @@ export class SearchMasterManifestDto {
   @IsUUID()
   @Transform(({ value }) => value || undefined)
   shippingLineId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  @Transform(({ value }) => value || undefined)
+  shipperId?: string;
 
   @IsOptional()
   @IsString()

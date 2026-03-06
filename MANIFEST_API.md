@@ -52,7 +52,7 @@ Get all master manifests with pagination and search.
 Get single master manifest by ID.
 
 ### POST /manifests/master
-Create new master manifest.
+Create new master manifest. Assign a `principalId` to enable handling charge calculation on house BLs.
 
 **Body:**
 ```json
@@ -65,8 +65,9 @@ Create new master manifest.
   "rotationDate": "2024-01-14",
   "destination": "TEMA",
   "portLoad": "SHANGHAI",
-  "shippingLine": "MAERSK",
-  "shipper": "ABC COMPANY",
+  "shippingLineId": "uuid-of-shipping-line",
+  "shipperId": "uuid-of-shipper",
+  "principalId": "uuid-of-principal",
   "cntSize": "40FT",
   "sealNo": "SEAL123",
   "consignType": "FCL",
@@ -127,7 +128,7 @@ Get all house manifests with pagination and search.
 Get single house manifest by ID.
 
 ### POST /manifests/house
-Create new house manifest. Automatically calculates handling charge based on weight if not provided.
+Create new house manifest. Ensure `totalCBM` is set — it is required for handling charge calculation.
 
 **Body:**
 ```json
@@ -162,6 +163,116 @@ Update house manifest. Recalculates charge if weight changes.
 
 ### DELETE /manifests/house/:id
 Soft delete house manifest.
+
+---
+
+## Principals Endpoints
+
+### GET /principals
+List all principals with pagination. Filter by `name` or `isActive`.
+
+### GET /principals/:id
+Get single principal.
+
+### POST /principals
+Create a new active principal.
+
+**Body:**
+```json
+{ "name": "GLC OCEAN LINE", "isActive": true }
+```
+
+### PUT /principals/:id
+Update principal name or active status.
+
+### DELETE /principals/:id
+Soft delete principal.
+
+---
+
+## Currencies Endpoints
+
+### GET /currencies
+List all currencies. Filter by `code` or `isActive`.
+
+### GET /currencies/:id
+Get single currency.
+
+### POST /currencies
+Create a currency rate. The currency must be active for use in handling charge calculations.
+
+**Body:**
+```json
+{ "code": "USD", "name": "US Dollar", "rate": 14, "period": "JAN-2024", "isActive": true }
+```
+
+### PUT /currencies/:id
+Update rate, period, or active status.
+
+### DELETE /currencies/:id
+Soft delete currency.
+
+---
+
+## Principal Charge Setup Endpoints
+
+### GET /principal-charges
+List all principal charge setups with their charge types.
+
+### GET /principal-charges/:principalId
+Get the charge setup for a specific principal.
+
+### POST /principal-charges
+Create or fully replace a principal's handling charge setup (upsert). Max 10 charge types.
+
+**Body:**
+```json
+{
+  "principalId": "uuid-of-principal",
+  "currencyId": "uuid-of-currency",
+  "chargeTypes": [
+    { "chargeType": "CFS", "calcMode": "MIN_MAX", "minValue": 25, "maxValue": 110, "sortOrder": 0 },
+    { "chargeType": "DRYAGE", "calcMode": "MIN_MAX", "minValue": 16, "maxValue": 35, "sortOrder": 1 },
+    { "chargeType": "GCNET", "calcMode": "FIXED", "fixedValue": 70, "sortOrder": 2 },
+    { "chargeType": "THC", "calcMode": "MIN_MAX", "minValue": 12, "maxValue": 30, "sortOrder": 3 }
+  ]
+}
+```
+
+**calcMode values:** `MIN_MAX`, `MAX`, `FIXED`
+
+### DELETE /principal-charges/:principalId
+Remove a principal's charge setup.
+
+---
+
+## Recompute Handling Charge
+
+### POST /manifest-jobs/:id/recompute-handling-charge
+Recalculates the handling charge for a manifest job using the principal's charge setup and the house BL's CBM.
+
+**Prerequisites:**
+1. Master manifest must have a `principalId` assigned
+2. The principal must have an active currency and charge setup configured
+3. The house BL must have a `totalCBM` value > 0
+
+**Response:**
+```json
+{
+  "job": { "id": "...", "handCharge": 3430, "calcStatus": true, "..." },
+  "result": {
+    "handCharge": 245,
+    "currencyRate": 14,
+    "totalHandCharge": 3430,
+    "breakdown": [
+      { "chargeType": "CFS", "calcMode": "MIN_MAX", "subCharge": 110 },
+      { "chargeType": "DRYAGE", "calcMode": "MIN_MAX", "subCharge": 35 },
+      { "chargeType": "GCNET", "calcMode": "FIXED", "subCharge": 70 },
+      { "chargeType": "THC", "calcMode": "MIN_MAX", "subCharge": 30 }
+    ]
+  }
+}
+```
 
 ---
 
@@ -210,7 +321,8 @@ Delete weight charge configuration.
 ✅ **Multi-tenant isolation** - Each organization has separate data  
 ✅ **Soft deletes** - Data is never permanently deleted  
 ✅ **Audit trail** - Tracks who created/updated records  
-✅ **Automatic charge calculation** - Based on weight ranges  
+✅ **Principal-based handling charge calculation** - CBM × charge type rules per principal  
+✅ **Recompute handling charge** - Triggered on manifest job via dedicated endpoint  
 ✅ **Cascading updates** - Master changes propagate to house manifests  
 ✅ **Search & filter** - Multiple search criteria supported  
 ✅ **Pagination** - Efficient data retrieval  

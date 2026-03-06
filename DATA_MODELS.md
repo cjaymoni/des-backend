@@ -8,13 +8,16 @@ src/
 ├── users/                  # User accounts (per tenant)
 ├── companies/              # Company profile (public schema)
 ├── tenant/                 # Multi-tenancy middleware & context
+├── principals/             # Active Principals (freight companies)
+├── currencies/             # Currency rates with active/inactive status
+├── principal-charges/      # Handling charge setup per principal (charge types, Min/Max/Fixed)
 ├── manifests/
 │   ├── entities/
 │   │   ├── master-manifest.entity.ts
 │   │   ├── house-manifest.entity.ts
 │   │   └── weight-charge.entity.ts
 │   └── services/ & controllers/
-├── manifest-jobs/          # Handling charges job file (JobFiles_Man)
+├── manifest-jobs/          # Handling charges job file (JobFiles_Man) + recompute engine
 ├── jobs/                   # Customs declaration job file (JobFiles)
 ├── importer-exporter/      # Consignee/shipper master data
 ├── income-expenditure/     # Financial transactions linked to jobs
@@ -39,8 +42,20 @@ src/
     │
     ├── [User]
     │
+    ├── [Principal]  (active freight companies for handling charge config)
+    │       name, isActive
+    │       └──(OneToOne via PrincipalChargeSetup)──► [PrincipalChargeSetup]
+    │                                                       │ currencyId
+    │                                                       └──(OneToMany)──► [PrincipalChargeType]
+    │                                                                               chargeType, calcMode
+    │                                                                               minValue, maxValue, fixedValue
+    │
+    ├── [Currency]  (exchange rates — active/inactive)
+    │       code, name, rate, period, isActive
+    │
     ├── [MasterManifest] ──────────────────────────────────────────────────────
     │       │ blNo, containerNo, vessel, voyage, arrivalDate
+    │       │ principalId (FK → Principal)
     │       │
     │       └──(OneToMany)──► [HouseManifest]
     │                               │ hblNo, consignee, weight, handCharge
@@ -92,6 +107,10 @@ src/
 | Entity | Relates To | Type | Key |
 |--------|-----------|------|-----|
 | `MasterManifest` | `HouseManifest` | One-to-Many | `house_manifests.masterManifestId` |
+| `MasterManifest` | `Principal` | Many-to-One | `master_manifests.principalId` |
+| `PrincipalChargeSetup` | `Principal` | One-to-One | `principal_charge_setups.principalId` |
+| `PrincipalChargeSetup` | `Currency` | Many-to-One | `principal_charge_setups.currencyId` |
+| `PrincipalChargeType` | `PrincipalChargeSetup` | Many-to-One | `principal_charge_types.setupId` |
 | `HouseManifest` | `ManifestJob` | One-to-Many | `manifest_jobs.houseManifestId` |
 | `Job` | `IncomeExpenditure` | Logical (no FK) | `income_expenditures.transRemarks = jobs.jobNo` |
 | `Job` | `ImporterExporter` | Logical (no FK) | `jobs.ie` matches `importer_exporters.ieName` |
@@ -119,14 +138,25 @@ Request → x-org-name: acme
 
 ## Key Business Flows
 
-### 1. Manifest → Handling Charges
+### 1. Manifest → Handling Charges (Principal-based CBM calculation)
 ```
-Create MasterManifest (BL No, vessel, container)
-  └─► Create HouseManifest (HBL No, consignee, weight)
-        └─► Create ManifestJob (handling charge calculation)
-              vatAmt = handCharge × vatPer / 100
-              nhilAmt = handCharge × nhilPer / 100
-              grandHandCharge = handCharge + vatAmt + nhilAmt + gfdAmt
+Setup phase:
+  Create Principal (e.g. GLC OCEAN LINE, isActive=true)
+  Create Currency (e.g. USD, rate=14, isActive=true)
+  POST /principal-charges → link principal to currency + define charge types
+    e.g. CFS MIN_MAX(25,110), DRYAGE MIN_MAX(16,35), GCNET FIXED(70), THC MIN_MAX(12,30)
+
+Runtime phase:
+  Create MasterManifest with principalId assigned
+    └─► Create HouseManifest with totalCBM (e.g. 0.797)
+          └─► Create ManifestJob
+                └─► POST /manifest-jobs/:id/recompute-handling-charge
+                      For each charge type (up to 10):
+                        MIN_MAX: if min*CBM < max → use max, else use min*CBM
+                        FIXED:   use fixedValue
+                        MAX:     use maxValue
+                      handCharge = sum of all subCharges × currencyRate
+                      e.g. (110+35+70+30) × 14 = 3430
 ```
 
 ### 2. Job → Income Recording
@@ -158,6 +188,10 @@ cifValue  = fobValue + frtValue + insValue
 
 | Table | Schema | Notes |
 |-------|--------|-------|
+| `principals` | `tenant_{org}` | Active freight companies for handling charge config |
+| `currencies` | `tenant_{org}` | Exchange rates with active/inactive status |
+| `principal_charge_setups` | `tenant_{org}` | One per principal, links to currency |
+| `principal_charge_types` | `tenant_{org}` | Up to 10 charge type rows per setup |
 | `companies` | `public` | Shared; holds tax rates & company info |
 | `users` | `tenant_{org}` | Per-tenant user accounts |
 | `master_manifests` | `tenant_{org}` | Ocean/Air BL |
@@ -181,6 +215,10 @@ cifValue  = fobValue + frtValue + insValue
 | Auth | `POST /auth/register`, `POST /auth/login` | Public |
 | Users | `GET/PUT /users/:id` | JWT |
 | Companies | `GET/POST/PUT /companies` | JWT |
+| Principals | `GET/POST/PUT/DELETE /principals` | JWT |
+| Currencies | `GET/POST/PUT/DELETE /currencies` | JWT |
+| Principal Charge Setup | `GET/POST/DELETE /principal-charges` | JWT |
+| Recompute Handling Charge | `POST /manifest-jobs/:id/recompute-handling-charge` | JWT |
 | Master Manifests | `GET/POST/PUT/DELETE /manifests/master` | JWT |
 | House Manifests | `GET/POST/PUT/DELETE /manifests/house` | JWT |
 | Weight Charges | `GET/POST/PUT/DELETE /manifests/weight-charges` | JWT |

@@ -22,6 +22,9 @@ import { BankTransactionsModule } from './bank-transactions/bank-transactions.mo
 import { CifValuesModule } from './cif-values/cif-values.module';
 import { ShippingLineModule } from './shipping-lines/shipping-line.module';
 import { ShipperModule } from './shippers/shipper.module';
+import { PrincipalModule } from './principals/principal.module';
+import { CurrencyModule } from './currencies/currency.module';
+import { PrincipalChargeModule } from './principal-charges/principal-charge.module';
 import { WarmupInterceptor } from './health/warmup.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -55,6 +58,9 @@ import { getDatabaseConfig } from './config/database.config';
     CifValuesModule,
     ShippingLineModule,
     ShipperModule,
+    PrincipalModule,
+    CurrencyModule,
+    PrincipalChargeModule,
   ],
   providers: [
     {

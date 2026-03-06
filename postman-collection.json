@@ -1722,30 +1722,274 @@
           "request": {
             "method": "DELETE",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "{{orgName}}"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
             ],
             "url": {
               "raw": "{{baseUrl}}/manifest-jobs/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "manifest-jobs",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": ""
-                }
+              "host": ["{{baseUrl}}"],
+              "path": ["manifest-jobs", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Recompute Handling Charge",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/manifest-jobs/:id/recompute-handling-charge",
+              "host": ["{{baseUrl}}"],
+              "path": ["manifest-jobs", ":id", "recompute-handling-charge"],
+              "variable": [{ "key": "id", "value": "" }]
+            },
+            "description": "Recalculates handling charge using the principal's charge setup and house BL CBM. Prerequisites: master manifest must have principalId, principal must have active currency + charge types configured, house BL must have totalCBM > 0."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Principals",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/principals?page=1&limit=10&name=&isActive=",
+              "host": ["{{baseUrl}}"],
+              "path": ["principals"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "name", "value": "", "description": "Filter by name (partial match)" },
+                { "key": "isActive", "value": "", "description": "true or false" }
               ]
+            }
+          }
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/principals/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["principals", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"GLC OCEAN LINE\",\n  \"isActive\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/principals", "host": ["{{baseUrl}}"], "path": ["principals"] }
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"isActive\": false\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/principals/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["principals", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/principals/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["principals", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Currencies",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/currencies?page=1&limit=10&code=&isActive=",
+              "host": ["{{baseUrl}}"],
+              "path": ["currencies"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "code", "value": "", "description": "Filter by currency code" },
+                { "key": "isActive", "value": "", "description": "true or false" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/currencies/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["currencies", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"code\": \"USD\",\n  \"name\": \"US Dollar\",\n  \"rate\": 14,\n  \"period\": \"JAN-2024\",\n  \"isActive\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/currencies", "host": ["{{baseUrl}}"], "path": ["currencies"] }
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"rate\": 15.5,\n  \"period\": \"FEB-2024\",\n  \"isActive\": true\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/currencies/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["currencies", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/currencies/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["currencies", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Principal Charges",
+      "item": [
+        {
+          "name": "Get All Setups",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/principal-charges", "host": ["{{baseUrl}}"], "path": ["principal-charges"] }
+          }
+        },
+        {
+          "name": "Get by Principal ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/principal-charges/:principalId",
+              "host": ["{{baseUrl}}"],
+              "path": ["principal-charges", ":principalId"],
+              "variable": [{ "key": "principalId", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Upsert Setup",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"principalId\": \"uuid-of-principal\",\n  \"currencyId\": \"uuid-of-currency\",\n  \"chargeTypes\": [\n    { \"chargeType\": \"CFS\", \"calcMode\": \"MIN_MAX\", \"minValue\": 25, \"maxValue\": 110, \"sortOrder\": 0 },\n    { \"chargeType\": \"DRYAGE\", \"calcMode\": \"MIN_MAX\", \"minValue\": 16, \"maxValue\": 35, \"sortOrder\": 1 },\n    { \"chargeType\": \"GCNET\", \"calcMode\": \"FIXED\", \"fixedValue\": 70, \"sortOrder\": 2 },\n    { \"chargeType\": \"THC\", \"calcMode\": \"MIN_MAX\", \"minValue\": 12, \"maxValue\": 30, \"sortOrder\": 3 }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/principal-charges", "host": ["{{baseUrl}}"], "path": ["principal-charges"] },
+            "description": "Creates or fully replaces a principal's charge setup. calcMode: MIN_MAX | MAX | FIXED. Max 10 charge types."
+          }
+        },
+        {
+          "name": "Delete Setup",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-org-name", "value": "{{orgName}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/principal-charges/:principalId",
+              "host": ["{{baseUrl}}"],
+              "path": ["principal-charges", ":principalId"],
+              "variable": [{ "key": "principalId", "value": "" }]
             }
           }
         }

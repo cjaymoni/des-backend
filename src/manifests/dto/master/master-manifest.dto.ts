@@ -54,6 +54,10 @@ export class CreateMasterManifestDto {
   shipperId?: string;
 
   @IsOptional()
+  @IsUUID()
+  principalId?: string;
+
+  @IsOptional()
   @IsString()
   @MaxLength(50)
   cntSize?: string;
@@ -122,6 +126,10 @@ export class UpdateMasterManifestDto {
   @IsOptional()
   @IsUUID()
   shipperId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  principalId?: string;
 
   @IsOptional()
   @IsString()

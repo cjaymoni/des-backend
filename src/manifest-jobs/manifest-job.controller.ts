@@ -47,4 +47,12 @@ export class ManifestJobController {
   delete(@Param('id') id: string): Promise<void> {
     return this.service.delete(id);
   }
+
+  @Post(':id/recompute-handling-charge')
+  recompute(
+    @Param('id') id: string,
+    @Req() req: { user: { id: string } },
+  ) {
+    return this.service.recomputeHandlingCharge(id, req.user.id);
+  }
 }

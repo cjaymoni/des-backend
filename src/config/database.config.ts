@@ -15,6 +15,10 @@ import { CifValue } from 'src/cif-values/cif-value.entity';
 import { CifSettings } from 'src/cif-values/cif-settings.entity';
 import { ShippingLine } from '../shipping-lines/shipping-line.entity';
 import { Shipper } from '../shippers/shipper.entity';
+import { Principal } from '../principals/principal.entity';
+import { Currency } from '../currencies/currency.entity';
+import { PrincipalChargeSetup } from '../principal-charges/principal-charge-setup.entity';
+import { PrincipalChargeType } from '../principal-charges/principal-charge-type.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -41,6 +45,10 @@ export const getDatabaseConfig = (
     CifSettings,
     ShippingLine,
     Shipper,
+    Principal,
+    Currency,
+    PrincipalChargeSetup,
+    PrincipalChargeType,
   ],
   synchronize: false,
   // schema: 'public',

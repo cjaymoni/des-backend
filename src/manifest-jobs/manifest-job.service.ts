@@ -2,20 +2,26 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { TenantService } from '../tenant/tenant.service';
 import { ManifestJob } from './manifest-job.entity';
 import { HouseManifest } from '../manifests/entities/house-manifest.entity';
+import { MasterManifest } from '../manifests/entities/master-manifest.entity';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
 import {
   CreateManifestJobDto,
   UpdateManifestJobDto,
   SearchManifestJobDto,
 } from './manifest-job.dto';
+import { HandlingChargeEngine, HandlingChargeResult } from './handling-charge.engine';
 
 @Injectable()
 export class ManifestJobService {
-  constructor(private tenantService: TenantService) {}
+  constructor(
+    private tenantService: TenantService,
+    private handlingChargeEngine: HandlingChargeEngine,
+  ) {}
 
   async findAll(
     pagination: PaginationDto,
@@ -132,6 +138,37 @@ export class ManifestJobService {
       }
 
       return this.fetchOne(manager, id);
+    });
+  }
+
+  async recomputeHandlingCharge(id: string, userId: string): Promise<{ job: ManifestJob; result: HandlingChargeResult }> {
+    return this.tenantService.withManager(async (manager) => {
+      const job = await this.fetchOne(manager, id);
+
+      const house = await manager
+        .getRepository(HouseManifest)
+        .findOne({ where: { id: job.houseManifestId } });
+      if (!house) throw new NotFoundException('House manifest not found');
+
+      const master = await manager
+        .getRepository(MasterManifest)
+        .findOne({ where: { id: house.masterManifestId } });
+      if (!master) throw new NotFoundException('Master manifest not found');
+      if (!master.principalId) throw new BadRequestException('No principal assigned to this cargo manifest');
+
+      const cbm = house.totalCBM;
+      if (!cbm || cbm <= 0) throw new BadRequestException('House BL has no CBM value');
+
+      const result = await this.handlingChargeEngine.compute(master.principalId, cbm, manager);
+
+      await manager.getRepository(ManifestJob).update(id, {
+        handCharge: result.totalHandCharge,
+        calcStatus: true,
+        updatedBy: userId,
+      });
+
+      const updated = await this.fetchOne(manager, id);
+      return { job: updated, result };
     });
   }
 

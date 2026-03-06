@@ -45,6 +45,7 @@ export class MasterManifestService {
       const [items, total] = await qb
         .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
         .leftJoinAndSelect('master.shipperRef', 'shipper')
+        .leftJoinAndSelect('master.principalRef', 'principal')
         .skip(skip)
         .take(limit)
         .orderBy('master.createdAt', 'DESC')
@@ -138,6 +139,7 @@ export class MasterManifestService {
       .leftJoinAndSelect('master.houseManifests', 'house')
       .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
       .leftJoinAndSelect('master.shipperRef', 'shipper')
+      .leftJoinAndSelect('master.principalRef', 'principal')
       .where('master.id = :id', { id })
       .getOne();
     if (!manifest) throw new NotFoundException('Master manifest not found');

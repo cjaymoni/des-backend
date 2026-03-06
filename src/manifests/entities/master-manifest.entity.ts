@@ -3,6 +3,7 @@ import { BaseEntity } from '../../common/entities/base.entity';
 import { HouseManifest } from './house-manifest.entity';
 import { ShippingLine } from '../../shipping-lines/shipping-line.entity';
 import { Shipper } from '../../shippers/shipper.entity';
+import { Principal } from '../../principals/principal.entity';
 
 @Entity('master_manifests')
 @Index(['blNo'])
@@ -49,6 +50,13 @@ export class MasterManifest extends BaseEntity {
   @ManyToOne(() => Shipper, { nullable: true, eager: false })
   @JoinColumn({ name: 'shipperId' })
   shipperRef: Shipper;
+
+  @Column({ nullable: true })
+  principalId: string;
+
+  @ManyToOne(() => Principal, { nullable: true, eager: false })
+  @JoinColumn({ name: 'principalId' })
+  principalRef: Principal;
 
   @Column({ length: 50, nullable: true })
   cntSize: string;

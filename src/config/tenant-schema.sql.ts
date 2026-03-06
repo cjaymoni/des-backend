@@ -15,6 +15,73 @@ CREATE TABLE IF NOT EXISTS "users" (
   "updatedBy" varchar
 );
 
+-- Principals table (Active Principals for handling charge setup)
+CREATE TABLE IF NOT EXISTS "principals" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(100) NOT NULL UNIQUE,
+  "isActive" boolean NOT NULL DEFAULT true,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+CREATE INDEX IF NOT EXISTS "idx_principals_name" ON "principals" ("name");
+
+-- Currencies table (exchange rates with active/inactive status)
+CREATE TABLE IF NOT EXISTS "currencies" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "code" varchar(10) NOT NULL UNIQUE,
+  "name" varchar(100) NOT NULL,
+  "rate" decimal(12,4) NOT NULL DEFAULT 1,
+  "period" varchar(50),
+  "isActive" boolean NOT NULL DEFAULT true,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+CREATE INDEX IF NOT EXISTS "idx_currencies_code" ON "currencies" ("code");
+
+-- Principal Charge Setups table (one per principal, links to currency)
+CREATE TABLE IF NOT EXISTS "principal_charge_setups" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "principalId" uuid NOT NULL UNIQUE,
+  "currencyId" uuid NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar,
+  FOREIGN KEY ("principalId") REFERENCES "principals"("id") ON DELETE CASCADE,
+  FOREIGN KEY ("currencyId") REFERENCES "currencies"("id") ON DELETE RESTRICT
+);
+
+CREATE INDEX IF NOT EXISTS "idx_principal_charge_setups_principalId" ON "principal_charge_setups" ("principalId");
+
+-- Principal Charge Types table (up to 10 rows per setup)
+CREATE TABLE IF NOT EXISTS "principal_charge_types" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "setupId" uuid NOT NULL,
+  "chargeType" varchar(50) NOT NULL,
+  "calcMode" varchar(10) NOT NULL,
+  "minValue" decimal(12,4),
+  "maxValue" decimal(12,4),
+  "fixedValue" decimal(12,4),
+  "sortOrder" int NOT NULL DEFAULT 0,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar,
+  FOREIGN KEY ("setupId") REFERENCES "principal_charge_setups"("id") ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "idx_principal_charge_types_setupId" ON "principal_charge_types" ("setupId");
+
 -- Shippers table
 CREATE TABLE IF NOT EXISTS "shippers" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -54,6 +121,7 @@ CREATE TABLE IF NOT EXISTS "master_manifests" (
   "portLoad" varchar(50),
   "shippingLineId" uuid,
   "shipperId" uuid,
+  "principalId" uuid,
   "cntSize" varchar(50),
   "sealNo" varchar(50),
   "consignType" varchar(20),
@@ -64,7 +132,8 @@ CREATE TABLE IF NOT EXISTS "master_manifests" (
   "createdBy" varchar,
   "updatedBy" varchar,
   FOREIGN KEY ("shippingLineId") REFERENCES "shipping_lines"("id") ON DELETE SET NULL,
-  FOREIGN KEY ("shipperId") REFERENCES "shippers"("id") ON DELETE SET NULL
+  FOREIGN KEY ("shipperId") REFERENCES "shippers"("id") ON DELETE SET NULL,
+  FOREIGN KEY ("principalId") REFERENCES "principals"("id") ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS "idx_master_manifests_blNo" ON "master_manifests" ("blNo");
@@ -462,6 +531,9 @@ DO $$ BEGIN
       DROP COLUMN IF EXISTS "status";
   END IF;
 END $$;
+
+-- Add principalId to master_manifests for existing tenants
+ALTER TABLE IF EXISTS "master_manifests" ADD COLUMN IF NOT EXISTS "principalId" uuid;
 
 -- Add version columns for optimistic locking (safe for existing tenants)
 ALTER TABLE IF EXISTS "jobs" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;

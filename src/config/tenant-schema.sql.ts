@@ -562,10 +562,12 @@ ALTER TABLE IF EXISTS "manifest_jobs" ADD COLUMN IF NOT EXISTS "version" int NOT
 -- Migrate vatNhilStatus from varchar to boolean for existing tenants
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='jobs' AND column_name='vatNhilStatus' AND data_type='character varying') THEN
+    ALTER TABLE "jobs" ALTER COLUMN "vatNhilStatus" DROP DEFAULT;
     ALTER TABLE "jobs" ALTER COLUMN "vatNhilStatus" TYPE boolean USING ("vatNhilStatus" != '0');
     ALTER TABLE "jobs" ALTER COLUMN "vatNhilStatus" SET DEFAULT false;
   END IF;
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='income_expenditures' AND column_name='vatNhilStatus' AND data_type='character varying') THEN
+    ALTER TABLE "income_expenditures" ALTER COLUMN "vatNhilStatus" DROP DEFAULT;
     ALTER TABLE "income_expenditures" ALTER COLUMN "vatNhilStatus" TYPE boolean USING ("vatNhilStatus" != '0');
     ALTER TABLE "income_expenditures" ALTER COLUMN "vatNhilStatus" SET DEFAULT false;
   END IF;

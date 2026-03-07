@@ -1,5 +1,5 @@
 import {
-  IsString, IsOptional, IsNumber, IsDate, MaxLength, Min,
+  IsString, IsOptional, IsNumber, IsDate, IsBoolean, MaxLength, Min,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
@@ -91,9 +91,9 @@ export class CreateIncomeExpenditureDto {
   payTerms?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  vatNhilStatus?: string;
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  vatNhilStatus?: boolean;
 
   @IsOptional()
   @IsString()
@@ -217,9 +217,9 @@ export class UpdateIncomeExpenditureDto {
   payTerms?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  vatNhilStatus?: string;
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  vatNhilStatus?: boolean;
 
   @IsOptional()
   @IsString()

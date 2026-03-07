@@ -13,6 +13,15 @@ import { Job } from './job.entity';
 export class JobController {
   constructor(private service: JobService) {}
 
+  @Get('next-number')
+  nextNumber(
+    @Query('transType') transType: string,
+    @Query('a2IdfNo') a2IdfNo: string,
+    @Query('finType') finType: string,
+  ): Promise<string> {
+    return this.service.nextNumber(transType, a2IdfNo, finType);
+  }
+
   @Get()
   findAll(
     @Query() pagination: PaginationDto,

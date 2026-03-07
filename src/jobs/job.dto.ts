@@ -135,9 +135,9 @@ export class CreateJobDto {
   totItem?: number;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  vatNhilStatus?: string;
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  vatNhilStatus?: boolean;
 
   @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)
@@ -274,9 +274,9 @@ export class UpdateJobDto {
   totItem?: number;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  vatNhilStatus?: string;
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  vatNhilStatus?: boolean;
 
   @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)

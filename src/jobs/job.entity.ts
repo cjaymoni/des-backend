@@ -175,8 +175,8 @@ export class Job extends BaseEntity {
   @Column({ length: 4, nullable: true })
   strYear: string;
 
-  @Column({ length: 10, default: '0' })
-  vatNhilStatus: string;
+  @Column({ default: false })
+  vatNhilStatus: boolean;
 
   @Column({ default: false })
   paidStatus: boolean;

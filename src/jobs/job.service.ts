@@ -105,6 +105,23 @@ export class JobService {
     });
   }
 
+  async nextNumber(transType: string, a2IdfNo: string, finType: string): Promise<string> {
+    return this.tenantService.withManager(async (manager) => {
+      const year = new Date().getFullYear();
+      const trans = transType.slice(0, 3).toUpperCase();
+      const idf = a2IdfNo.replace(/\s+/g, '').toUpperCase().slice(0, 10);
+      const fin = finType.slice(0, 3).toUpperCase();
+      const prefix = `${trans}-${idf}-${fin}-${year}-`;
+      const count = await manager
+        .getRepository(Job)
+        .createQueryBuilder('j')
+        .where('j.jobNo LIKE :prefix', { prefix: `${prefix}%` })
+        .getCount();
+      const seq = String(count + 1).padStart(4, '0');
+      return `${prefix}${seq}`;
+    });
+  }
+
   async delete(id: string): Promise<void> {
     await this.tenantService.withManager(async (manager) => {
       const existing = await manager

@@ -290,7 +290,7 @@ CREATE TABLE IF NOT EXISTS "income_expenditures" (
   "incCheqVat" decimal(10,2) NOT NULL DEFAULT 0,
   "expCheqVat" decimal(10,2) NOT NULL DEFAULT 0,
   "payTerms" varchar(10) NOT NULL DEFAULT '0',
-  "vatNhilStatus" varchar(10) NOT NULL DEFAULT '0',
+  "vatNhilStatus" boolean NOT NULL DEFAULT false,
   "consignee" varchar(200),
   "hbl" varchar(20),
   "agentDetails" varchar(200),
@@ -344,7 +344,7 @@ CREATE TABLE IF NOT EXISTS "jobs" (
   "totItem" int NOT NULL DEFAULT 0,
   "strMonth" varchar(10),
   "strYear" varchar(4),
-  "vatNhilStatus" varchar(10) NOT NULL DEFAULT '0',
+  "vatNhilStatus" boolean NOT NULL DEFAULT false,
   "paidStatus" boolean NOT NULL DEFAULT false,
   "version" int NOT NULL DEFAULT 1,
   "createdAt" timestamp NOT NULL DEFAULT now(),
@@ -539,7 +539,7 @@ DO $$ BEGIN
       ADD COLUMN IF NOT EXISTS "totItem" int NOT NULL DEFAULT 0,
       ADD COLUMN IF NOT EXISTS "strMonth" varchar(10),
       ADD COLUMN IF NOT EXISTS "strYear" varchar(4),
-      ADD COLUMN IF NOT EXISTS "vatNhilStatus" varchar(10) NOT NULL DEFAULT '0',
+      ADD COLUMN IF NOT EXISTS "vatNhilStatus" boolean NOT NULL DEFAULT false,
       ADD COLUMN IF NOT EXISTS "paidStatus" boolean NOT NULL DEFAULT false,
       ADD COLUMN IF NOT EXISTS "deletedAt" timestamp;
     -- Drop old stub columns if they exist
@@ -558,4 +558,16 @@ ALTER TABLE IF EXISTS "jobs" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEF
 ALTER TABLE IF EXISTS "bank_accounts" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
 ALTER TABLE IF EXISTS "house_manifests" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
 ALTER TABLE IF EXISTS "manifest_jobs" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
+
+-- Migrate vatNhilStatus from varchar to boolean for existing tenants
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='jobs' AND column_name='vatNhilStatus' AND data_type='character varying') THEN
+    ALTER TABLE "jobs" ALTER COLUMN "vatNhilStatus" TYPE boolean USING ("vatNhilStatus" != '0');
+    ALTER TABLE "jobs" ALTER COLUMN "vatNhilStatus" SET DEFAULT false;
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='income_expenditures' AND column_name='vatNhilStatus' AND data_type='character varying') THEN
+    ALTER TABLE "income_expenditures" ALTER COLUMN "vatNhilStatus" TYPE boolean USING ("vatNhilStatus" != '0');
+    ALTER TABLE "income_expenditures" ALTER COLUMN "vatNhilStatus" SET DEFAULT false;
+  END IF;
+END $$;
 `;

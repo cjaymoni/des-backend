@@ -19,6 +19,7 @@ import { Principal } from '../principals/principal.entity';
 import { Currency } from '../currencies/currency.entity';
 import { PrincipalChargeSetup } from '../principal-charges/principal-charge-setup.entity';
 import { PrincipalChargeType } from '../principal-charges/principal-charge-type.entity';
+import { ChargeSetupAuditLog } from 'src/principal-charges/charge-setup-audit.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -49,6 +50,7 @@ export const getDatabaseConfig = (
     Currency,
     PrincipalChargeSetup,
     PrincipalChargeType,
+    ChargeSetupAuditLog,
   ],
   synchronize: false,
   // schema: 'public',

@@ -82,6 +82,24 @@ CREATE TABLE IF NOT EXISTS "principal_charge_types" (
 
 CREATE INDEX IF NOT EXISTS "idx_principal_charge_types_setupId" ON "principal_charge_types" ("setupId");
 
+-- Charge Setup Audit Logs table (immutable history of charge setup changes)
+CREATE TABLE IF NOT EXISTS "charge_setup_audit_logs" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "principalId" uuid NOT NULL,
+  "principalName" varchar(100) NOT NULL,
+  "action" varchar(20) NOT NULL,
+  "currencyId" uuid,
+  "currencyCode" varchar(10),
+  "chargeTypes" jsonb,
+  "previousChargeTypes" jsonb,
+  "previousCurrencyCode" varchar(10),
+  "performedBy" varchar,
+  "createdAt" timestamp NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS "idx_charge_setup_audit_logs_principalId" ON "charge_setup_audit_logs" ("principalId");
+CREATE INDEX IF NOT EXISTS "idx_charge_setup_audit_logs_createdAt" ON "charge_setup_audit_logs" ("createdAt");
+
 -- Shippers table
 CREATE TABLE IF NOT EXISTS "shippers" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),

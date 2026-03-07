@@ -1,10 +1,22 @@
 import {
-  Controller, Get, Post, Put, Delete,
-  Body, Param, Query, Req, UseGuards,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ManifestJobService } from './manifest-job.service';
-import { CreateManifestJobDto, UpdateManifestJobDto, SearchManifestJobDto } from './manifest-job.dto';
+import {
+  CreateManifestJobDto,
+  UpdateManifestJobDto,
+  SearchManifestJobDto,
+} from './manifest-job.dto';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
 import { ManifestJob } from './manifest-job.entity';
 
@@ -48,11 +60,13 @@ export class ManifestJobController {
     return this.service.delete(id);
   }
 
+  @Get(':id/preview-handling-charge')
+  previewHandlingCharge(@Param('id') id: string) {
+    return this.service.previewHandlingCharge(id);
+  }
+
   @Post(':id/recompute-handling-charge')
-  recompute(
-    @Param('id') id: string,
-    @Req() req: { user: { id: string } },
-  ) {
+  recompute(@Param('id') id: string, @Req() req: { user: { id: string } }) {
     return this.service.recomputeHandlingCharge(id, req.user.id);
   }
 }

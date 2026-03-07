@@ -14,7 +14,10 @@ import {
   UpdateManifestJobDto,
   SearchManifestJobDto,
 } from './manifest-job.dto';
-import { HandlingChargeEngine, HandlingChargeResult } from './handling-charge.engine';
+import {
+  HandlingChargeEngine,
+  HandlingChargeResult,
+} from './handling-charge.engine';
 
 @Injectable()
 export class ManifestJobService {
@@ -141,7 +144,10 @@ export class ManifestJobService {
     });
   }
 
-  async recomputeHandlingCharge(id: string, userId: string): Promise<{ job: ManifestJob; result: HandlingChargeResult }> {
+  /** Preview handling charge without persisting — read-only calculation */
+  async previewHandlingCharge(
+    id: string,
+  ): Promise<{ currentHandCharge: number; result: HandlingChargeResult }> {
     return this.tenantService.withManager(async (manager) => {
       const job = await this.fetchOne(manager, id);
 
@@ -154,12 +160,55 @@ export class ManifestJobService {
         .getRepository(MasterManifest)
         .findOne({ where: { id: house.masterManifestId } });
       if (!master) throw new NotFoundException('Master manifest not found');
-      if (!master.principalId) throw new BadRequestException('No principal assigned to this cargo manifest');
+      if (!master.principalId)
+        throw new BadRequestException(
+          'No principal assigned to this cargo manifest',
+        );
 
       const cbm = house.totalCBM;
-      if (!cbm || cbm <= 0) throw new BadRequestException('House BL has no CBM value');
+      if (!cbm || cbm <= 0)
+        throw new BadRequestException('House BL has no CBM value');
 
-      const result = await this.handlingChargeEngine.compute(master.principalId, cbm, manager);
+      const result = await this.handlingChargeEngine.compute(
+        master.principalId,
+        cbm,
+        manager,
+      );
+
+      return { currentHandCharge: job.handCharge, result };
+    });
+  }
+
+  async recomputeHandlingCharge(
+    id: string,
+    userId: string,
+  ): Promise<{ job: ManifestJob; result: HandlingChargeResult }> {
+    return this.tenantService.withManager(async (manager) => {
+      const job = await this.fetchOne(manager, id);
+
+      const house = await manager
+        .getRepository(HouseManifest)
+        .findOne({ where: { id: job.houseManifestId } });
+      if (!house) throw new NotFoundException('House manifest not found');
+
+      const master = await manager
+        .getRepository(MasterManifest)
+        .findOne({ where: { id: house.masterManifestId } });
+      if (!master) throw new NotFoundException('Master manifest not found');
+      if (!master.principalId)
+        throw new BadRequestException(
+          'No principal assigned to this cargo manifest',
+        );
+
+      const cbm = house.totalCBM;
+      if (!cbm || cbm <= 0)
+        throw new BadRequestException('House BL has no CBM value');
+
+      const result = await this.handlingChargeEngine.compute(
+        master.principalId,
+        cbm,
+        manager,
+      );
 
       await manager.getRepository(ManifestJob).update(id, {
         handCharge: result.totalHandCharge,

@@ -166,6 +166,50 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+-- Account Types table
+CREATE TABLE IF NOT EXISTS "account_types" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(50) NOT NULL UNIQUE,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+-- Bank Names (BankSetup) table
+CREATE TABLE IF NOT EXISTS "bank_names" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "bankCode" varchar(10) NOT NULL UNIQUE,
+  "bankName" varchar(150) NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+CREATE INDEX IF NOT EXISTS "idx_bank_names_bankCode" ON "bank_names" ("bankCode");
+
+-- Bank Purposes table
+CREATE TABLE IF NOT EXISTS "bank_purposes" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(100) NOT NULL UNIQUE,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+-- Transaction Purposes table
+CREATE TABLE IF NOT EXISTS "transaction_purposes" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "purposeCode" varchar(50) NOT NULL UNIQUE,
+  "purposeName" varchar(150) NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+CREATE INDEX IF NOT EXISTS "idx_transaction_purposes_purposeCode" ON "transaction_purposes" ("purposeCode");
+
 -- House Manifests table
 CREATE TABLE IF NOT EXISTS "house_manifests" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -197,18 +241,6 @@ CREATE TABLE IF NOT EXISTS "house_manifests" (
 CREATE INDEX IF NOT EXISTS "idx_house_manifests_hblNo" ON "house_manifests" ("hblNo");
 CREATE INDEX IF NOT EXISTS "idx_house_manifests_consignee" ON "house_manifests" ("consignee");
 CREATE INDEX IF NOT EXISTS "idx_house_manifests_masterManifestId" ON "house_manifests" ("masterManifestId");
-
--- Bank Names (BankSetup) table
-CREATE TABLE IF NOT EXISTS "bank_names" (
-  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "bankCode" varchar(10) NOT NULL UNIQUE,
-  "bankName" varchar(150) NOT NULL,
-  "createdAt" timestamp NOT NULL DEFAULT now(),
-  "updatedAt" timestamp NOT NULL DEFAULT now(),
-  "createdBy" varchar,
-  "updatedBy" varchar
-);
-CREATE INDEX IF NOT EXISTS "idx_bank_names_bankCode" ON "bank_names" ("bankCode");
 
 -- Bank Accounts table (new tenants)
 CREATE TABLE IF NOT EXISTS "bank_accounts" (
@@ -301,38 +333,6 @@ DO $$ BEGIN
 END $$;
 CREATE INDEX IF NOT EXISTS "idx_bank_transactions_bankAccountId" ON "bank_transactions" ("bankAccountId");
 CREATE INDEX IF NOT EXISTS "idx_bank_transactions_transactionDate" ON "bank_transactions" ("transactionDate");
-
--- Bank Purposes table
-CREATE TABLE IF NOT EXISTS "bank_purposes" (
-  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "name" varchar(100) NOT NULL UNIQUE,
-  "createdAt" timestamp NOT NULL DEFAULT now(),
-  "updatedAt" timestamp NOT NULL DEFAULT now(),
-  "createdBy" varchar,
-  "updatedBy" varchar
-);
-
--- Transaction Purposes table
-CREATE TABLE IF NOT EXISTS "transaction_purposes" (
-  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "purposeCode" varchar(50) NOT NULL UNIQUE,
-  "purposeName" varchar(150) NOT NULL,
-  "createdAt" timestamp NOT NULL DEFAULT now(),
-  "updatedAt" timestamp NOT NULL DEFAULT now(),
-  "createdBy" varchar,
-  "updatedBy" varchar
-);
-CREATE INDEX IF NOT EXISTS "idx_transaction_purposes_purposeCode" ON "transaction_purposes" ("purposeCode");
-
--- Account Types table
-CREATE TABLE IF NOT EXISTS "account_types" (
-  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "name" varchar(50) NOT NULL UNIQUE,
-  "createdAt" timestamp NOT NULL DEFAULT now(),
-  "updatedAt" timestamp NOT NULL DEFAULT now(),
-  "createdBy" varchar,
-  "updatedBy" varchar
-);
 
 -- Weight Charges table
 CREATE TABLE IF NOT EXISTS "weight_charges" (

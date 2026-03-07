@@ -1722,14 +1722,30 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/manifest-jobs/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["manifest-jobs", ":id"],
-              "variable": [{ "key": "id", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "manifest-jobs",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
             }
           }
         },
@@ -1738,14 +1754,31 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/manifest-jobs/:id/recompute-handling-charge",
-              "host": ["{{baseUrl}}"],
-              "path": ["manifest-jobs", ":id", "recompute-handling-charge"],
-              "variable": [{ "key": "id", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "manifest-jobs",
+                ":id",
+                "recompute-handling-charge"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
             },
             "description": "Recalculates handling charge using the principal's charge setup and house BL CBM. Prerequisites: master manifest must have principalId, principal must have active currency + charge types configured, house BL must have totalCBM > 0."
           }
@@ -1760,18 +1793,42 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/principals?page=1&limit=10&name=&isActive=",
-              "host": ["{{baseUrl}}"],
-              "path": ["principals"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principals"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" },
-                { "key": "name", "value": "", "description": "Filter by name (partial match)" },
-                { "key": "isActive", "value": "", "description": "true or false" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "name",
+                  "value": "",
+                  "description": "Filter by name (partial match)"
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "description": "true or false"
+                }
               ]
             }
           }
@@ -1781,14 +1838,30 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/principals/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["principals", ":id"],
-              "variable": [{ "key": "id", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principals",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
             }
           }
         },
@@ -1797,12 +1870,32 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"name\": \"GLC OCEAN LINE\",\n  \"isActive\": true\n}" },
-            "url": { "raw": "{{baseUrl}}/principals", "host": ["{{baseUrl}}"], "path": ["principals"] }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"GLC OCEAN LINE\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/principals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principals"
+              ]
+            }
           }
         },
         {
@@ -1810,16 +1903,38 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"isActive\": false\n}" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/principals/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["principals", ":id"],
-              "variable": [{ "key": "id", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principals",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
             }
           }
         },
@@ -1828,14 +1943,30 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/principals/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["principals", ":id"],
-              "variable": [{ "key": "id", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principals",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
             }
           }
         }
@@ -1849,18 +1980,42 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/currencies?page=1&limit=10&code=&isActive=",
-              "host": ["{{baseUrl}}"],
-              "path": ["currencies"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "currencies"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" },
-                { "key": "code", "value": "", "description": "Filter by currency code" },
-                { "key": "isActive", "value": "", "description": "true or false" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "code",
+                  "value": "",
+                  "description": "Filter by currency code"
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "description": "true or false"
+                }
               ]
             }
           }
@@ -1870,14 +2025,30 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/currencies/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["currencies", ":id"],
-              "variable": [{ "key": "id", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "currencies",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
             }
           }
         },
@@ -1886,12 +2057,32 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"code\": \"USD\",\n  \"name\": \"US Dollar\",\n  \"rate\": 14,\n  \"period\": \"JAN-2024\",\n  \"isActive\": true\n}" },
-            "url": { "raw": "{{baseUrl}}/currencies", "host": ["{{baseUrl}}"], "path": ["currencies"] }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"USD\",\n  \"name\": \"US Dollar\",\n  \"rate\": 14,\n  \"period\": \"JAN-2024\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/currencies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "currencies"
+              ]
+            }
           }
         },
         {
@@ -1899,16 +2090,38 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"rate\": 15.5,\n  \"period\": \"FEB-2024\",\n  \"isActive\": true\n}" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rate\": 15.5,\n  \"period\": \"FEB-2024\",\n  \"isActive\": true\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/currencies/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["currencies", ":id"],
-              "variable": [{ "key": "id", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "currencies",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
             }
           }
         },
@@ -1917,14 +2130,30 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/currencies/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["currencies", ":id"],
-              "variable": [{ "key": "id", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "currencies",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
             }
           }
         }
@@ -1938,10 +2167,24 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
-            "url": { "raw": "{{baseUrl}}/principal-charges", "host": ["{{baseUrl}}"], "path": ["principal-charges"] }
+            "url": {
+              "raw": "{{baseUrl}}/principal-charges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principal-charges"
+              ]
+            }
           }
         },
         {
@@ -1949,14 +2192,30 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/principal-charges/:principalId",
-              "host": ["{{baseUrl}}"],
-              "path": ["principal-charges", ":principalId"],
-              "variable": [{ "key": "principalId", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principal-charges",
+                ":principalId"
+              ],
+              "variable": [
+                {
+                  "key": "principalId",
+                  "value": ""
+                }
+              ]
             }
           }
         },
@@ -1965,15 +2224,32 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"principalId\": \"uuid-of-principal\",\n  \"currencyId\": \"uuid-of-currency\",\n  \"chargeTypes\": [\n    { \"chargeType\": \"CFS\", \"calcMode\": \"MIN_MAX\", \"minValue\": 25, \"maxValue\": 110, \"sortOrder\": 0 },\n    { \"chargeType\": \"DRYAGE\", \"calcMode\": \"MIN_MAX\", \"minValue\": 16, \"maxValue\": 35, \"sortOrder\": 1 },\n    { \"chargeType\": \"GCNET\", \"calcMode\": \"FIXED\", \"fixedValue\": 70, \"sortOrder\": 2 },\n    { \"chargeType\": \"THC\", \"calcMode\": \"MIN_MAX\", \"minValue\": 12, \"maxValue\": 30, \"sortOrder\": 3 }\n  ]\n}"
             },
-            "url": { "raw": "{{baseUrl}}/principal-charges", "host": ["{{baseUrl}}"], "path": ["principal-charges"] },
+            "url": {
+              "raw": "{{baseUrl}}/principal-charges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principal-charges"
+              ]
+            },
             "description": "Creates or fully replaces a principal's charge setup. calcMode: MIN_MAX | MAX | FIXED. Max 10 charge types."
           }
         },
@@ -1982,14 +2258,30 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "x-org-name", "value": "{{orgName}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/principal-charges/:principalId",
-              "host": ["{{baseUrl}}"],
-              "path": ["principal-charges", ":principalId"],
-              "variable": [{ "key": "principalId", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principal-charges",
+                ":principalId"
+              ],
+              "variable": [
+                {
+                  "key": "principalId",
+                  "value": ""
+                }
+              ]
             }
           }
         }
@@ -2417,6 +2709,145 @@
       "name": "Bank Transactions",
       "item": [
         {
+          "name": "Bank Names",
+          "item": [
+            {
+              "name": "Get All Bank Names",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/bank-names",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "bank-transactions",
+                    "bank-names"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create Bank Name",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bankCode\": \"GCB\",\n  \"bankName\": \"Ghana Commercial Bank\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/bank-names",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "bank-transactions",
+                    "bank-names"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Bank Name",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bankName\": \"GCB Bank PLC\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/bank-names/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "bank-transactions",
+                    "bank-names",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Bank Name",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/bank-names/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "bank-transactions",
+                    "bank-names",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
           "name": "Accounts",
           "item": [
             {
@@ -2493,24 +2924,24 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/bank-transactions/accounts/:acctNumber/summary",
+                  "raw": "{{baseUrl}}/bank-transactions/accounts/:id/summary",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "bank-transactions",
                     "accounts",
-                    ":acctNumber",
+                    ":id",
                     "summary"
                   ],
                   "variable": [
                     {
-                      "key": "acctNumber",
-                      "value": "1234567890"
+                      "key": "id",
+                      "value": ""
                     }
                   ]
                 },
-                "description": "Returns current balance and total bank charges for the account"
+                "description": "Returns current balance and total bank charges for the account (uses account UUID)"
               }
             },
             {
@@ -2533,7 +2964,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"bankCode\": \"GCB\",\n  \"acctNumber\": \"1234567890\",\n  \"branchName\": \"ACCRA MAIN\",\n  \"acctType\": \"CURRENT\",\n  \"currencyCode\": \"GHS\",\n  \"balance\": 0,\n  \"address\": \"High Street, Accra\",\n  \"bankTel\": \"+233302123456\",\n  \"email\": \"gcb@gcb.com.gh\"\n}"
+                  "raw": "{\n  \"bankNameId\": \"uuid-of-bank-name\",\n  \"acctNumber\": \"1234567890\",\n  \"branchName\": \"ACCRA MAIN\",\n  \"acctType\": \"CURRENT\",\n  \"currencyCode\": \"GHS\",\n  \"balance\": 0,\n  \"address\": \"High Street, Accra\",\n  \"bankTel\": \"+233302123456\",\n  \"email\": \"gcb@gcb.com.gh\"\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/bank-transactions/accounts",
@@ -2544,7 +2975,8 @@
                     "bank-transactions",
                     "accounts"
                   ]
-                }
+                },
+                "description": "bankNameId is the UUID from the bank-names endpoint"
               }
             },
             {
@@ -2567,7 +2999,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"branchName\": \"TEMA BRANCH\",\n  \"bankTel\": \"+233303456789\"\n}"
+                  "raw": "{\n  \"branchName\": \"TEMA BRANCH\",\n  \"bankTel\": \"+233303456789\",\n  \"bankNameId\": \"uuid-of-bank-name\"\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/bank-transactions/accounts/:id",
@@ -2641,7 +3073,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/bank-transactions?page=1&limit=10&bankCode=&acctNumber=&currencyCode=&strYear=",
+                  "raw": "{{baseUrl}}/bank-transactions?page=1&limit=10&bankAccountId=&bankNameId=&strYear=",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -2658,19 +3090,14 @@
                       "value": "10"
                     },
                     {
-                      "key": "bankCode",
+                      "key": "bankAccountId",
                       "value": "",
-                      "description": "Filter by bank code"
+                      "description": "Filter by bank account UUID"
                     },
                     {
-                      "key": "acctNumber",
+                      "key": "bankNameId",
                       "value": "",
-                      "description": "Filter by account number"
-                    },
-                    {
-                      "key": "currencyCode",
-                      "value": "",
-                      "description": "Filter by currency e.g. GHS, USD"
+                      "description": "Filter by bank name UUID"
                     },
                     {
                       "key": "strYear",
@@ -2733,7 +3160,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"bankCode\": \"GCB\",\n  \"acctNumber\": \"1234567890\",\n  \"transPurpose\": \"CLIENT PAYMENT\",\n  \"chequeNo\": \"CHQ-001\",\n  \"currencyCode\": \"GHS\",\n  \"transactionType\": \"Deposit\",\n  \"transactionAmount\": 5000.00,\n  \"bankCharges\": 10.00,\n  \"transactionDate\": \"2024-01-20\",\n  \"transactionBy\": \"John Doe\",\n  \"remarks\": \"Payment for services\"\n}"
+                  "raw": "{\n  \"bankAccountId\": \"uuid-of-bank-account\",\n  \"transPurpose\": \"CLIENT PAYMENT\",\n  \"chequeNo\": \"CHQ-001\",\n  \"transactionType\": \"Deposit\",\n  \"transactionAmount\": 5000.00,\n  \"bankCharges\": 10.00,\n  \"transactionDate\": \"2024-01-20\",\n  \"transactionBy\": \"John Doe\",\n  \"remarks\": \"Payment for services\"\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/bank-transactions",
@@ -2744,7 +3171,7 @@
                     "bank-transactions"
                   ]
                 },
-                "description": "Creates a deposit. Account balance is automatically increased."
+                "description": "bankAccountId is the UUID from the accounts endpoint. Balance is automatically updated."
               }
             },
             {
@@ -2767,7 +3194,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"bankCode\": \"GCB\",\n  \"acctNumber\": \"1234567890\",\n  \"transPurpose\": \"OFFICE EXPENSES\",\n  \"chequeNo\": \"CHQ-002\",\n  \"currencyCode\": \"GHS\",\n  \"transactionType\": \"Withdrawal\",\n  \"transactionAmount\": 1500.00,\n  \"bankCharges\": 5.00,\n  \"transactionDate\": \"2024-01-21\",\n  \"transactionBy\": \"Jane Doe\",\n  \"remarks\": \"Monthly office expenses\"\n}"
+                  "raw": "{\n  \"bankAccountId\": \"uuid-of-bank-account\",\n  \"transPurpose\": \"OFFICE EXPENSES\",\n  \"chequeNo\": \"CHQ-002\",\n  \"transactionType\": \"Withdrawal\",\n  \"transactionAmount\": 1500.00,\n  \"bankCharges\": 5.00,\n  \"transactionDate\": \"2024-01-21\",\n  \"transactionBy\": \"Jane Doe\",\n  \"remarks\": \"Monthly office expenses\"\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/bank-transactions",
@@ -2778,7 +3205,7 @@
                     "bank-transactions"
                   ]
                 },
-                "description": "Creates a withdrawal. Account balance is automatically decreased."
+                "description": "Balance is automatically decreased."
               }
             },
             {
@@ -2854,6 +3281,912 @@
               }
             }
           ]
+        },
+        {
+          "name": "Purposes",
+          "item": [
+            {
+              "name": "Get All Purposes",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/purposes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "bank-transactions",
+                    "purposes"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create Purpose",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"CLIENT PAYMENT\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/purposes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "bank-transactions",
+                    "purposes"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Purpose",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/purposes/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "bank-transactions",
+                    "purposes",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reports",
+          "item": [
+            {
+              "name": "Finance Summary",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/bank-transactions/reports/finance-summary?dateFrom=&dateTo=",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "bank-transactions",
+                    "reports",
+                    "finance-summary"
+                  ],
+                  "query": [
+                    {
+                      "key": "dateFrom",
+                      "value": "",
+                      "description": "e.g. 2024-01-01"
+                    },
+                    {
+                      "key": "dateTo",
+                      "value": "",
+                      "description": "e.g. 2024-12-31"
+                    }
+                  ]
+                },
+                "description": "Aggregated debit/credit/charges/balance per account grouped by bank name (equivalent to VB6 RptxBank.EXSUM_Bank)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Account Types",
+      "item": [
+        {
+          "name": "Get All Account Types",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/account-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "account-types"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Account Type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"CURRENT\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/account-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "account-types"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Account Type",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"SAVINGS\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/account-types/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "account-types",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Account Type",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/account-types/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "account-types",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shippers",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/shippers?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shippers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/shippers/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shippers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"ABC EXPORTS LTD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shippers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shippers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"ABC EXPORTS & IMPORTS LTD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shippers/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shippers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/shippers/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shippers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shipping Lines",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/shipping-lines?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipping-lines"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/shipping-lines/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipping-lines",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MAERSK\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shipping-lines",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipping-lines"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MAERSK LINE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shipping-lines/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipping-lines",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/shipping-lines/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipping-lines",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "House Manifest Attachments",
+      "item": [
+        {
+          "name": "Upload Attachment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/manifests/house/:id/attachments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "manifests",
+                "house",
+                ":id",
+                "attachments"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Attachment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/manifests/house/:id/attachments/:publicId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "manifests",
+                "house",
+                ":id",
+                "attachments",
+                ":publicId"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                },
+                {
+                  "key": "publicId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Misc",
+      "item": [
+        {
+          "name": "Get Company by Subdomain (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/companies/subdomain/:subdomain/public",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "companies",
+                "subdomain",
+                ":subdomain",
+                "public"
+              ],
+              "variable": [
+                {
+                  "key": "subdomain",
+                  "value": "acme"
+                }
+              ]
+            },
+            "description": "Public endpoint \u2014 no auth required"
+          }
+        },
+        {
+          "name": "Get Current Tenant",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenant/current",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenant",
+                "current"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Next Job Number",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/next-number",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "next-number"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Preview Handling Charge",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/manifest-jobs/:id/preview-handling-charge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "manifest-jobs",
+                ":id",
+                "preview-handling-charge"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Preview computed handling charge without saving"
+          }
+        },
+        {
+          "name": "Get All Charge Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/principal-charges/audit-log?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principal-charges",
+                "audit-log"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Charge Audit Log by Principal",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/principal-charges/:principalId/audit-log",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principal-charges",
+                ":principalId",
+                "audit-log"
+              ],
+              "variable": [
+                {
+                  "key": "principalId",
+                  "value": ""
+                }
+              ]
+            }
+          }
         }
       ]
     },

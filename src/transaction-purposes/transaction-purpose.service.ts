@@ -1,0 +1,48 @@
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { IsString } from 'class-validator';
+import { TenantService } from '../tenant/tenant.service';
+import { TransactionPurpose } from './transaction-purpose.entity';
+
+export class TransactionPurposeDto {
+  @IsString()
+  purposeCode: string;
+
+  @IsString()
+  purposeName: string;
+}
+
+@Injectable()
+export class TransactionPurposeService {
+  constructor(private readonly tenantService: TenantService) {}
+
+  findAll(): Promise<TransactionPurpose[]> {
+    return this.tenantService.withManager((m) =>
+      m.getRepository(TransactionPurpose).find({ order: { purposeCode: 'ASC' } }),
+    );
+  }
+
+  create(data: TransactionPurposeDto, userId: string): Promise<TransactionPurpose> {
+    return this.tenantService.withManager(async (m) => {
+      const existing = await m.getRepository(TransactionPurpose).findOne({ where: { purposeCode: data.purposeCode } });
+      if (existing) throw new BadRequestException(`Purpose code "${data.purposeCode}" already exists`);
+      return m.save(m.create(TransactionPurpose, { ...data, createdBy: userId }));
+    });
+  }
+
+  update(id: string, data: Partial<TransactionPurposeDto>, userId: string): Promise<TransactionPurpose> {
+    return this.tenantService.withManager(async (m) => {
+      const existing = await m.getRepository(TransactionPurpose).findOne({ where: { id } });
+      if (!existing) throw new NotFoundException('Transaction purpose not found');
+      await m.getRepository(TransactionPurpose).update(id, { ...data, updatedBy: userId });
+      return m.getRepository(TransactionPurpose).findOne({ where: { id } }) as Promise<TransactionPurpose>;
+    });
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.tenantService.withManager(async (m) => {
+      const existing = await m.getRepository(TransactionPurpose).findOne({ where: { id } });
+      if (!existing) throw new NotFoundException('Transaction purpose not found');
+      await m.getRepository(TransactionPurpose).delete(id);
+    });
+  }
+}

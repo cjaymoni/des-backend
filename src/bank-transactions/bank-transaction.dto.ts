@@ -1,18 +1,13 @@
 import {
-  IsString, IsOptional, IsNumber, IsDate, IsEnum,
+  IsString, IsOptional, IsNumber, IsDate, IsEnum, IsUUID,
   MaxLength, Min,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { TransactionType } from './bank-transaction.entity';
 
 export class CreateBankTransactionDto {
-  @IsString()
-  @MaxLength(50)
-  bankCode: string;
-
-  @IsString()
-  @MaxLength(20)
-  acctNumber: string;
+  @IsUUID()
+  bankAccountId: string;
 
   @IsString()
   @MaxLength(50)
@@ -22,11 +17,6 @@ export class CreateBankTransactionDto {
   @IsString()
   @MaxLength(50)
   chequeNo?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(20)
-  currencyCode?: string;
 
   @IsEnum(TransactionType)
   transactionType: TransactionType;
@@ -67,11 +57,6 @@ export class UpdateBankTransactionDto {
   chequeNo?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(20)
-  currencyCode?: string;
-
-  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
@@ -84,19 +69,14 @@ export class UpdateBankTransactionDto {
 
 export class SearchBankTransactionDto {
   @IsOptional()
-  @IsString()
+  @IsUUID()
   @Transform(({ value }) => value || undefined)
-  bankCode?: string;
+  bankAccountId?: string;
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
   @Transform(({ value }) => value || undefined)
-  acctNumber?: string;
-
-  @IsOptional()
-  @IsString()
-  @Transform(({ value }) => value || undefined)
-  currencyCode?: string;
+  bankNameId?: string;
 
   @IsOptional()
   @IsString()
@@ -105,9 +85,9 @@ export class SearchBankTransactionDto {
 }
 
 export class CreateBankAccountDto {
-  @IsString()
-  @MaxLength(50)
-  bankCode: string;
+  @IsOptional()
+  @IsUUID()
+  bankNameId?: string;
 
   @IsString()
   @MaxLength(20)
@@ -118,13 +98,13 @@ export class CreateBankAccountDto {
   @MaxLength(50)
   branchName?: string;
 
-  @IsString()
-  @MaxLength(20)
-  acctType: string;
+  @IsOptional()
+  @IsUUID()
+  acctTypeId?: string;
 
-  @IsString()
-  @MaxLength(20)
-  currencyCode: string;
+  @IsOptional()
+  @IsUUID()
+  currencyId?: string;
 
   @IsOptional()
   @Type(() => Number)
@@ -150,19 +130,21 @@ export class CreateBankAccountDto {
 
 export class UpdateBankAccountDto {
   @IsOptional()
+  @IsUUID()
+  bankNameId?: string;
+
+  @IsOptional()
   @IsString()
   @MaxLength(50)
   branchName?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(20)
-  acctType?: string;
+  @IsUUID()
+  acctTypeId?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(20)
-  currencyCode?: string;
+  @IsUUID()
+  currencyId?: string;
 
   @IsOptional()
   @IsString()
@@ -178,4 +160,27 @@ export class UpdateBankAccountDto {
   @IsString()
   @MaxLength(100)
   email?: string;
+}
+
+export class CreateBankNameDto {
+  @IsString()
+  @MaxLength(10)
+  bankCode: string;
+
+  @IsString()
+  @MaxLength(150)
+  bankName: string;
+}
+
+export class UpdateBankNameDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  bankName?: string;
+}
+
+export class CreateLookupDto {
+  @IsString()
+  @MaxLength(100)
+  name: string;
 }

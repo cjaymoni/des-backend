@@ -7,6 +7,7 @@ import { BankTransactionService } from './bank-transaction.service';
 import {
   CreateBankTransactionDto, UpdateBankTransactionDto, SearchBankTransactionDto,
   CreateBankAccountDto, UpdateBankAccountDto,
+  CreateBankNameDto, UpdateBankNameDto, CreateLookupDto,
 } from './bank-transaction.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 
@@ -49,9 +50,68 @@ export class BankTransactionController {
     return this.service.deleteAccount(id);
   }
 
-  @Get('accounts/:acctNumber/summary')
-  getSummary(@Param('acctNumber') acctNumber: string) {
-    return this.service.getSummary(acctNumber);
+  @Get('accounts/:id/summary')
+  getSummary(@Param('id') id: string) {
+    return this.service.getSummary(id);
+  }
+
+  // ── Bank Names (BankSetup) ─────────────────────────────────────────────────
+
+  @Get('bank-names')
+  findAllBankNames() {
+    return this.service.findAllBankNames();
+  }
+
+  @Post('bank-names')
+  createBankName(
+    @Body() data: CreateBankNameDto,
+    @Req() req: { user: { id: string } },
+  ) {
+    return this.service.createBankName(data, req.user.id);
+  }
+
+  @Put('bank-names/:id')
+  updateBankName(
+    @Param('id') id: string,
+    @Body() data: UpdateBankNameDto,
+    @Req() req: { user: { id: string } },
+  ) {
+    return this.service.updateBankName(id, data, req.user.id);
+  }
+
+  @Delete('bank-names/:id')
+  deleteBankName(@Param('id') id: string) {
+    return this.service.deleteBankName(id);
+  }
+
+  // ── Bank Purposes ──────────────────────────────────────────────────────────
+
+  @Get('purposes')
+  findAllPurposes() {
+    return this.service.findAllPurposes();
+  }
+
+  @Post('purposes')
+  createPurpose(
+    @Body() data: CreateLookupDto,
+    @Req() req: { user: { id: string } },
+  ) {
+    return this.service.createPurpose(data, req.user.id);
+  }
+
+  @Delete('purposes/:id')
+  deletePurpose(@Param('id') id: string) {
+    return this.service.deletePurpose(id);
+  }
+
+  // ── Finance Summary Report (RptxBank) ──────────────────────────────────────
+
+  @Get('reports/finance-summary')
+  getFinanceSummary(
+    @Query('dateFrom') dateFrom?: string,
+    @Query('dateTo') dateTo?: string,
+  ) {
+    return this.service.getFinanceSummary(dateFrom, dateTo);
   }
 
   // ── Transactions ───────────────────────────────────────────────────────────

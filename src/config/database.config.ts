@@ -11,6 +11,9 @@ import { ManifestJob } from '../manifest-jobs/manifest-job.entity';
 import { IncomeExpenditure } from '../income-expenditure/income-expenditure.entity';
 import { BankAccount } from 'src/bank-transactions/bank-account.entity';
 import { BankTransaction } from 'src/bank-transactions/bank-transaction.entity';
+import { BankName } from 'src/bank-transactions/bank-name.entity';
+import { BankPurpose } from 'src/bank-transactions/bank-lookup.entity';
+import { AccountType } from 'src/bank-transactions/account-type.entity';
 import { CifValue } from 'src/cif-values/cif-value.entity';
 import { CifSettings } from 'src/cif-values/cif-settings.entity';
 import { ShippingLine } from '../shipping-lines/shipping-line.entity';
@@ -20,6 +23,7 @@ import { Currency } from '../currencies/currency.entity';
 import { PrincipalChargeSetup } from '../principal-charges/principal-charge-setup.entity';
 import { PrincipalChargeType } from '../principal-charges/principal-charge-type.entity';
 import { ChargeSetupAuditLog } from 'src/principal-charges/charge-setup-audit.entity';
+import { TransactionPurpose } from 'src/transaction-purposes/transaction-purpose.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -42,6 +46,9 @@ export const getDatabaseConfig = (
     IncomeExpenditure,
     BankAccount,
     BankTransaction,
+    BankName,
+    BankPurpose,
+    AccountType,
     CifValue,
     CifSettings,
     ShippingLine,
@@ -51,6 +58,7 @@ export const getDatabaseConfig = (
     PrincipalChargeSetup,
     PrincipalChargeType,
     ChargeSetupAuditLog,
+    TransactionPurpose,
   ],
   synchronize: false,
   // schema: 'public',

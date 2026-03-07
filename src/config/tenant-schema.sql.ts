@@ -198,6 +198,142 @@ CREATE INDEX IF NOT EXISTS "idx_house_manifests_hblNo" ON "house_manifests" ("hb
 CREATE INDEX IF NOT EXISTS "idx_house_manifests_consignee" ON "house_manifests" ("consignee");
 CREATE INDEX IF NOT EXISTS "idx_house_manifests_masterManifestId" ON "house_manifests" ("masterManifestId");
 
+-- Bank Names (BankSetup) table
+CREATE TABLE IF NOT EXISTS "bank_names" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "bankCode" varchar(10) NOT NULL UNIQUE,
+  "bankName" varchar(150) NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+CREATE INDEX IF NOT EXISTS "idx_bank_names_bankCode" ON "bank_names" ("bankCode");
+
+-- Bank Accounts table (new tenants)
+CREATE TABLE IF NOT EXISTS "bank_accounts" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "bankNameId" uuid,
+  "acctNumber" varchar(20) NOT NULL UNIQUE,
+  "branchName" varchar(50),
+  "acctTypeId" uuid,
+  "currencyId" uuid,
+  "balance" decimal(14,2) NOT NULL DEFAULT 0,
+  "availableBalance" decimal(14,2) NOT NULL DEFAULT 0,
+  "totalBankCharges" decimal(14,2) NOT NULL DEFAULT 0,
+  "address" varchar(255),
+  "bankTel" varchar(30),
+  "email" varchar(100),
+  "version" int NOT NULL DEFAULT 1,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+-- Migrate existing bank_accounts
+DO $$ BEGIN
+  -- old bankCode -> bankNameId FK
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='bank_accounts' AND column_name='bankCode') THEN
+    ALTER TABLE "bank_accounts" ADD COLUMN IF NOT EXISTS "bankNameId" uuid;
+    UPDATE "bank_accounts" ba SET "bankNameId" = bn.id FROM "bank_names" bn WHERE bn."bankCode" = ba."bankCode";
+    ALTER TABLE "bank_accounts" DROP COLUMN "bankCode";
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='bank_accounts' AND constraint_name='fk_bank_accounts_bankNameId') THEN
+    ALTER TABLE "bank_accounts" ADD CONSTRAINT "fk_bank_accounts_bankNameId" FOREIGN KEY ("bankNameId") REFERENCES "bank_names"("id") ON DELETE SET NULL;
+  END IF;
+  -- acctType string -> acctTypeId FK
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='bank_accounts' AND column_name='acctType') THEN
+    ALTER TABLE "bank_accounts" ADD COLUMN IF NOT EXISTS "acctTypeId" uuid;
+    ALTER TABLE "bank_accounts" DROP COLUMN "acctType";
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='bank_accounts' AND constraint_name='fk_bank_accounts_acctTypeId') THEN
+    ALTER TABLE "bank_accounts" ADD CONSTRAINT "fk_bank_accounts_acctTypeId" FOREIGN KEY ("acctTypeId") REFERENCES "account_types"("id") ON DELETE SET NULL;
+  END IF;
+  -- currencyCode string -> currencyId FK
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='bank_accounts' AND column_name='currencyCode') THEN
+    ALTER TABLE "bank_accounts" ADD COLUMN IF NOT EXISTS "currencyId" uuid;
+    ALTER TABLE "bank_accounts" DROP COLUMN "currencyCode";
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='bank_accounts' AND constraint_name='fk_bank_accounts_currencyId') THEN
+    ALTER TABLE "bank_accounts" ADD CONSTRAINT "fk_bank_accounts_currencyId" FOREIGN KEY ("currencyId") REFERENCES "currencies"("id") ON DELETE SET NULL;
+  END IF;
+  -- new computed columns
+  ALTER TABLE "bank_accounts" ADD COLUMN IF NOT EXISTS "availableBalance" decimal(14,2) NOT NULL DEFAULT 0;
+  ALTER TABLE "bank_accounts" ADD COLUMN IF NOT EXISTS "totalBankCharges" decimal(14,2) NOT NULL DEFAULT 0;
+END $$;
+CREATE INDEX IF NOT EXISTS "idx_bank_accounts_bankNameId" ON "bank_accounts" ("bankNameId");
+
+-- Bank Transactions table (new tenants)
+CREATE TABLE IF NOT EXISTS "bank_transactions" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "bankAccountId" uuid,
+  "transPurpose" varchar(50) NOT NULL DEFAULT '',
+  "chequeNo" varchar(50),
+  "transactionType" varchar(20) NOT NULL DEFAULT '',
+  "creditAmt" decimal(12,2) NOT NULL DEFAULT 0,
+  "debitAmt" decimal(12,2) NOT NULL DEFAULT 0,
+  "bankCharges" decimal(12,2) NOT NULL DEFAULT 0,
+  "balance" decimal(14,2) NOT NULL DEFAULT 0,
+  "transactionDate" date NOT NULL DEFAULT CURRENT_DATE,
+  "transactionBy" varchar(50) NOT NULL DEFAULT '',
+  "remarks" text,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+-- Migrate existing bank_transactions: drop old bankCode/acctNumber, add bankAccountId FK
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='bank_transactions' AND column_name='acctNumber') THEN
+    ALTER TABLE "bank_transactions" ADD COLUMN IF NOT EXISTS "bankAccountId" uuid;
+    UPDATE "bank_transactions" bt SET "bankAccountId" = ba.id FROM "bank_accounts" ba WHERE ba."acctNumber" = bt."acctNumber";
+    ALTER TABLE "bank_transactions" DROP COLUMN IF EXISTS "acctNumber";
+    ALTER TABLE "bank_transactions" DROP COLUMN IF EXISTS "bankCode";
+    ALTER TABLE "bank_transactions" DROP COLUMN IF EXISTS "currencyCode";
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='bank_transactions' AND constraint_name='fk_bank_transactions_bankAccountId') THEN
+    ALTER TABLE "bank_transactions" ADD CONSTRAINT "fk_bank_transactions_bankAccountId" FOREIGN KEY ("bankAccountId") REFERENCES "bank_accounts"("id") ON DELETE SET NULL;
+  END IF;
+END $$;
+CREATE INDEX IF NOT EXISTS "idx_bank_transactions_bankAccountId" ON "bank_transactions" ("bankAccountId");
+CREATE INDEX IF NOT EXISTS "idx_bank_transactions_transactionDate" ON "bank_transactions" ("transactionDate");
+
+-- Bank Purposes table
+CREATE TABLE IF NOT EXISTS "bank_purposes" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(100) NOT NULL UNIQUE,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+-- Transaction Purposes table
+CREATE TABLE IF NOT EXISTS "transaction_purposes" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "purposeCode" varchar(50) NOT NULL UNIQUE,
+  "purposeName" varchar(150) NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+CREATE INDEX IF NOT EXISTS "idx_transaction_purposes_purposeCode" ON "transaction_purposes" ("purposeCode");
+
+-- Account Types table
+CREATE TABLE IF NOT EXISTS "account_types" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(50) NOT NULL UNIQUE,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
 -- Weight Charges table
 CREATE TABLE IF NOT EXISTS "weight_charges" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -358,55 +494,6 @@ CREATE INDEX IF NOT EXISTS "idx_jobs_jobNo" ON "jobs" ("jobNo");
 CREATE INDEX IF NOT EXISTS "idx_jobs_ie" ON "jobs" ("ie");
 CREATE INDEX IF NOT EXISTS "idx_jobs_blNo" ON "jobs" ("blNo");
 
--- Bank Accounts table
-CREATE TABLE IF NOT EXISTS "bank_accounts" (
-  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "bankCode" varchar(50) NOT NULL,
-  "acctNumber" varchar(20) NOT NULL UNIQUE,
-  "branchName" varchar(50),
-  "acctType" varchar(20) NOT NULL,
-  "currencyCode" varchar(20) NOT NULL,
-  "balance" decimal(14,2) NOT NULL DEFAULT 0,
-  "address" varchar(255),
-  "bankTel" varchar(30),
-  "email" varchar(100),
-  "version" int NOT NULL DEFAULT 1,
-  "createdAt" timestamp NOT NULL DEFAULT now(),
-  "updatedAt" timestamp NOT NULL DEFAULT now(),
-  "deletedAt" timestamp,
-  "createdBy" varchar,
-  "updatedBy" varchar
-);
-
-CREATE INDEX IF NOT EXISTS "idx_bank_accounts_bankCode" ON "bank_accounts" ("bankCode");
-
--- Bank Transactions table
-CREATE TABLE IF NOT EXISTS "bank_transactions" (
-  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "bankCode" varchar(50) NOT NULL,
-  "acctNumber" varchar(20) NOT NULL,
-  "transPurpose" varchar(50) NOT NULL,
-  "chequeNo" varchar(50),
-  "currencyCode" varchar(20),
-  "transactionType" varchar(20) NOT NULL,
-  "creditAmt" decimal(12,2) NOT NULL DEFAULT 0,
-  "debitAmt" decimal(12,2) NOT NULL DEFAULT 0,
-  "bankCharges" decimal(12,2) NOT NULL DEFAULT 0,
-  "balance" decimal(14,2) NOT NULL DEFAULT 0,
-  "transactionDate" date NOT NULL,
-  "transactionBy" varchar(50) NOT NULL,
-  "remarks" text,
-  "createdAt" timestamp NOT NULL DEFAULT now(),
-  "updatedAt" timestamp NOT NULL DEFAULT now(),
-  "deletedAt" timestamp,
-  "createdBy" varchar,
-  "updatedBy" varchar
-);
-
-CREATE INDEX IF NOT EXISTS "idx_bank_transactions_bankCode" ON "bank_transactions" ("bankCode");
-CREATE INDEX IF NOT EXISTS "idx_bank_transactions_acctNumber" ON "bank_transactions" ("acctNumber");
-CREATE INDEX IF NOT EXISTS "idx_bank_transactions_transactionDate" ON "bank_transactions" ("transactionDate");
-
 -- CIF Settings table (global FOB/freight/insurance rates)
 CREATE TABLE IF NOT EXISTS "cif_settings" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -555,7 +642,6 @@ ALTER TABLE IF EXISTS "master_manifests" ADD COLUMN IF NOT EXISTS "principalId" 
 
 -- Add version columns for optimistic locking (safe for existing tenants)
 ALTER TABLE IF EXISTS "jobs" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
-ALTER TABLE IF EXISTS "bank_accounts" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
 ALTER TABLE IF EXISTS "house_manifests" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
 ALTER TABLE IF EXISTS "manifest_jobs" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
 

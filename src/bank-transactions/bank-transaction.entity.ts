@@ -1,7 +1,9 @@
 import {
   Entity, Column, PrimaryGeneratedColumn,
-  CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Index,
+  CreateDateColumn, UpdateDateColumn, DeleteDateColumn,
+  Index, ManyToOne, JoinColumn,
 } from 'typeorm';
+import { BankAccount } from './bank-account.entity';
 
 export enum TransactionType {
   DEPOSIT = 'Deposit',
@@ -11,27 +13,24 @@ export enum TransactionType {
 const decimalTransformer = { to: (v: any) => v, from: (v: any) => v === null ? null : parseFloat(v) };
 
 @Entity('bank_transactions')
-@Index(['bankCode'])
-@Index(['acctNumber'])
+@Index(['bankAccountId'])
 @Index(['transactionDate'])
 export class BankTransaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 50 })
-  bankCode: string;
+  @Column({ nullable: true })
+  bankAccountId: string;
 
-  @Column({ length: 20 })
-  acctNumber: string;
+  @ManyToOne(() => BankAccount, (ba) => ba.transactions, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'bankAccountId' })
+  bankAccount: BankAccount;
 
   @Column({ length: 50 })
   transPurpose: string;
 
   @Column({ length: 50, nullable: true })
   chequeNo: string;
-
-  @Column({ length: 20, nullable: true })
-  currencyCode: string;
 
   @Column({ type: 'enum', enum: TransactionType })
   transactionType: TransactionType;

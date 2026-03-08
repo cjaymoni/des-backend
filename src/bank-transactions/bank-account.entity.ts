@@ -1,3 +1,4 @@
+import { decimalTransformer } from '../common/transformers/decimal.transformer';
 import {
   Entity, Column, Index, DeleteDateColumn, VersionColumn,
   ManyToOne, OneToMany, JoinColumn,

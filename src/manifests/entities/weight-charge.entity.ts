@@ -1,3 +1,4 @@
+import { decimalTransformer } from '../../common/transformers/decimal.transformer';
 import {
   Entity,
   Column,
@@ -15,10 +16,7 @@ export class WeightCharge {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   weightFrom: number;
 
@@ -26,10 +24,7 @@ export class WeightCharge {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   weightTo: number;
 
@@ -37,10 +32,7 @@ export class WeightCharge {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   charges: number;
 

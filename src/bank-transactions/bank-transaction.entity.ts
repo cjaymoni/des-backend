@@ -4,13 +4,12 @@ import {
   Index, ManyToOne, JoinColumn,
 } from 'typeorm';
 import { BankAccount } from './bank-account.entity';
+import { decimalTransformer } from '../common/transformers/decimal.transformer';
 
 export enum TransactionType {
   DEPOSIT = 'Deposit',
   WITHDRAWAL = 'Withdrawal',
 }
-
-const decimalTransformer = { to: (v: any) => v, from: (v: any) => v === null ? null : parseFloat(v) };
 
 @Entity('bank_transactions')
 @Index(['bankAccountId'])

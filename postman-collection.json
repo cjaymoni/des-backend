@@ -133,27 +133,32 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "x-org-name",
                 "value": "{{orgName}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@acme.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\",\n  \"role\": \"company_admin\"\n}"
-            },
             "url": {
-              "raw": "{{baseUrl}}/auth/register",
+              "raw": "{{baseUrl}}/auth/register-company-admin",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "auth",
-                "register"
+                "register-company-admin"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@acme.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\",\n  \"subdomain\": \"acme\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -404,6 +409,29 @@
               ]
             },
             "description": "Public endpoint that returns basic company info (id, subdomain, name, logo)"
+          }
+        },
+        {
+          "name": "Get Company by Subdomain (Auth)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/companies/subdomain/acme",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "companies",
+                "subdomain",
+                "acme"
+              ]
+            }
           }
         },
         {
@@ -1782,6 +1810,29 @@
             },
             "description": "Recalculates handling charge using the principal's charge setup and house BL CBM. Prerequisites: master manifest must have principalId, principal must have active currency + charge types configured, house BL must have totalCBM > 0."
           }
+        },
+        {
+          "name": "Preview Handling Charge",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/manifest-jobs/{{manifestJobId}}/preview-handling-charge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "manifest-jobs",
+                "{{manifestJobId}}",
+                "preview-handling-charge"
+              ]
+            }
+          }
         }
       ]
     },
@@ -2284,6 +2335,51 @@
               ]
             }
           }
+        },
+        {
+          "name": "Get All Charge Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/principal-charges/audit-log",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principal-charges",
+                "audit-log"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Charge Audit Log by Principal",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/principal-charges/{{principalId}}/audit-log",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "principal-charges",
+                "{{principalId}}",
+                "audit-log"
+              ]
+            }
+          }
         }
       ]
     },
@@ -2493,8 +2589,484 @@
       ]
     },
     {
+      "name": "Transaction Purposes",
+      "item": [
+        {
+          "name": "Get All Purposes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transaction-purposes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transaction-purposes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Purpose",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purposeCode\": \"CUSTOMS\",\n  \"purposeName\": \"Customs Charges\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transaction-purposes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transaction-purposes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Purpose",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purposeName\": \"Customs & Duties\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transaction-purposes/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transaction-purposes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Purpose",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transaction-purposes/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transaction-purposes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Purpose Details",
+          "item": [
+            {
+              "name": "Get Details by Purpose Code",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction-purpose-details/:purposeCode",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction-purpose-details",
+                    ":purposeCode"
+                  ],
+                  "variable": [
+                    {
+                      "key": "purposeCode",
+                      "value": "CUSTOMS"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create Detail",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"detailCode\": \"PROC\",\n  \"purposeCode\": \"CUSTOMS\",\n  \"purposeDetails\": \"Processing Fee\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/transaction-purpose-details",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction-purpose-details"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Detail",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"purposeDetails\": \"IMPORT DUTY\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/transaction-purpose-details/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction-purpose-details",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Detail",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "x-org-name",
+                    "value": "{{orgName}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction-purpose-details/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction-purpose-details",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Job Tracking",
+      "item": [
+        {
+          "name": "Get Tracking by Job No",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/job-tracking/:jobNo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-tracking",
+                ":jobNo"
+              ],
+              "variable": [
+                {
+                  "key": "jobNo",
+                  "value": "JOB-2024-001"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Tracking Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobNo\": \"JOB-2024-001\",\n  \"purposeCode\": \"CUSTOMS\",\n  \"detailCode\": \"PROC\",\n  \"transAmount\": 8500.0,\n  \"vatAmount\": 1275.0,\n  \"vatStatus\": true,\n  \"transBy\": \"admin\",\n  \"transactionDate\": \"2025-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-tracking",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-tracking"
+              ]
+            },
+            "description": "Creates a debit note line item for a job. purposeCode and detailCode must match existing transaction_purposes and transaction_purpose_details records."
+          }
+        },
+        {
+          "name": "Update Tracking Entry",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transAmount\": 9000.00,\n  \"vatAmount\": 1350.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-tracking/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-tracking",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Tracking Entry",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/job-tracking/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-tracking",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Jobs",
       "item": [
+        {
+          "name": "Get All Debit Notes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/debit-notes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "debit-notes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Debit Note",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/debit-note/:jobNo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "debit-note",
+                ":jobNo"
+              ],
+              "variable": [
+                {
+                  "key": "jobNo",
+                  "value": "JOB-2024-001"
+                }
+              ]
+            },
+            "description": "Returns job + tracking line items + grandTotal. Equivalent to VB6 FrmDebitNotes."
+          }
+        },
         {
           "name": "Get All",
           "request": {
@@ -3563,183 +4135,6 @@
       ]
     },
     {
-      "name": "Shippers",
-      "item": [
-        {
-          "name": "Get All",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "{{orgName}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/shippers?page=1&limit=10",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "shippers"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get by ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "{{orgName}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/shippers/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "shippers",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": ""
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Create",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "x-org-name",
-                "value": "{{orgName}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"ABC EXPORTS LTD\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/shippers",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "shippers"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "x-org-name",
-                "value": "{{orgName}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"ABC EXPORTS & IMPORTS LTD\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/shippers/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "shippers",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": ""
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "{{orgName}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/shippers/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "shippers",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": ""
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "Shipping Lines",
       "item": [
         {
@@ -4081,109 +4476,6 @@
               "path": [
                 "jobs",
                 "next-number"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Preview Handling Charge",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "{{orgName}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/manifest-jobs/:id/preview-handling-charge",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "manifest-jobs",
-                ":id",
-                "preview-handling-charge"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": ""
-                }
-              ]
-            },
-            "description": "Preview computed handling charge without saving"
-          }
-        },
-        {
-          "name": "Get All Charge Audit Logs",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "{{orgName}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/principal-charges/audit-log?page=1&limit=10",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "principal-charges",
-                "audit-log"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Charge Audit Log by Principal",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-org-name",
-                "value": "{{orgName}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/principal-charges/:principalId/audit-log",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "principal-charges",
-                ":principalId",
-                "audit-log"
-              ],
-              "variable": [
-                {
-                  "key": "principalId",
-                  "value": ""
-                }
               ]
             }
           }

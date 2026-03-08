@@ -29,6 +29,10 @@ export class MigrationController {
     await queryRunner.startTransaction();
     try {
       await queryRunner.query(`SET LOCAL search_path TO "${schemaName}"`);
+      // Pre-migration: add columns that existing tables may be missing
+      await queryRunner.query(`
+        ALTER TABLE IF EXISTS "transaction_purpose_details" ADD COLUMN IF NOT EXISTS "detailCode" varchar(50) NOT NULL DEFAULT '';
+      `);
       await queryRunner.query(TENANT_SCHEMA_SQL);
       await queryRunner.commitTransaction();
     } catch (err) {

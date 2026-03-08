@@ -1,3 +1,4 @@
+import { decimalTransformer } from '../common/transformers/decimal.transformer';
 import {
   Entity,
   Column,
@@ -8,6 +9,7 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '../common/entities/base.entity';
 import { CifValue } from '../cif-values/cif-value.entity';
+import { JobTracking } from './job-tracking.entity';
 
 @Entity('jobs')
 @Index(['jobNo'], { unique: true })
@@ -38,10 +40,7 @@ export class Job extends BaseEntity {
     precision: 12,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   totDuty: number;
 
@@ -90,10 +89,7 @@ export class Job extends BaseEntity {
     precision: 12,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   jobFinanceeAmount: number;
 
@@ -102,10 +98,7 @@ export class Job extends BaseEntity {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   agencyFee: number;
 
@@ -117,10 +110,7 @@ export class Job extends BaseEntity {
     precision: 5,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   vatPer: number;
 
@@ -129,10 +119,7 @@ export class Job extends BaseEntity {
     precision: 5,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   nhilPer: number;
 
@@ -141,10 +128,7 @@ export class Job extends BaseEntity {
     precision: 5,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   gfdPer: number;
 
@@ -153,10 +137,7 @@ export class Job extends BaseEntity {
     precision: 5,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   covidPer: number;
 
@@ -183,6 +164,9 @@ export class Job extends BaseEntity {
 
   @OneToMany(() => CifValue, (c) => c.job)
   cifValues: CifValue[];
+
+  @OneToMany(() => JobTracking, (t) => t.job)
+  tracking: JobTracking[];
 
   @VersionColumn()
   version: number;

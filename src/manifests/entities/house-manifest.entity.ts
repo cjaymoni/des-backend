@@ -1,3 +1,4 @@
+import { decimalTransformer } from '../../common/transformers/decimal.transformer';
 import {
   Entity,
   Column,
@@ -39,10 +40,7 @@ export class HouseManifest extends BaseEntity {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   weight: number;
 
@@ -51,10 +49,7 @@ export class HouseManifest extends BaseEntity {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   totalCBM: number;
 
@@ -72,10 +67,7 @@ export class HouseManifest extends BaseEntity {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   handCharge: number;
 

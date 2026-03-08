@@ -1,3 +1,4 @@
+import { decimalTransformer } from '../common/transformers/decimal.transformer';
 import {
   Entity,
   Column,
@@ -46,10 +47,7 @@ export class ManifestJob {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   handCharge: number;
 
@@ -58,10 +56,7 @@ export class ManifestJob {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   netHandCharge: number;
 
@@ -70,10 +65,7 @@ export class ManifestJob {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   grandHandCharge: number;
 
@@ -82,10 +74,7 @@ export class ManifestJob {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   vatAmt: number;
 
@@ -94,10 +83,7 @@ export class ManifestJob {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   nhilAmt: number;
 
@@ -106,10 +92,7 @@ export class ManifestJob {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   gfdAmt: number;
 
@@ -118,10 +101,7 @@ export class ManifestJob {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   covidAmt: number;
 
@@ -130,10 +110,7 @@ export class ManifestJob {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   totalCBM: number;
 
@@ -142,10 +119,7 @@ export class ManifestJob {
     precision: 10,
     scale: 2,
     default: 0,
-    transformer: {
-      to: (v) => v,
-      from: (v) => (v === null ? null : parseFloat(v)),
-    },
+    transformer: decimalTransformer,
   })
   weight: number;
 

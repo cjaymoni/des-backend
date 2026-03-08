@@ -600,6 +600,42 @@ ALTER TABLE IF EXISTS "jobs" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEF
 ALTER TABLE IF EXISTS "house_manifests" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
 ALTER TABLE IF EXISTS "manifest_jobs" ADD COLUMN IF NOT EXISTS "version" int NOT NULL DEFAULT 1;
 
+-- Transaction Purpose Details table
+CREATE TABLE IF NOT EXISTS "transaction_purpose_details" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "detailCode" varchar(50) NOT NULL,
+  "purposeCode" varchar(50) NOT NULL,
+  "purposeDetails" varchar(200) NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar,
+  FOREIGN KEY ("purposeCode") REFERENCES "transaction_purposes"("purposeCode") ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS "idx_transaction_purpose_details_purposeCode" ON "transaction_purpose_details" ("purposeCode");
+CREATE INDEX IF NOT EXISTS "idx_transaction_purpose_details_detailCode" ON "transaction_purpose_details" ("detailCode");
+
+-- Job Tracking table (debit note line items)
+CREATE TABLE IF NOT EXISTS "job_tracking" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "jobNo" varchar NOT NULL,
+  "purposeCode" varchar(50),
+  "detailCode" varchar(50),
+  "transAmount" decimal(12,2) NOT NULL DEFAULT 0,
+  "vatAmount" decimal(12,2) NOT NULL DEFAULT 0,
+  "vatStatus" boolean NOT NULL DEFAULT false,
+  "transBy" varchar(100),
+  "transactionDate" date,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar,
+  FOREIGN KEY ("jobNo") REFERENCES "jobs"("jobNo") ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS "idx_job_tracking_jobNo" ON "job_tracking" ("jobNo");
+
 -- Migrate vatNhilStatus from varchar to boolean for existing tenants
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='jobs' AND column_name='vatNhilStatus' AND data_type='character varying') THEN

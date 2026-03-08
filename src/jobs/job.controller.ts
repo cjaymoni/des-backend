@@ -3,7 +3,7 @@ import {
   Body, Param, Query, Req, UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { JobService } from './job.service';
+import { JobService, JobTrackingService, CreateJobTrackingDto, UpdateJobTrackingDto } from './job.service';
 import { CreateJobDto, UpdateJobDto, SearchJobDto } from './job.dto';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
 import { Job } from './job.entity';
@@ -20,6 +20,16 @@ export class JobController {
     @Query('finType') finType: string,
   ): Promise<string> {
     return this.service.nextNumber(transType, a2IdfNo, finType);
+  }
+
+  @Get('debit-notes')
+  getAllDebitNotes() {
+    return this.service.getAllDebitNotes();
+  }
+
+  @Get('debit-note/:jobNo')
+  getDebitNote(@Param('jobNo') jobNo: string) {
+    return this.service.getDebitNote(jobNo);
   }
 
   @Get()
@@ -54,6 +64,32 @@ export class JobController {
 
   @Delete(':id')
   delete(@Param('id') id: string): Promise<void> {
+    return this.service.delete(id);
+  }
+}
+
+@Controller('job-tracking')
+@UseGuards(AuthGuard('jwt'))
+export class JobTrackingController {
+  constructor(private service: JobTrackingService) {}
+
+  @Get(':jobNo')
+  findByJob(@Param('jobNo') jobNo: string) {
+    return this.service.findByJob(jobNo);
+  }
+
+  @Post()
+  create(@Body() data: CreateJobTrackingDto, @Req() req) {
+    return this.service.create(data, req.user.id);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() data: UpdateJobTrackingDto, @Req() req) {
+    return this.service.update(id, data, req.user.id);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
     return this.service.delete(id);
   }
 }

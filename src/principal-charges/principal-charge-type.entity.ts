@@ -1,3 +1,4 @@
+import { decimalTransformer } from '../common/transformers/decimal.transformer';
 import { Entity, Column, Index, DeleteDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../common/entities/base.entity';
 import { PrincipalChargeSetup } from './principal-charge-setup.entity';

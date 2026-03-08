@@ -23,6 +23,8 @@ import { PrincipalChargeSetup } from '../principal-charges/principal-charge-setu
 import { PrincipalChargeType } from '../principal-charges/principal-charge-type.entity';
 import { ChargeSetupAuditLog } from 'src/principal-charges/charge-setup-audit.entity';
 import { TransactionPurpose } from 'src/transaction-purposes/transaction-purpose.entity';
+import { TransactionPurposeDetail } from 'src/transaction-purposes/transaction-purpose-detail.entity';
+import { JobTracking } from 'src/jobs/job-tracking.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -57,6 +59,8 @@ export const getDatabaseConfig = (
     PrincipalChargeType,
     ChargeSetupAuditLog,
     TransactionPurpose,
+    TransactionPurposeDetail,
+    JobTracking,
   ],
   synchronize: false,
   // schema: 'public',

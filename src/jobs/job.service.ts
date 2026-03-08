@@ -3,8 +3,12 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
+import { IsString, IsOptional, IsNumber, IsBoolean, IsDate, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 import { TenantService } from '../tenant/tenant.service';
 import { Job } from './job.entity';
+import { JobTracking } from './job-tracking.entity';
+import { ManifestJob } from '../manifest-jobs/manifest-job.entity';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
 import { CreateJobDto, UpdateJobDto, SearchJobDto } from './job.dto';
 
@@ -129,6 +133,128 @@ export class JobService {
         .findOne({ where: { id } });
       if (!existing) throw new NotFoundException('Job not found');
       await manager.getRepository(Job).softDelete(id);
+    });
+  }
+
+  private async buildDebitNote(manager: any, rows: JobTracking[], company: any) {
+    const job = rows[0].job;
+    const manifestJob = await manager
+      .getRepository(ManifestJob)
+      .findOne({
+        where: { jobNo: job.jobNo },
+        relations: ['houseManifest', 'houseManifest.masterManifest'],
+      });
+    const grandTotal = rows.reduce((sum, r) => sum + r.transAmount + r.vatAmount, 0);
+    return { company, job, manifestJob: manifestJob ?? null, lineItems: rows, grandTotal };
+  }
+
+  async getDebitNote(jobNo: string) {
+    return this.tenantService.withManager(async (manager) => {
+      const rows = await manager
+        .getRepository(JobTracking)
+        .createQueryBuilder('jt')
+        .innerJoinAndSelect('jt.job', 'j')
+        .leftJoinAndSelect('jt.detail', 'd')
+        .where('jt.jobNo = :jobNo', { jobNo })
+        .orderBy('jt.vatAmount', 'ASC')
+        .addOrderBy('d.purposeDetails', 'ASC')
+        .getMany();
+
+      if (!rows.length) throw new NotFoundException('No debit note records found');
+
+      const company = await this.tenantService.validateTenant(
+        this.tenantService.tenantContext.getTenant(),
+      );
+      return this.buildDebitNote(manager, rows, company);
+    });
+  }
+
+  async getAllDebitNotes() {
+    return this.tenantService.withManager(async (manager) => {
+      const rows = await manager
+        .getRepository(JobTracking)
+        .createQueryBuilder('jt')
+        .innerJoinAndSelect('jt.job', 'j')
+        .leftJoinAndSelect('jt.detail', 'd')
+        .orderBy('jt.jobNo', 'ASC')
+        .getMany();
+
+      const company = await this.tenantService.validateTenant(
+        this.tenantService.tenantContext.getTenant(),
+      );
+
+      const grouped = new Map<string, JobTracking[]>();
+      for (const row of rows) {
+        if (!grouped.has(row.jobNo)) grouped.set(row.jobNo, []);
+        grouped.get(row.jobNo)!.push(row);
+      }
+
+      return Promise.all(
+        Array.from(grouped.values()).map((jobRows) =>
+          this.buildDebitNote(manager, jobRows, company),
+        ),
+      );
+    });
+  }
+}
+
+export class CreateJobTrackingDto {
+  @IsString() jobNo: string;
+  @IsOptional() @IsString() purposeCode?: string;
+  @IsOptional() @IsString() detailCode?: string;
+  @Type(() => Number) @IsNumber() @Min(0) transAmount: number;
+  @Type(() => Number) @IsNumber() @Min(0) vatAmount: number;
+  @IsOptional() @IsBoolean() vatStatus?: boolean;
+  @IsOptional() @IsString() transBy?: string;
+  @IsOptional() @Type(() => Date) @IsDate() transactionDate?: Date;
+}
+
+export class UpdateJobTrackingDto {
+  @IsOptional() @IsString() purposeCode?: string;
+  @IsOptional() @IsString() detailCode?: string;
+  @IsOptional() @Type(() => Number) @IsNumber() @Min(0) transAmount?: number;
+  @IsOptional() @Type(() => Number) @IsNumber() @Min(0) vatAmount?: number;
+  @IsOptional() @IsBoolean() vatStatus?: boolean;
+  @IsOptional() @IsString() transBy?: string;
+  @IsOptional() @Type(() => Date) @IsDate() transactionDate?: Date;
+}
+
+@Injectable()
+export class JobTrackingService {
+  constructor(private tenantService: TenantService) {}
+
+  findByJob(jobNo: string): Promise<JobTracking[]> {
+    return this.tenantService.withManager((m) =>
+      m.getRepository(JobTracking).find({
+        where: { jobNo },
+        relations: ['detail'],
+        order: { transactionDate: 'DESC' },
+      }),
+    );
+  }
+
+  create(data: CreateJobTrackingDto, userId: string): Promise<JobTracking> {
+    return this.tenantService.withManager(async (m) => {
+      const job = await m.getRepository(Job).findOne({ where: { jobNo: data.jobNo } });
+      if (!job) throw new NotFoundException(`Job "${data.jobNo}" not found`);
+      return m.save(m.create(JobTracking, { ...data, createdBy: userId }));
+    });
+  }
+
+  update(id: string, data: UpdateJobTrackingDto, userId: string): Promise<JobTracking> {
+    return this.tenantService.withManager(async (m) => {
+      const existing = await m.getRepository(JobTracking).findOne({ where: { id } });
+      if (!existing) throw new NotFoundException('Tracking entry not found');
+      await m.getRepository(JobTracking).update(id, { ...data, updatedBy: userId });
+      return m.getRepository(JobTracking).findOne({ where: { id }, relations: ['detail'] }) as Promise<JobTracking>;
+    });
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.tenantService.withManager(async (m) => {
+      const existing = await m.getRepository(JobTracking).findOne({ where: { id } });
+      if (!existing) throw new NotFoundException('Tracking entry not found');
+      await m.getRepository(JobTracking).softDelete(id);
     });
   }
 }

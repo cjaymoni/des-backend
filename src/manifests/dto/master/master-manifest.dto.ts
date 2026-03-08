@@ -51,10 +51,6 @@ export class CreateMasterManifestDto {
 
   @IsOptional()
   @IsUUID()
-  shipperId?: string;
-
-  @IsOptional()
-  @IsUUID()
   principalId?: string;
 
   @IsOptional()
@@ -125,10 +121,6 @@ export class UpdateMasterManifestDto {
 
   @IsOptional()
   @IsUUID()
-  shipperId?: string;
-
-  @IsOptional()
-  @IsUUID()
   principalId?: string;
 
   @IsOptional()
@@ -169,17 +161,7 @@ export class SearchMasterManifestDto {
   shippingLineId?: string;
 
   @IsOptional()
-  @IsUUID()
-  @Transform(({ value }) => value || undefined)
-  shipperId?: string;
-
-  @IsOptional()
   @IsString()
   @Transform(({ value }) => value || undefined)
   containerNo?: string;
-
-  @IsOptional()
-  @IsString()
-  @Transform(({ value }) => value || undefined)
-  shipper?: string;
 }

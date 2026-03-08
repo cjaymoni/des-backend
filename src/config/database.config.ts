@@ -17,7 +17,6 @@ import { AccountType } from 'src/bank-transactions/account-type.entity';
 import { CifValue } from 'src/cif-values/cif-value.entity';
 import { CifSettings } from 'src/cif-values/cif-settings.entity';
 import { ShippingLine } from '../shipping-lines/shipping-line.entity';
-import { Shipper } from '../shippers/shipper.entity';
 import { Principal } from '../principals/principal.entity';
 import { Currency } from '../currencies/currency.entity';
 import { PrincipalChargeSetup } from '../principal-charges/principal-charge-setup.entity';
@@ -52,7 +51,6 @@ export const getDatabaseConfig = (
     CifValue,
     CifSettings,
     ShippingLine,
-    Shipper,
     Principal,
     Currency,
     PrincipalChargeSetup,

@@ -34,17 +34,12 @@ export class MasterManifestService {
         qb.andWhere('master.vessel = :vessel', { vessel: search.vessel });
       if (search.shippingLineId)
         qb.andWhere('master.shippingLineId = :shippingLineId', { shippingLineId: search.shippingLineId });
-      if (search.shipperId)
-        qb.andWhere('master.shipperId = :shipperId', { shipperId: search.shipperId });
       if (search.containerNo)
         qb.andWhere('master.containerNo = :containerNo', {
           containerNo: search.containerNo,
         });
-      if (search.shipper)
-        qb.andWhere('master.shipper = :shipper', { shipper: search.shipper });
       const [items, total] = await qb
         .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
-        .leftJoinAndSelect('master.shipperRef', 'shipper')
         .leftJoinAndSelect('master.principalRef', 'principal')
         .skip(skip)
         .take(limit)
@@ -138,7 +133,6 @@ export class MasterManifestService {
       .createQueryBuilder('master')
       .leftJoinAndSelect('master.houseManifests', 'house')
       .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
-      .leftJoinAndSelect('master.shipperRef', 'shipper')
       .leftJoinAndSelect('master.principalRef', 'principal')
       .where('master.id = :id', { id })
       .getOne();

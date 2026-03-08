@@ -21,7 +21,6 @@ import { JobsModule } from './jobs/jobs.module';
 import { BankTransactionsModule } from './bank-transactions/bank-transactions.module';
 import { CifValuesModule } from './cif-values/cif-values.module';
 import { ShippingLineModule } from './shipping-lines/shipping-line.module';
-import { ShipperModule } from './shippers/shipper.module';
 import { PrincipalModule } from './principals/principal.module';
 import { CurrencyModule } from './currencies/currency.module';
 import { PrincipalChargeModule } from './principal-charges/principal-charge.module';
@@ -58,7 +57,6 @@ import { getDatabaseConfig } from './config/database.config';
     BankTransactionsModule,
     CifValuesModule,
     ShippingLineModule,
-    ShipperModule,
     PrincipalModule,
     CurrencyModule,
     PrincipalChargeModule,

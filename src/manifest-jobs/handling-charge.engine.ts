@@ -33,9 +33,14 @@ export class HandlingChargeEngine {
     }
 
     const currencyRate = setup.currency.rate;
-    const totalHandCharge = handCharge * currencyRate;
+    const totalHandCharge = Math.round(handCharge * currencyRate * 100) / 100;
 
-    return { handCharge, currencyRate, totalHandCharge, breakdown };
+    return {
+      handCharge: Math.round(handCharge * 100) / 100,
+      currencyRate: Math.round(currencyRate * 100) / 100,
+      totalHandCharge,
+      breakdown: breakdown.map(b => ({ ...b, subCharge: Math.round(b.subCharge * 100) / 100 })),
+    };
   }
 
   /** Per doc section 2.4.2: MIN_MAX, MAX, FIXED logic */

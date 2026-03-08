@@ -100,19 +100,6 @@ CREATE TABLE IF NOT EXISTS "charge_setup_audit_logs" (
 CREATE INDEX IF NOT EXISTS "idx_charge_setup_audit_logs_principalId" ON "charge_setup_audit_logs" ("principalId");
 CREATE INDEX IF NOT EXISTS "idx_charge_setup_audit_logs_createdAt" ON "charge_setup_audit_logs" ("createdAt");
 
--- Shippers table
-CREATE TABLE IF NOT EXISTS "shippers" (
-  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "name" varchar(100) NOT NULL UNIQUE,
-  "createdAt" timestamp NOT NULL DEFAULT now(),
-  "updatedAt" timestamp NOT NULL DEFAULT now(),
-  "deletedAt" timestamp,
-  "createdBy" varchar,
-  "updatedBy" varchar
-);
-
-CREATE INDEX IF NOT EXISTS "idx_shippers_name" ON "shippers" ("name");
-
 -- Shipping Lines table
 CREATE TABLE IF NOT EXISTS "shipping_lines" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -138,7 +125,6 @@ CREATE TABLE IF NOT EXISTS "master_manifests" (
   "destination" varchar(50),
   "portLoad" varchar(50),
   "shippingLineId" uuid,
-  "shipperId" uuid,
   "principalId" uuid,
   "cntSize" varchar(50),
   "sealNo" varchar(50),
@@ -150,7 +136,6 @@ CREATE TABLE IF NOT EXISTS "master_manifests" (
   "createdBy" varchar,
   "updatedBy" varchar,
   FOREIGN KEY ("shippingLineId") REFERENCES "shipping_lines"("id") ON DELETE SET NULL,
-  FOREIGN KEY ("shipperId") REFERENCES "shippers"("id") ON DELETE SET NULL,
   FOREIGN KEY ("principalId") REFERENCES "principals"("id") ON DELETE SET NULL
 );
 
@@ -160,9 +145,6 @@ CREATE INDEX IF NOT EXISTS "idx_master_manifests_containerNo" ON "master_manifes
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='master_manifests' AND column_name='shippingLineId') THEN
     CREATE INDEX IF NOT EXISTS "idx_master_manifests_shippingLineId" ON "master_manifests" ("shippingLineId");
-  END IF;
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='master_manifests' AND column_name='shipperId') THEN
-    CREATE INDEX IF NOT EXISTS "idx_master_manifests_shipperId" ON "master_manifests" ("shipperId");
   END IF;
 END $$;
 
@@ -553,33 +535,6 @@ DO $$ BEGIN
     FOREIGN KEY ("shippingLineId") REFERENCES "shipping_lines"("id") ON DELETE SET NULL;
 
     CREATE INDEX IF NOT EXISTS "idx_master_manifests_shippingLineId" ON "master_manifests" ("shippingLineId");
-  END IF;
-END $$;
-
--- Migrate shipper string column to shipperId FK
-DO $$ BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='master_manifests' AND column_name='shipper') THEN
-    INSERT INTO "shippers" ("name")
-    SELECT DISTINCT UPPER(TRIM("shipper"))
-    FROM "master_manifests"
-    WHERE "shipper" IS NOT NULL AND TRIM("shipper") <> ''
-    ON CONFLICT ("name") DO NOTHING;
-
-    ALTER TABLE "master_manifests" ADD COLUMN IF NOT EXISTS "shipperId" uuid;
-
-    UPDATE "master_manifests" mm
-    SET "shipperId" = s.id
-    FROM "shippers" s
-    WHERE UPPER(TRIM(mm."shipper")) = s."name"
-      AND mm."shipper" IS NOT NULL;
-
-    ALTER TABLE "master_manifests" DROP COLUMN "shipper";
-
-    ALTER TABLE "master_manifests"
-    ADD CONSTRAINT "fk_master_manifests_shipperId"
-    FOREIGN KEY ("shipperId") REFERENCES "shippers"("id") ON DELETE SET NULL;
-
-    CREATE INDEX IF NOT EXISTS "idx_master_manifests_shipperId" ON "master_manifests" ("shipperId");
   END IF;
 END $$;
 

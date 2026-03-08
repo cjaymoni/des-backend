@@ -2,14 +2,12 @@ import { Entity, Column, Index, DeleteDateColumn, OneToMany, ManyToOne, JoinColu
 import { BaseEntity } from '../../common/entities/base.entity';
 import { HouseManifest } from './house-manifest.entity';
 import { ShippingLine } from '../../shipping-lines/shipping-line.entity';
-import { Shipper } from '../../shippers/shipper.entity';
 import { Principal } from '../../principals/principal.entity';
 
 @Entity('master_manifests')
 @Index(['blNo'])
 @Index(['vessel'])
 @Index(['shippingLineId'])
-@Index(['shipperId'])
 @Index(['containerNo'])
 export class MasterManifest extends BaseEntity {
 
@@ -43,13 +41,6 @@ export class MasterManifest extends BaseEntity {
   @ManyToOne(() => ShippingLine, { nullable: true, eager: false })
   @JoinColumn({ name: 'shippingLineId' })
   shippingLineRef: ShippingLine;
-
-  @Column({ nullable: true })
-  shipperId: string;
-
-  @ManyToOne(() => Shipper, { nullable: true, eager: false })
-  @JoinColumn({ name: 'shipperId' })
-  shipperRef: Shipper;
 
   @Column({ nullable: true })
   principalId: string;

@@ -35,8 +35,19 @@ async function bootstrap() {
     // },
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-org-name'],
-    exposedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-org-name',
+      'x-csrf-token',
+      'X-CSRF-Token',
+    ],
+    exposedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-csrf-token',
+      'X-CSRF-Token',
+    ],
     credentials: true,
     preflightContinue: false,
     optionsSuccessStatus: 204,
@@ -49,7 +60,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = process.env.PORT || 5059;
+  const port = process.env.PORT || 5050;
   await app.listen(port, '0.0.0.0');
 
   winstonConfig.log(`Server running on http://localhost:${port}`);

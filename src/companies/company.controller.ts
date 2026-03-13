@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Public } from '../common/decorators/public.decorator';
 import { fileFilter } from '../common/utils/file-filter.util';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
@@ -33,13 +34,16 @@ export class CompanyController {
   ) {}
 
   @Get('subdomain/:subdomain/public')
+  @Public()
   async findBySubdomainPublic(@Param('subdomain') subdomain: string) {
     return this.companyService.findBySubdomainPublic(subdomain);
   }
 
   @Get('subdomain/:subdomain')
   @UseGuards(AuthGuard('jwt'))
-  async findBySubdomain(@Param('subdomain') subdomain: string): Promise<Company> {
+  async findBySubdomain(
+    @Param('subdomain') subdomain: string,
+  ): Promise<Company> {
     return this.companyService.findBySubdomain(subdomain);
   }
 

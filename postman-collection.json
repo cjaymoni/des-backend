@@ -55,6 +55,30 @@
             },
             "description": "Creates a new tenant schema (e.g., tenant_acme) for complete data isolation"
           }
+        },
+        {
+          "name": "Get Current Tenant (Public — subdomain validation)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-org-name",
+                "value": "{{orgName}}",
+                "description": "Subdomain to validate"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenant/current",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenant",
+                "current"
+              ]
+            },
+            "description": "Public endpoint used by the frontend to verify whether a subdomain (x-org-name) is valid before loading the app. Returns only: id, appSubdomain, companyName, logo. Returns 404 if the subdomain does not exist."
+          }
         }
       ]
     },
@@ -113,7 +137,8 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"role\": \"user\"\n}"
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}",
+              "options": { "raw": { "language": "json" } }
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
@@ -124,23 +149,35 @@
                 "auth",
                 "register"
               ]
-            }
+            },
+            "description": "Public endpoint. Registers a regular tenant user (role is always 'user'). Requires x-org-name header for tenant scoping."
           }
         },
         {
-          "name": "Register Company Admin",
+          "name": "Register Company Admin (System Admin only)",
           "request": {
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "description": "system_admin JWT required"
+              },
+              {
                 "key": "x-org-name",
-                "value": "{{orgName}}"
+                "value": "{{orgName}}",
+                "description": "Tenant subdomain the new admin belongs to"
               },
               {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@acme.com\",\n  \"password\": \"securepassword\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
             "url": {
               "raw": "{{baseUrl}}/auth/register-company-admin",
               "host": [
@@ -151,25 +188,18 @@
                 "register-company-admin"
               ]
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@acme.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\",\n  \"subdomain\": \"acme\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
+            "description": "Protected endpoint — requires a valid system_admin JWT. Creates a company_admin user in the tenant specified by x-org-name."
           }
         },
         {
-          "name": "Register System Admin",
+          "name": "Register System Admin (System Admin only)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{token}}",
+                "description": "system_admin JWT required"
               },
               {
                 "key": "Content-Type",
@@ -178,10 +208,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin2@system.com\",\n  \"password\": \"admin123\",\n  \"firstName\": \"System\",\n  \"lastName\": \"Admin\"\n}"
+              "raw": "{\n  \"email\": \"admin2@system.com\",\n  \"password\": \"securepassword\",\n  \"firstName\": \"System\",\n  \"lastName\": \"Admin\"\n}",
+              "options": { "raw": { "language": "json" } }
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register-system-admin",
+              "description": "Protected endpoint — requires a valid system_admin JWT. Creates another system_admin user."
               "host": [
                 "{{baseUrl}}"
               ],

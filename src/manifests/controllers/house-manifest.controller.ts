@@ -99,6 +99,7 @@ export class HouseManifestController {
   private async uploadFiles(files: Express.Multer.File[]): Promise<{ url: string; publicId: string; filename: string }[]> {
     if (!files || files.length === 0) return [];
     const orgName = this.tenantContext.getTenant();
+    if (!orgName) throw new Error('Tenant context not set');
     const attachments: { url: string; publicId: string; filename: string }[] = [];
     try {
       for (const file of files) {

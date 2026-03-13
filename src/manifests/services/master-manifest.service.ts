@@ -22,39 +22,45 @@ export class MasterManifestService {
     pagination: PaginationDto,
     search: SearchMasterManifestDto,
   ): Promise<PaginatedResult<MasterManifest>> {
-    return this.tenantService.withManager(async (manager) => {
-      const { page, limit } = pagination;
-      const skip = (page - 1) * limit;
-      const qb = manager
-        .getRepository(MasterManifest)
-        .createQueryBuilder('master');
-      if (search.blNo)
-        qb.andWhere('master.blNo = :blNo', { blNo: search.blNo });
-      if (search.vessel)
-        qb.andWhere('master.vessel = :vessel', { vessel: search.vessel });
-      if (search.shippingLineId)
-        qb.andWhere('master.shippingLineId = :shippingLineId', { shippingLineId: search.shippingLineId });
-      if (search.containerNo)
-        qb.andWhere('master.containerNo = :containerNo', {
-          containerNo: search.containerNo,
-        });
-      const [items, total] = await qb
-        .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
-        .leftJoinAndSelect('master.principalRef', 'principal')
-        .skip(skip)
-        .take(limit)
-        .orderBy('master.createdAt', 'DESC')
-        .getManyAndCount();
-      return {
-        items,
-        meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
-      };
-    });
+    return this.tenantService.withManager(
+      async (manager) => {
+        const { page, limit } = pagination;
+        const skip = (page - 1) * limit;
+        const qb = manager
+          .getRepository(MasterManifest)
+          .createQueryBuilder('master');
+        if (search.blNo)
+          qb.andWhere('master.blNo = :blNo', { blNo: search.blNo });
+        if (search.vessel)
+          qb.andWhere('master.vessel = :vessel', { vessel: search.vessel });
+        if (search.shippingLineId)
+          qb.andWhere('master.shippingLineId = :shippingLineId', {
+            shippingLineId: search.shippingLineId,
+          });
+        if (search.containerNo)
+          qb.andWhere('master.containerNo = :containerNo', {
+            containerNo: search.containerNo,
+          });
+        const [items, total] = await qb
+          .leftJoinAndSelect('master.shippingLineRef', 'shippingLine')
+          .leftJoinAndSelect('master.principalRef', 'principal')
+          .skip(skip)
+          .take(limit)
+          .orderBy('master.createdAt', 'DESC')
+          .getManyAndCount();
+        return {
+          items,
+          meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+        };
+      },
+      { transactional: false },
+    );
   }
 
   async findOne(id: string): Promise<MasterManifest> {
-    return this.tenantService.withManager((manager) =>
-      this.fetchOne(manager, id),
+    return this.tenantService.withManager(
+      (manager) => this.fetchOne(manager, id),
+      { transactional: false },
     );
   }
 
@@ -117,9 +123,13 @@ export class MasterManifestService {
         .then((rows) => rows.map((r) => r.id));
 
       if (houseIds.length > 0) {
-        await manager.getRepository(ManifestJob).softDelete({ houseManifestId: houseIds as any });
+        await manager
+          .getRepository(ManifestJob)
+          .softDelete({ houseManifestId: houseIds as any });
       }
-      await manager.getRepository(HouseManifest).softDelete({ masterManifestId: id });
+      await manager
+        .getRepository(HouseManifest)
+        .softDelete({ masterManifestId: id });
       await manager.getRepository(MasterManifest).softDelete(id);
     });
   }

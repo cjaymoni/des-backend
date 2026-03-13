@@ -1,5 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 
+/** 5 MB – applied as multer limits.fileSize on every upload interceptor */
+export const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
 const ALLOWED_MIME_TYPES = [
   'image/jpeg',
   'image/png',

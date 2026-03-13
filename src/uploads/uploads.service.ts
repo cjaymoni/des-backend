@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 import { unlinkSync } from 'fs';
 
 @Injectable()
 export class UploadsService {
+  private readonly logger = new Logger(UploadsService.name);
+
   constructor() {
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -50,17 +52,12 @@ export class UploadsService {
     publicId: string,
     resourceType: 'image' | 'raw' | 'video' = 'image',
   ) {
-    console.log(
-      'Attempting to delete from Cloudinary:',
-      publicId,
-      'type:',
-      resourceType,
-    );
+    this.logger.log(`Attempting to delete from Cloudinary: ${publicId} type: ${resourceType}`);
     const result = await cloudinary.uploader.destroy(publicId, {
       invalidate: true,
       resource_type: resourceType,
     });
-    console.log('Cloudinary delete response:', result);
+    this.logger.log(`Cloudinary delete response: ${JSON.stringify(result)}`);
     return { success: true, result };
   }
 }

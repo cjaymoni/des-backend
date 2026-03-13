@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
@@ -15,8 +19,16 @@ export class AuthService {
     @InjectConnection() private connection: Connection,
   ) {}
 
-  private async findPublicUser(field: 'email' | 'id', value: string): Promise<User | null> {
-    const col = field === 'email' ? 'email' : 'id';
+  private static readonly ALLOWED_COLUMNS: Record<'email' | 'id', string> = {
+    email: 'email',
+    id: 'id',
+  };
+
+  private async findPublicUser(
+    field: 'email' | 'id',
+    value: string,
+  ): Promise<User | null> {
+    const col = AuthService.ALLOWED_COLUMNS[field];
     const rows: User[] = await this.connection.query(
       `SELECT * FROM public.users WHERE "${col}" = $1 LIMIT 1`,
       [value],
@@ -63,10 +75,12 @@ export class AuthService {
     });
   }
 
-  async login(email: string, password: string, orgName?: string): Promise<AuthResponseDto> {
-    console.log('[DEBUG] Login attempt:', { email, orgName });
+  async login(
+    email: string,
+    password: string,
+    orgName?: string,
+  ): Promise<AuthResponseDto> {
     const systemUser = await this.findPublicUser('email', email);
-    console.log('[DEBUG] System user found:', systemUser ? { email: systemUser.email, role: systemUser.role } : null);
 
     if (systemUser && systemUser.role === 'system_admin') {
       if (!(await bcrypt.compare(password, systemUser.password))) {
@@ -86,7 +100,9 @@ export class AuthService {
     }
 
     if (!orgName) {
-      throw new UnauthorizedException('Organization header (x-org-name) is required for login');
+      throw new UnauthorizedException(
+        'Organization header (x-org-name) is required for login',
+      );
     }
 
     return this.tenantService.withManager(async (manager) => {
@@ -133,11 +149,14 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    return this.tenantService.withManager(async (manager) => {
-      const user = await manager.findOne(User, { where: { id: userId } });
-      if (!user) throw new NotFoundException('User not found');
-      const { password, ...userWithoutPassword } = user;
-      return userWithoutPassword;
-    });
+    return this.tenantService.withManager(
+      async (manager) => {
+        const user = await manager.findOne(User, { where: { id: userId } });
+        if (!user) throw new NotFoundException('User not found');
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      },
+      { transactional: false },
+    );
   }
 }

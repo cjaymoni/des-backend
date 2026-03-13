@@ -16,17 +16,20 @@ export class PrincipalChargeService {
   constructor(private tenantService: TenantService) {}
 
   async findAll(): Promise<PrincipalChargeSetup[]> {
-    return this.tenantService.withManager((manager) =>
-      manager.getRepository(PrincipalChargeSetup).find({
-        order: { createdAt: 'ASC' },
-        relations: ['principal', 'currency', 'chargeTypes'],
-      }),
+    return this.tenantService.withManager(
+      (manager) =>
+        manager.getRepository(PrincipalChargeSetup).find({
+          order: { createdAt: 'ASC' },
+          relations: ['principal', 'currency', 'chargeTypes'],
+        }),
+      { transactional: false },
     );
   }
 
   async findByPrincipal(principalId: string): Promise<PrincipalChargeSetup> {
-    return this.tenantService.withManager((manager) =>
-      this.fetchByPrincipal(manager, principalId),
+    return this.tenantService.withManager(
+      (manager) => this.fetchByPrincipal(manager, principalId),
+      { transactional: false },
     );
   }
 
@@ -178,23 +181,27 @@ export class PrincipalChargeService {
   }
 
   async getAuditLog(): Promise<ChargeSetupAuditLog[]> {
-    return this.tenantService.withManager((manager) =>
-      manager.getRepository(ChargeSetupAuditLog).find({
-        order: { createdAt: 'DESC' },
-        take: 200,
-      }),
+    return this.tenantService.withManager(
+      (manager) =>
+        manager.getRepository(ChargeSetupAuditLog).find({
+          order: { createdAt: 'DESC' },
+          take: 200,
+        }),
+      { transactional: false },
     );
   }
 
   async getAuditLogByPrincipal(
     principalId: string,
   ): Promise<ChargeSetupAuditLog[]> {
-    return this.tenantService.withManager((manager) =>
-      manager.getRepository(ChargeSetupAuditLog).find({
-        where: { principalId },
-        order: { createdAt: 'DESC' },
-        take: 100,
-      }),
+    return this.tenantService.withManager(
+      (manager) =>
+        manager.getRepository(ChargeSetupAuditLog).find({
+          where: { principalId },
+          order: { createdAt: 'DESC' },
+          take: 100,
+        }),
+      { transactional: false },
     );
   }
 

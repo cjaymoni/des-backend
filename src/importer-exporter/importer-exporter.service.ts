@@ -20,40 +20,46 @@ export class ImporterExporterService {
     pagination: PaginationDto,
     search: SearchImporterExporterDto,
   ): Promise<PaginatedResult<ImporterExporter>> {
-    return this.tenantService.withManager(async (manager) => {
-      const { page, limit } = pagination;
-      const skip = (page - 1) * limit;
-      const qb = manager
-        .getRepository(ImporterExporter)
-        .createQueryBuilder('ie');
+    return this.tenantService.withManager(
+      async (manager) => {
+        const { page, limit } = pagination;
+        const skip = (page - 1) * limit;
+        const qb = manager
+          .getRepository(ImporterExporter)
+          .createQueryBuilder('ie');
 
-      if (search.ieName)
-        qb.andWhere('ie.ieName ILIKE :ieName', {
-          ieName: `%${search.ieName}%`,
-        });
-      if (search.code) qb.andWhere('ie.code = :code', { code: search.code });
+        if (search.ieName)
+          qb.andWhere('ie.ieName ILIKE :ieName', {
+            ieName: `%${search.ieName}%`,
+          });
+        if (search.code) qb.andWhere('ie.code = :code', { code: search.code });
 
-      const [items, total] = await qb
-        .skip(skip)
-        .take(limit)
-        .orderBy('ie.ieName', 'ASC')
-        .getManyAndCount();
+        const [items, total] = await qb
+          .skip(skip)
+          .take(limit)
+          .orderBy('ie.ieName', 'ASC')
+          .getManyAndCount();
 
-      return {
-        items,
-        meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
-      };
-    });
+        return {
+          items,
+          meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+        };
+      },
+      { transactional: false },
+    );
   }
 
   async findOne(id: string): Promise<ImporterExporter> {
-    return this.tenantService.withManager(async (manager) => {
-      const ie = await manager
-        .getRepository(ImporterExporter)
-        .findOne({ where: { id } });
-      if (!ie) throw new NotFoundException('Importer/Exporter not found');
-      return ie;
-    });
+    return this.tenantService.withManager(
+      async (manager) => {
+        const ie = await manager
+          .getRepository(ImporterExporter)
+          .findOne({ where: { id } });
+        if (!ie) throw new NotFoundException('Importer/Exporter not found');
+        return ie;
+      },
+      { transactional: false },
+    );
   }
 
   async create(

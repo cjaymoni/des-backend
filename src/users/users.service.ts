@@ -15,47 +15,53 @@ export class UsersService {
   async findAll(
     pagination: PaginationDto,
   ): Promise<PaginatedResult<Partial<User>>> {
-    return this.tenantService.withManager(async (manager) => {
-      const { page, limit } = pagination;
-      const skip = (page - 1) * limit;
-      const [items, total] = await manager.getRepository(User).findAndCount({
-        select: [
-          'id',
-          'email',
-          'firstName',
-          'lastName',
-          'role',
-          'isActive',
-          'createdAt',
-        ],
-        skip,
-        take: limit,
-      });
-      return {
-        items,
-        meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
-      };
-    });
+    return this.tenantService.withManager(
+      async (manager) => {
+        const { page, limit } = pagination;
+        const skip = (page - 1) * limit;
+        const [items, total] = await manager.getRepository(User).findAndCount({
+          select: [
+            'id',
+            'email',
+            'firstName',
+            'lastName',
+            'role',
+            'isActive',
+            'createdAt',
+          ],
+          skip,
+          take: limit,
+        });
+        return {
+          items,
+          meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+        };
+      },
+      { transactional: false },
+    );
   }
 
   async findOne(id: string): Promise<Partial<User>> {
-    return this.tenantService.withManager(async (manager) => {
-      const user = await manager.getRepository(User).findOne({
-        where: { id },
-        select: [
-          'id',
-          'email',
-          'firstName',
-          'lastName',
-          'role',
-          'isActive',
-          'createdAt',
-          'updatedAt',
-        ],
-      });
-      if (!user) throw new NotFoundException('User not found');
-      return user;
-    });
+    return this.tenantService.withManager(
+      async (manager) => {
+        const user = await manager.getRepository(User).findOne({
+          where: { id },
+          select: [
+            'id',
+            'email',
+            'firstName',
+            'lastName',
+            'role',
+            'isActive',
+            'createdAt',
+            'updatedAt',
+          ],
+        });
+        if (!user) throw new NotFoundException('User not found');
+        return user;
+      },
+      { transactional: false },
+    );
   }
 
   async create(data: Partial<User>): Promise<Partial<User>> {

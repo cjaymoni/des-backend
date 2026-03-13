@@ -32,6 +32,7 @@ export class HouseManifestAttachmentsController {
     @Req() req: { user: { id: string } },
   ): Promise<any> {
     const orgName = this.tenantContext.getTenant();
+    if (!orgName) throw new Error('Tenant context not set');
     const uploadedFiles: { url: string; publicId: string; filename: string }[] =
       [];
 

@@ -1,14 +1,15 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ClsService } from 'nestjs-cls';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class TenantContext {
-  private tenantId: string;
+  constructor(private readonly cls: ClsService) {}
 
   setTenant(tenantId: string) {
-    this.tenantId = tenantId;
+    this.cls.set('tenantId', tenantId);
   }
 
-  getTenant(): string {
-    return this.tenantId;
+  getTenant(): string | undefined {
+    return this.cls.get<string>('tenantId');
   }
 }

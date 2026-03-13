@@ -25,37 +25,41 @@ export class HouseManifestService {
     pagination: PaginationDto,
     search: SearchHouseManifestDto,
   ): Promise<PaginatedResult<HouseManifest>> {
-    return this.tenantService.withManager(async (manager) => {
-      const { page, limit } = pagination;
-      const skip = (page - 1) * limit;
-      const qb = manager
-        .getRepository(HouseManifest)
-        .createQueryBuilder('house');
-      if (search.hblNo)
-        qb.andWhere('house.hblNo = :hblNo', { hblNo: search.hblNo });
-      if (search.consignee)
-        qb.andWhere('house.consignee = :consignee', {
-          consignee: search.consignee,
-        });
-      if (search.masterManifestId)
-        qb.andWhere('house.masterManifestId = :masterManifestId', {
-          masterManifestId: search.masterManifestId,
-        });
-      const [items, total] = await qb
-        .skip(skip)
-        .take(limit)
-        .orderBy('house.createdAt', 'DESC')
-        .getManyAndCount();
-      return {
-        items,
-        meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
-      };
-    });
+    return this.tenantService.withManager(
+      async (manager) => {
+        const { page, limit } = pagination;
+        const skip = (page - 1) * limit;
+        const qb = manager
+          .getRepository(HouseManifest)
+          .createQueryBuilder('house');
+        if (search.hblNo)
+          qb.andWhere('house.hblNo = :hblNo', { hblNo: search.hblNo });
+        if (search.consignee)
+          qb.andWhere('house.consignee = :consignee', {
+            consignee: search.consignee,
+          });
+        if (search.masterManifestId)
+          qb.andWhere('house.masterManifestId = :masterManifestId', {
+            masterManifestId: search.masterManifestId,
+          });
+        const [items, total] = await qb
+          .skip(skip)
+          .take(limit)
+          .orderBy('house.createdAt', 'DESC')
+          .getManyAndCount();
+        return {
+          items,
+          meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+        };
+      },
+      { transactional: false },
+    );
   }
 
   async findOne(id: string): Promise<HouseManifest> {
-    return this.tenantService.withManager((manager) =>
-      this.fetchOne(manager, id),
+    return this.tenantService.withManager(
+      (manager) => this.fetchOne(manager, id),
+      { transactional: false },
     );
   }
 

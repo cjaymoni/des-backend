@@ -7,8 +7,9 @@ export class WeightChargeService {
   constructor(private tenantService: TenantService) {}
 
   async findAll(): Promise<WeightCharge[]> {
-    return this.tenantService.withManager((manager) =>
-      manager.find(WeightCharge, { order: { weightFrom: 'ASC' } }),
+    return this.tenantService.withManager(
+      (manager) => manager.find(WeightCharge, { order: { weightFrom: 'ASC' } }),
+      { transactional: false },
     );
   }
 

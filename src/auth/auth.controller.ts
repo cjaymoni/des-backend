@@ -27,7 +27,21 @@ export class AuthController {
       body.password,
       body.firstName,
       body.lastName,
-      body.role,
+    );
+  }
+
+  @Post('register-company-admin')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('system_admin')
+  async registerCompanyAdmin(
+    @Body() body: RegisterDto,
+  ): Promise<AuthResponseDto> {
+    return this.authService.register(
+      body.email,
+      body.password,
+      body.firstName,
+      body.lastName,
+      'company_admin',
     );
   }
 
@@ -35,7 +49,7 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('system_admin')
   async registerSystemAdmin(
-    @Body() body: Omit<RegisterDto, 'role'>,
+    @Body() body: RegisterDto,
   ): Promise<AuthResponseDto> {
     return this.authService.register(
       body.email,

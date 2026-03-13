@@ -27,8 +27,9 @@ export class BankTransactionService {
   // ── Bank Names ─────────────────────────────────────────────────────────────
 
   async findAllBankNames(): Promise<BankName[]> {
-    return this.tenantService.withManager((m) =>
-      m.getRepository(BankName).find({ order: { bankCode: 'ASC' } }),
+    return this.tenantService.withManager(
+      (m) => m.getRepository(BankName).find({ order: { bankCode: 'ASC' } }),
+      { transactional: false },
     );
   }
 
@@ -80,23 +81,28 @@ export class BankTransactionService {
   // ── Bank Accounts ──────────────────────────────────────────────────────────
 
   async findAllAccounts(): Promise<BankAccount[]> {
-    return this.tenantService.withManager((m) =>
-      m.getRepository(BankAccount).find({
-        relations: ['bankName', 'acctType', 'currency'],
-        order: { acctNumber: 'ASC' },
-      }),
+    return this.tenantService.withManager(
+      (m) =>
+        m.getRepository(BankAccount).find({
+          relations: ['bankName', 'acctType', 'currency'],
+          order: { acctNumber: 'ASC' },
+        }),
+      { transactional: false },
     );
   }
 
   async findOneAccount(id: string): Promise<BankAccount> {
-    return this.tenantService.withManager(async (m) => {
-      const account = await m.getRepository(BankAccount).findOne({
-        where: { id },
-        relations: ['bankName', 'acctType', 'currency'],
-      });
-      if (!account) throw new NotFoundException('Bank account not found');
-      return account;
-    });
+    return this.tenantService.withManager(
+      async (m) => {
+        const account = await m.getRepository(BankAccount).findOne({
+          where: { id },
+          relations: ['bankName', 'acctType', 'currency'],
+        });
+        if (!account) throw new NotFoundException('Bank account not found');
+        return account;
+      },
+      { transactional: false },
+    );
   }
 
   async createAccount(
@@ -149,12 +155,10 @@ export class BankTransactionService {
         ),
       );
       await m.getRepository(BankAccount).update(id, payload);
-      return m
-        .getRepository(BankAccount)
-        .findOne({
-          where: { id },
-          relations: ['bankName', 'acctType', 'currency'],
-        }) as Promise<BankAccount>;
+      return m.getRepository(BankAccount).findOne({
+        where: { id },
+        relations: ['bankName', 'acctType', 'currency'],
+      }) as Promise<BankAccount>;
     });
   }
 
@@ -174,51 +178,57 @@ export class BankTransactionService {
     pagination: PaginationDto,
     search: SearchBankTransactionDto,
   ): Promise<PaginatedResult<BankTransaction>> {
-    return this.tenantService.withManager(async (m) => {
-      const { page, limit } = pagination;
-      const qb = m
-        .getRepository(BankTransaction)
-        .createQueryBuilder('bt')
-        .leftJoinAndSelect('bt.bankAccount', 'ba')
-        .leftJoinAndSelect('ba.bankName', 'bn');
+    return this.tenantService.withManager(
+      async (m) => {
+        const { page, limit } = pagination;
+        const qb = m
+          .getRepository(BankTransaction)
+          .createQueryBuilder('bt')
+          .leftJoinAndSelect('bt.bankAccount', 'ba')
+          .leftJoinAndSelect('ba.bankName', 'bn');
 
-      if (search.bankAccountId)
-        qb.andWhere('bt.bankAccountId = :bankAccountId', {
-          bankAccountId: search.bankAccountId,
-        });
-      if (search.bankNameId)
-        qb.andWhere('ba.bankNameId = :bankNameId', {
-          bankNameId: search.bankNameId,
-        });
-      if (search.strYear) {
-        qb.andWhere('bt.transactionDate BETWEEN :from AND :to', {
-          from: `${search.strYear}-01-01`,
-          to: `${search.strYear}-12-31`,
-        });
-      }
+        if (search.bankAccountId)
+          qb.andWhere('bt.bankAccountId = :bankAccountId', {
+            bankAccountId: search.bankAccountId,
+          });
+        if (search.bankNameId)
+          qb.andWhere('ba.bankNameId = :bankNameId', {
+            bankNameId: search.bankNameId,
+          });
+        if (search.strYear) {
+          qb.andWhere('bt.transactionDate BETWEEN :from AND :to', {
+            from: `${search.strYear}-01-01`,
+            to: `${search.strYear}-12-31`,
+          });
+        }
 
-      const [items, total] = await qb
-        .skip((page - 1) * limit)
-        .take(limit)
-        .orderBy('bt.transactionDate', 'DESC')
-        .getManyAndCount();
+        const [items, total] = await qb
+          .skip((page - 1) * limit)
+          .take(limit)
+          .orderBy('bt.transactionDate', 'DESC')
+          .getManyAndCount();
 
-      return {
-        items,
-        meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
-      };
-    });
+        return {
+          items,
+          meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+        };
+      },
+      { transactional: false },
+    );
   }
 
   async findOne(id: string): Promise<BankTransaction> {
-    return this.tenantService.withManager(async (m) => {
-      const tx = await m.getRepository(BankTransaction).findOne({
-        where: { id },
-        relations: ['bankAccount', 'bankAccount.bankName'],
-      });
-      if (!tx) throw new NotFoundException('Transaction not found');
-      return tx;
-    });
+    return this.tenantService.withManager(
+      async (m) => {
+        const tx = await m.getRepository(BankTransaction).findOne({
+          where: { id },
+          relations: ['bankAccount', 'bankAccount.bankName'],
+        });
+        if (!tx) throw new NotFoundException('Transaction not found');
+        return tx;
+      },
+      { transactional: false },
+    );
   }
 
   async create(
@@ -346,80 +356,85 @@ export class BankTransactionService {
     });
   }
 
-  async getSummary(
-    bankAccountId: string,
-  ): Promise<{
+  async getSummary(bankAccountId: string): Promise<{
     balance: number;
     availableBalance: number;
     totalBankCharges: number;
   }> {
-    return this.tenantService.withManager(async (m) => {
-      const account = await m
-        .getRepository(BankAccount)
-        .findOne({ where: { id: bankAccountId } });
-      if (!account) throw new NotFoundException(`Account not found`);
+    return this.tenantService.withManager(
+      async (m) => {
+        const account = await m
+          .getRepository(BankAccount)
+          .findOne({ where: { id: bankAccountId } });
+        if (!account) throw new NotFoundException(`Account not found`);
 
-      const { totalCharges } = await m
-        .getRepository(BankTransaction)
-        .createQueryBuilder('bt')
-        .select('SUM(bt.bankCharges)', 'totalCharges')
-        .where('bt.bankAccountId = :bankAccountId', { bankAccountId })
-        .getRawOne();
+        const { totalCharges } = await m
+          .getRepository(BankTransaction)
+          .createQueryBuilder('bt')
+          .select('SUM(bt.bankCharges)', 'totalCharges')
+          .where('bt.bankAccountId = :bankAccountId', { bankAccountId })
+          .getRawOne();
 
-      return {
-        balance: account.balance,
-        availableBalance: account.availableBalance,
-        totalBankCharges: parseFloat(totalCharges) || 0,
-      };
-    });
+        return {
+          balance: account.balance,
+          availableBalance: account.availableBalance,
+          totalBankCharges: parseFloat(totalCharges) || 0,
+        };
+      },
+      { transactional: false },
+    );
   }
 
   // ── Finance Summary Report (RptxBank) ──────────────────────────────────────
 
   async getFinanceSummary(dateFrom?: string, dateTo?: string) {
-    return this.tenantService.withManager(async (m) => {
-      const qb = m
-        .getRepository(BankTransaction)
-        .createQueryBuilder('bt')
-        .select('ba.id', 'bankAccountId')
-        .addSelect('ba.acctNumber', 'acctNumber')
-        .addSelect('bn.bankName', 'bankName')
-        .addSelect('ba.balance', 'balance')
-        .addSelect('SUM(bt.debitAmt)', 'totDebit')
-        .addSelect('SUM(bt.creditAmt)', 'totCredit')
-        .addSelect('SUM(bt.bankCharges)', 'totBankCharges')
-        .innerJoin('bt.bankAccount', 'ba')
-        .innerJoin('ba.bankName', 'bn')
-        .groupBy('ba.id')
-        .addGroupBy('ba.acctNumber')
-        .addGroupBy('bn.bankName')
-        .addGroupBy('ba.balance');
+    return this.tenantService.withManager(
+      async (m) => {
+        const qb = m
+          .getRepository(BankTransaction)
+          .createQueryBuilder('bt')
+          .select('ba.id', 'bankAccountId')
+          .addSelect('ba.acctNumber', 'acctNumber')
+          .addSelect('bn.bankName', 'bankName')
+          .addSelect('ba.balance', 'balance')
+          .addSelect('SUM(bt.debitAmt)', 'totDebit')
+          .addSelect('SUM(bt.creditAmt)', 'totCredit')
+          .addSelect('SUM(bt.bankCharges)', 'totBankCharges')
+          .innerJoin('bt.bankAccount', 'ba')
+          .innerJoin('ba.bankName', 'bn')
+          .groupBy('ba.id')
+          .addGroupBy('ba.acctNumber')
+          .addGroupBy('bn.bankName')
+          .addGroupBy('ba.balance');
 
-      if (dateFrom && dateTo) {
-        qb.where('bt.transactionDate BETWEEN :dateFrom AND :dateTo', {
-          dateFrom,
-          dateTo,
-        });
-      }
+        if (dateFrom && dateTo) {
+          qb.where('bt.transactionDate BETWEEN :dateFrom AND :dateTo', {
+            dateFrom,
+            dateTo,
+          });
+        }
 
-      const rows = await qb.getRawMany();
-      return rows.map((r) => ({
-        bankAccountId: r.bankAccountId,
-        acctNumber: r.acctNumber,
-        bankName: r.bankName,
-        balance: parseFloat(r.balance) || 0,
-        totDebit: parseFloat(r.totDebit) || 0,
-        totCredit: parseFloat(r.totCredit) || 0,
-        totBankCharges: parseFloat(r.totBankCharges) || 0,
-      }));
-    });
+        const rows = await qb.getRawMany();
+        return rows.map((r) => ({
+          bankAccountId: r.bankAccountId,
+          acctNumber: r.acctNumber,
+          bankName: r.bankName,
+          balance: parseFloat(r.balance) || 0,
+          totDebit: parseFloat(r.totDebit) || 0,
+          totCredit: parseFloat(r.totCredit) || 0,
+          totBankCharges: parseFloat(r.totBankCharges) || 0,
+        }));
+      },
+      { transactional: false },
+    );
   }
 
   // ── Bank Purposes ──────────────────────────────────────────────────────────
 
   async findAllPurposes(): Promise<BankPurpose[]> {
-    return this.tenantService.withManager((m) =>
-      m.getRepository(BankPurpose).find({ order: { name: 'ASC' } }),
+    return this.tenantService.withManager(
+      (m) => m.getRepository(BankPurpose).find({ order: { name: 'ASC' } }),
+      { transactional: false },
     );
   }
 

@@ -30,52 +30,56 @@ export class ManifestJobService {
     pagination: PaginationDto,
     search: SearchManifestJobDto,
   ): Promise<PaginatedResult<ManifestJob>> {
-    return this.tenantService.withManager(async (manager) => {
-      const { page, limit } = pagination;
-      const skip = (page - 1) * limit;
-      const qb = manager
-        .getRepository(ManifestJob)
-        .createQueryBuilder('mj')
-        .leftJoinAndSelect('mj.houseManifest', 'house')
-        .leftJoinAndSelect('house.masterManifest', 'master');
+    return this.tenantService.withManager(
+      async (manager) => {
+        const { page, limit } = pagination;
+        const skip = (page - 1) * limit;
+        const qb = manager
+          .getRepository(ManifestJob)
+          .createQueryBuilder('mj')
+          .leftJoinAndSelect('mj.houseManifest', 'house')
+          .leftJoinAndSelect('house.masterManifest', 'master');
 
-      if (search.jobNo)
-        qb.andWhere('mj.jobNo ILIKE :jobNo', { jobNo: `%${search.jobNo}%` });
-      if (search.hblNo)
-        qb.andWhere('mj.hblNo = :hblNo', { hblNo: search.hblNo });
-      if (search.consigneeDetails)
-        qb.andWhere('mj.consigneeDetails ILIKE :c', {
-          c: `%${search.consigneeDetails}%`,
-        });
-      if (search.custRefNo)
-        qb.andWhere('mj.custRefNo = :custRefNo', {
-          custRefNo: search.custRefNo,
-        });
-      if (search.houseManifestId)
-        qb.andWhere('mj.houseManifestId = :houseManifestId', {
-          houseManifestId: search.houseManifestId,
-        });
-      if (search.paidStatus !== undefined)
-        qb.andWhere('mj.paidStatus = :paidStatus', {
-          paidStatus: search.paidStatus,
-        });
+        if (search.jobNo)
+          qb.andWhere('mj.jobNo ILIKE :jobNo', { jobNo: `%${search.jobNo}%` });
+        if (search.hblNo)
+          qb.andWhere('mj.hblNo = :hblNo', { hblNo: search.hblNo });
+        if (search.consigneeDetails)
+          qb.andWhere('mj.consigneeDetails ILIKE :c', {
+            c: `%${search.consigneeDetails}%`,
+          });
+        if (search.custRefNo)
+          qb.andWhere('mj.custRefNo = :custRefNo', {
+            custRefNo: search.custRefNo,
+          });
+        if (search.houseManifestId)
+          qb.andWhere('mj.houseManifestId = :houseManifestId', {
+            houseManifestId: search.houseManifestId,
+          });
+        if (search.paidStatus !== undefined)
+          qb.andWhere('mj.paidStatus = :paidStatus', {
+            paidStatus: search.paidStatus,
+          });
 
-      const [items, total] = await qb
-        .skip(skip)
-        .take(limit)
-        .orderBy('mj.createdAt', 'DESC')
-        .getManyAndCount();
+        const [items, total] = await qb
+          .skip(skip)
+          .take(limit)
+          .orderBy('mj.createdAt', 'DESC')
+          .getManyAndCount();
 
-      return {
-        items,
-        meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
-      };
-    });
+        return {
+          items,
+          meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+        };
+      },
+      { transactional: false },
+    );
   }
 
   async findOne(id: string): Promise<ManifestJob> {
-    return this.tenantService.withManager((manager) =>
-      this.fetchOne(manager, id),
+    return this.tenantService.withManager(
+      (manager) => this.fetchOne(manager, id),
+      { transactional: false },
     );
   }
 
@@ -148,35 +152,38 @@ export class ManifestJobService {
   async previewHandlingCharge(
     id: string,
   ): Promise<{ currentHandCharge: number; result: HandlingChargeResult }> {
-    return this.tenantService.withManager(async (manager) => {
-      const job = await this.fetchOne(manager, id);
+    return this.tenantService.withManager(
+      async (manager) => {
+        const job = await this.fetchOne(manager, id);
 
-      const house = await manager
-        .getRepository(HouseManifest)
-        .findOne({ where: { id: job.houseManifestId } });
-      if (!house) throw new NotFoundException('House manifest not found');
+        const house = await manager
+          .getRepository(HouseManifest)
+          .findOne({ where: { id: job.houseManifestId } });
+        if (!house) throw new NotFoundException('House manifest not found');
 
-      const master = await manager
-        .getRepository(MasterManifest)
-        .findOne({ where: { id: house.masterManifestId } });
-      if (!master) throw new NotFoundException('Master manifest not found');
-      if (!master.principalId)
-        throw new BadRequestException(
-          'No principal assigned to this cargo manifest',
+        const master = await manager
+          .getRepository(MasterManifest)
+          .findOne({ where: { id: house.masterManifestId } });
+        if (!master) throw new NotFoundException('Master manifest not found');
+        if (!master.principalId)
+          throw new BadRequestException(
+            'No principal assigned to this cargo manifest',
+          );
+
+        const cbm = house.totalCBM;
+        if (!cbm || cbm <= 0)
+          throw new BadRequestException('House BL has no CBM value');
+
+        const result = await this.handlingChargeEngine.compute(
+          master.principalId,
+          cbm,
+          manager,
         );
 
-      const cbm = house.totalCBM;
-      if (!cbm || cbm <= 0)
-        throw new BadRequestException('House BL has no CBM value');
-
-      const result = await this.handlingChargeEngine.compute(
-        master.principalId,
-        cbm,
-        manager,
-      );
-
-      return { currentHandCharge: job.handCharge, result };
-    });
+        return { currentHandCharge: job.handCharge, result };
+      },
+      { transactional: false },
+    );
   }
 
   async recomputeHandlingCharge(

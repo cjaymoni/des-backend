@@ -16,8 +16,9 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 import { Public } from '../common/decorators/public.decorator';
-import { fileFilter } from '../common/utils/file-filter.util';
+import { fileFilter, MAX_FILE_SIZE } from '../common/utils/file-filter.util';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
 import { CompanyService } from './company.service';
@@ -96,15 +97,16 @@ export class CompanyController {
   @Roles('company_admin', 'system_admin')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: require('multer').diskStorage({
+      storage: diskStorage({
         destination: './temp-uploads',
-        filename: (req, file, cb) => {
+        filename: (_req, file, cb) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
           cb(null, `${uniqueSuffix}-${file.originalname}`);
         },
       }),
       fileFilter,
+      limits: { fileSize: MAX_FILE_SIZE },
     }),
   )
   async uploadLogo(
@@ -112,8 +114,6 @@ export class CompanyController {
     @UploadedFile() file: any,
     @Req() req: any,
   ): Promise<Company> {
-    console.log('Received file:', file);
-
     if (req.user.role === 'company_admin') {
       const company = await this.companyService.findOne(id);
       const currentTenant = this.tenantContext.getTenant();

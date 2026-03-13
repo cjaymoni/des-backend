@@ -22,6 +22,7 @@ export class TenantService {
    */
   async withManager<T>(
     callback: (manager: EntityManager) => Promise<T>,
+    options: { transactional?: boolean } = { transactional: true },
   ): Promise<T> {
     const subdomain = this.tenantContext.getTenant();
 
@@ -42,16 +43,28 @@ export class TenantService {
     const schemaName = `tenant_${subdomain}`;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction();
-    await queryRunner.query(`SET LOCAL search_path TO "${schemaName}"`);
+    const transactional = options.transactional ?? true;
+    if (transactional) {
+      await queryRunner.startTransaction();
+      await queryRunner.query(`SET LOCAL search_path TO "${schemaName}"`);
+    } else {
+      await queryRunner.query(`SET search_path TO "${schemaName}"`);
+    }
     try {
       const result = await callback(queryRunner.manager);
-      await queryRunner.commitTransaction();
+      if (transactional) {
+        await queryRunner.commitTransaction();
+      }
       return result;
     } catch (err) {
-      await queryRunner.rollbackTransaction();
+      if (transactional) {
+        await queryRunner.rollbackTransaction();
+      }
       throw err;
     } finally {
+      if (!transactional) {
+        await queryRunner.query('RESET search_path');
+      }
       await queryRunner.release();
     }
   }

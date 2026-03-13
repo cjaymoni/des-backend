@@ -12,7 +12,9 @@ export class TenantController {
   @Get('current')
   async getCurrentTenant() {
     const subdomain = this.tenantContext.getTenant();
-    const company = await this.tenantService.validateTenant(subdomain);
-    return company;
+    if (!subdomain) throw new Error('Tenant context not set');
+    const { id, appSubdomain, companyName, logo } =
+      await this.tenantService.validateTenant(subdomain);
+    return { id, appSubdomain, companyName, logo };
   }
 }

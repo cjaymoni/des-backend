@@ -25,6 +25,8 @@ import { ChargeSetupAuditLog } from 'src/principal-charges/charge-setup-audit.en
 import { TransactionPurpose } from 'src/transaction-purposes/transaction-purpose.entity';
 import { TransactionPurposeDetail } from 'src/transaction-purposes/transaction-purpose-detail.entity';
 import { JobTracking } from 'src/jobs/job-tracking.entity';
+import { RentCharge } from '../warehouse/entities/rent-charge.entity';
+import { WarehouseJob } from '../warehouse/entities/warehouse-job.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -61,6 +63,8 @@ export const getDatabaseConfig = (
     TransactionPurpose,
     TransactionPurposeDetail,
     JobTracking,
+    RentCharge,
+    WarehouseJob,
   ],
   synchronize: false,
   // schema: 'public',

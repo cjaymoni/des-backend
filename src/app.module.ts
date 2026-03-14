@@ -26,6 +26,7 @@ import { PrincipalModule } from './principals/principal.module';
 import { CurrencyModule } from './currencies/currency.module';
 import { PrincipalChargeModule } from './principal-charges/principal-charge.module';
 import { TransactionPurposeModule } from './transaction-purposes/transaction-purpose.module';
+import { WarehouseModule } from './warehouse/warehouse.module';
 import { WarmupInterceptor } from './health/warmup.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -70,6 +71,7 @@ import { getDatabaseConfig } from './config/database.config';
     CurrencyModule,
     PrincipalChargeModule,
     TransactionPurposeModule,
+    WarehouseModule,
   ],
   providers: [
     {

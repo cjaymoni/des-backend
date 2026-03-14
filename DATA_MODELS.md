@@ -18,6 +18,12 @@ src/
 │   │   └── weight-charge.entity.ts
 │   └── services/ & controllers/
 ├── manifest-jobs/          # Handling charges job file (JobFiles_Man) + recompute engine
+├── warehouse/              # Warehouse rent charges + warehouse job file (JobFiles_Rent)
+│   ├── entities/
+│   │   ├── rent-charge.entity.ts
+│   │   └── warehouse-job.entity.ts
+│   ├── rent-charge.engine.ts
+│   └── services/ & controllers/
 ├── jobs/                   # Customs declaration job file (JobFiles)
 ├── importer-exporter/      # Consignee/shipper master data
 ├── income-expenditure/     # Financial transactions linked to jobs
@@ -59,12 +65,22 @@ src/
     │       │
     │       └──(OneToMany)──► [HouseManifest]
     │                               │ hblNo, consignee, weight, handCharge
-    │                               │ releaseStatus, attachments (jsonb)
+    │                               │ releaseStatus, readStatusW, attachments (jsonb)
     │                               │
-    │                               └──(OneToMany)──► [ManifestJob]
-    │                                                       │ jobNo, handCharge
-    │                                                       │ vatAmt, nhilAmt
-    │                                                       │ paidStatus, releaseStatus
+    │                               ├──(OneToMany)──► [ManifestJob]
+    │                               │                       │ jobNo, handCharge
+    │                               │                       │ vatAmt, nhilAmt
+    │                               │                       │ paidStatus, releaseStatus
+    │                               │
+    │                               └──(OneToMany)──► [WarehouseJob]
+    │                                                       │ jobNo, hblNo
+    │                                                       │ unstuffDate, deliveryDate
+    │                                                       │ period, rentCharge, netRentCharge
+    │                                                       │ vatAmt, nhilAmt, gfdAmt, covidAmt
+    │                                                       │ grandTotal, paidStatus
+    │
+    ├── [RentCharge]  (warehouse bracket pricing — no FK)
+    │       dayFrom, dayTo, unitCharge
     │
     ├── [Job]  (customs declaration — independent)
     │       │ jobNo, ie (importer/exporter name), blNo
@@ -112,6 +128,7 @@ src/
 | `PrincipalChargeSetup` | `Currency` | Many-to-One | `principal_charge_setups.currencyId` |
 | `PrincipalChargeType` | `PrincipalChargeSetup` | Many-to-One | `principal_charge_types.setupId` |
 | `HouseManifest` | `ManifestJob` | One-to-Many | `manifest_jobs.houseManifestId` |
+| `HouseManifest` | `WarehouseJob` | One-to-Many | `warehouse_jobs.houseManifestId` |
 | `Job` | `IncomeExpenditure` | Logical (no FK) | `income_expenditures.transRemarks = jobs.jobNo` |
 | `Job` | `ImporterExporter` | Logical (no FK) | `jobs.ie` matches `importer_exporters.ieName` |
 | `BankAccount` | `BankTransaction` | One-to-Many | `bank_transactions.acctNumber` |
@@ -175,7 +192,24 @@ Create BankTransaction (Deposit/Withdrawal, amount)
         Withdrawal: balance = balance - transactionAmount
 ```
 
-### 4. CIF Calculation
+### 4. Warehouse Rent Charge
+```
+Setup phase:
+  POST /warehouse/rent-charges → define day brackets
+    e.g. Day 1–7: 0.00, Day 8–14: 11.64, Day 15–1000: 23.27
+
+Runtime phase:
+  GET /warehouse/jobs/available-hbls → pick HBL (readStatusW=true)
+  GET /warehouse/jobs/preview-rent?unstuffDate=&deliveryDate= → preview charge
+  POST /warehouse/jobs → create job
+    totalDays = deliveryDate - unstuffDate
+    for each bracket: daysInRange × unitCharge → sum = rentCharge
+    HouseManifest.readStatusW set to false
+  PUT /warehouse/jobs/:id → set vatAmt, nhilAmt, grandTotal etc.
+  POST /warehouse/jobs/:id/post-to-income → posts grandTotal to IncomeExpenditure
+```
+
+### 5. CIF Calculation
 ```
 frtValue  = fobValue × frtP / 100
 insValue  = (fobValue + frtValue) × insP / 100
@@ -203,6 +237,8 @@ cifValue  = fobValue + frtValue + insValue
 | `income_expenditures` | `tenant_{org}` | Financial records linked to jobs |
 | `bank_accounts` | `tenant_{org}` | Bank account master |
 | `bank_transactions` | `tenant_{org}` | Deposits & withdrawals |
+| `rent_charges` | `tenant_{org}` | Warehouse bracket pricing: day range → unit charge |
+| `warehouse_jobs` | `tenant_{org}` | Warehouse job file, FK → house_manifests |
 | `cif_settings` | `tenant_{org}` | Single-row global FOB/freight/insurance rates |
 | `cif_values` | `tenant_{org}` | Per-shipment CIF line items, logical link to jobs |
 
@@ -219,6 +255,11 @@ cifValue  = fobValue + frtValue + insValue
 | Currencies | `GET/POST/PUT/DELETE /currencies` | JWT |
 | Principal Charge Setup | `GET/POST/DELETE /principal-charges` | JWT |
 | Recompute Handling Charge | `POST /manifest-jobs/:id/recompute-handling-charge` | JWT |
+| Warehouse Rent Charges | `GET/POST/PUT/DELETE /warehouse/rent-charges` | JWT |
+| Warehouse Jobs | `GET/POST/PUT/DELETE /warehouse/jobs` | JWT |
+| Available HBLs | `GET /warehouse/jobs/available-hbls` | JWT |
+| Preview Rent Charge | `GET /warehouse/jobs/preview-rent` | JWT |
+| Post to Income | `POST /warehouse/jobs/:id/post-to-income` | JWT |
 | Master Manifests | `GET/POST/PUT/DELETE /manifests/master` | JWT |
 | House Manifests | `GET/POST/PUT/DELETE /manifests/house` | JWT |
 | Weight Charges | `GET/POST/PUT/DELETE /manifests/weight-charges` | JWT |

@@ -213,7 +213,7 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register-system-admin",
-              "description": "Protected endpoint — requires a valid system_admin JWT. Creates another system_admin user."
+              "description": "Protected endpoint — requires a valid system_admin JWT. Creates another system_admin user.",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -4815,6 +4815,262 @@
               ]
             }
           }
+        }
+      ]
+    },
+    {
+      "name": "Warehouse",
+      "item": [
+        {
+          "name": "Rent Charges",
+          "item": [
+            {
+              "name": "Get All Rent Charge Brackets",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/rent-charges",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "rent-charges"]
+                }
+              }
+            },
+            {
+              "name": "Get Rent Charge Bracket by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/rent-charges/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "rent-charges", ":id"],
+                  "variable": [{ "key": "id", "value": "" }]
+                }
+              }
+            },
+            {
+              "name": "Create Rent Charge Bracket",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dayFrom\": 1,\n  \"dayTo\": 7,\n  \"unitCharge\": 0\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/rent-charges",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "rent-charges"]
+                }
+              }
+            },
+            {
+              "name": "Update Rent Charge Bracket",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"unitCharge\": 11.64\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/rent-charges/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "rent-charges", ":id"],
+                  "variable": [{ "key": "id", "value": "" }]
+                }
+              }
+            },
+            {
+              "name": "Delete Rent Charge Bracket",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/rent-charges/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "rent-charges", ":id"],
+                  "variable": [{ "key": "id", "value": "" }]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Warehouse Jobs",
+          "item": [
+            {
+              "name": "Get All Warehouse Jobs",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/jobs?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "jobs"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" },
+                    { "key": "jobNo", "value": "", "disabled": true },
+                    { "key": "hblNo", "value": "", "disabled": true },
+                    { "key": "consigneeDetails", "value": "", "disabled": true },
+                    { "key": "paidStatus", "value": "false", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Available HBLs for Warehouse",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/jobs/available-hbls",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "jobs", "available-hbls"],
+                  "query": [
+                    { "key": "search", "value": "", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Preview Rent Charge",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/jobs/preview-rent?unstuffDate=2024-11-22&deliveryDate=2025-01-02",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "jobs", "preview-rent"],
+                  "query": [
+                    { "key": "unstuffDate", "value": "2024-11-22" },
+                    { "key": "deliveryDate", "value": "2025-01-02" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Warehouse Job by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/jobs/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "jobs", ":id"],
+                  "variable": [{ "key": "id", "value": "" }]
+                }
+              }
+            },
+            {
+              "name": "Create Warehouse Job",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jobNo\": \"WH-2024-001\",\n  \"hblNo\": \"HBL123456\",\n  \"houseManifestId\": \"uuid-of-house-manifest\",\n  \"consigneeDetails\": \"IMPORTER NAME\",\n  \"noPkg\": 10,\n  \"weight\": 500.00,\n  \"totalCBM\": 5.50,\n  \"unstuffDate\": \"2024-11-22\",\n  \"deliveryDate\": \"2025-01-02\",\n  \"arrivalDate\": \"2024-11-20\",\n  \"vatPer\": 15,\n  \"nhilPer\": 2.5,\n  \"gfdPer\": 0.5,\n  \"covidPer\": 1,\n  \"cargoType\": \"GENERAL\",\n  \"cargoTypeLevel\": 1,\n  \"cargoTypeAmt\": 0,\n  \"agentName\": \"AGENT NAME\",\n  \"description\": \"ELECTRONICS\",\n  \"fileDate\": \"2024-11-22\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/jobs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "jobs"]
+                }
+              }
+            },
+            {
+              "name": "Update Warehouse Job",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"vatAmt\": 109.96,\n  \"nhilAmt\": 18.33,\n  \"gfdAmt\": 3.67,\n  \"covidAmt\": 7.33,\n  \"netRentCharge\": 733.04,\n  \"grandTotal\": 872.33,\n  \"paidStatus\": false,\n  \"vatInvoice\": \"INV-2024-001\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/jobs/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "jobs", ":id"],
+                  "variable": [{ "key": "id", "value": "" }]
+                }
+              }
+            },
+            {
+              "name": "Post to Income",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/jobs/:id/post-to-income",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "jobs", ":id", "post-to-income"],
+                  "variable": [{ "key": "id", "value": "" }]
+                }
+              }
+            },
+            {
+              "name": "Delete Warehouse Job",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "x-org-name", "value": "{{orgName}}" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/warehouse/jobs/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["warehouse", "jobs", ":id"],
+                  "variable": [{ "key": "id", "value": "" }]
+                }
+              }
+            }
+          ]
         }
       ]
     }

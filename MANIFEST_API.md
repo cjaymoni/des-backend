@@ -323,13 +323,137 @@ Delete weight charge configuration.
 ✅ **Audit trail** - Tracks who created/updated records  
 ✅ **Principal-based handling charge calculation** - CBM × charge type rules per principal  
 ✅ **Recompute handling charge** - Triggered on manifest job via dedicated endpoint  
+✅ **Warehouse rent charge calculation** - Day bracket engine (unstuffDate → deliveryDate)  
+✅ **Warehouse HBL availability tracking** - readStatusW flag gates warehouse processing  
 ✅ **Cascading updates** - Master changes propagate to house manifests  
 ✅ **Search & filter** - Multiple search criteria supported  
 ✅ **Pagination** - Efficient data retrieval  
 
 ---
 
-## Example Usage
+## Warehouse Endpoints
+
+### GET /warehouse/rent-charges
+List all rent charge brackets ordered by `dayFrom` ascending.
+
+### POST /warehouse/rent-charges
+Create a new day bracket. Rejects overlapping ranges.
+
+**Body:**
+```json
+{ "dayFrom": 1, "dayTo": 7, "unitCharge": 0 }
+```
+
+### PUT /warehouse/rent-charges/:id
+Update a bracket. Re-validates overlap excluding self.
+
+### DELETE /warehouse/rent-charges/:id
+Delete a bracket.
+
+---
+
+### GET /warehouse/jobs/available-hbls
+Returns house manifests where `readStatusW = true` — HBLs not yet processed for warehouse.
+
+**Query Parameters:**
+- `search` (string, optional) — filters by consignee, hblNo or description
+
+### GET /warehouse/jobs/preview-rent
+Calculates rent charge without persisting. Requires brackets to be configured.
+
+**Query Parameters:**
+- `unstuffDate` (date, required) e.g. `2024-11-22`
+- `deliveryDate` (date, required) e.g. `2025-01-02`
+
+**Response:**
+```json
+{
+  "totalDays": 42,
+  "rentCharge": 733.04,
+  "breakdown": [
+    { "dayFrom": 1, "dayTo": 7, "daysApplied": 7, "unitCharge": 0, "charge": 0 },
+    { "dayFrom": 8, "dayTo": 14, "daysApplied": 7, "unitCharge": 11.64, "charge": 81.48 },
+    { "dayFrom": 15, "dayTo": 1000, "daysApplied": 28, "unitCharge": 23.27, "charge": 651.56 }
+  ]
+}
+```
+
+### POST /warehouse/jobs
+Create a warehouse job. Auto-calculates `rentCharge` and `period` from brackets.
+Sets `HouseManifest.readStatusW = false` on save.
+
+**Required fields:** `jobNo`, `hblNo`, `houseManifestId`, `consigneeDetails`, `unstuffDate`, `deliveryDate`
+
+**Body:**
+```json
+{
+  "jobNo": "WH-2024-001",
+  "hblNo": "HBL123456",
+  "houseManifestId": "uuid",
+  "consigneeDetails": "IMPORTER NAME",
+  "unstuffDate": "2024-11-22",
+  "deliveryDate": "2025-01-02",
+  "arrivalDate": "2024-11-20",
+  "weight": 500.00,
+  "totalCBM": 5.50,
+  "noPkg": 10,
+  "vatPer": 15,
+  "nhilPer": 2.5,
+  "gfdPer": 0.5,
+  "covidPer": 1,
+  "cargoType": "GENERAL",
+  "cargoTypeLevel": 1,
+  "cargoTypeAmt": 0,
+  "agentName": "AGENT NAME",
+  "fileDate": "2024-11-22"
+}
+```
+
+### PUT /warehouse/jobs/:id
+Update a warehouse job. If `unstuffDate` or `deliveryDate` changes, `rentCharge` and `period` are automatically recomputed.
+
+### POST /warehouse/jobs/:id/post-to-income
+Posts the job's `grandTotal` to `IncomeExpenditure` (upsert by `transRemarks = jobNo`).
+Requires `grandTotal > 0`.
+
+### DELETE /warehouse/jobs/:id
+Soft deletes the job, restores `HouseManifest.readStatusW = true`, and removes the linked income record.
+
+---
+
+## Example: Full Warehouse Flow
+
+```bash
+# 1. Setup brackets
+curl -X POST http://localhost:5000/warehouse/rent-charges \
+  -H "x-org-name: acme" -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"dayFrom": 1, "dayTo": 7, "unitCharge": 0}'
+
+curl -X POST http://localhost:5000/warehouse/rent-charges \
+  -H "x-org-name: acme" -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"dayFrom": 8, "dayTo": 14, "unitCharge": 11.64}'
+
+curl -X POST http://localhost:5000/warehouse/rent-charges \
+  -H "x-org-name: acme" -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"dayFrom": 15, "dayTo": 1000, "unitCharge": 23.27}'
+
+# 2. Preview charge
+curl "http://localhost:5000/warehouse/jobs/preview-rent?unstuffDate=2024-11-22&deliveryDate=2025-01-02" \
+  -H "x-org-name: acme" -H "Authorization: Bearer TOKEN"
+
+# 3. Create warehouse job
+curl -X POST http://localhost:5000/warehouse/jobs \
+  -H "x-org-name: acme" -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"jobNo": "WH-2024-001", "hblNo": "HBL123456", "houseManifestId": "uuid", "consigneeDetails": "IMPORTER", "unstuffDate": "2024-11-22", "deliveryDate": "2025-01-02"}'
+
+# 4. Post to income
+curl -X POST http://localhost:5000/warehouse/jobs/JOB_ID/post-to-income \
+  -H "x-org-name: acme" -H "Authorization: Bearer TOKEN"
+```
 
 ```bash
 # Create master manifest

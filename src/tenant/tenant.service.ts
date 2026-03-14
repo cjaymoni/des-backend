@@ -43,28 +43,22 @@ export class TenantService {
     const schemaName = `tenant_${subdomain}`;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    const transactional = options.transactional ?? true;
-    if (transactional) {
-      await queryRunner.startTransaction();
-      await queryRunner.query(`SET LOCAL search_path TO "${schemaName}"`);
-    } else {
-      await queryRunner.query(`SET search_path TO "${schemaName}"`);
-    }
+    // Always wrap in a transaction so SET LOCAL search_path is scoped
+    // to this unit of work and never leaks back to the connection pool.
+    await queryRunner.startTransaction();
+    await queryRunner.query(`SET LOCAL search_path TO "${schemaName}"`);
     try {
       const result = await callback(queryRunner.manager);
-      if (transactional) {
+      if (options.transactional ?? true) {
         await queryRunner.commitTransaction();
+      } else {
+        await queryRunner.rollbackTransaction(); // read-only: rollback is a clean no-op
       }
       return result;
     } catch (err) {
-      if (transactional) {
-        await queryRunner.rollbackTransaction();
-      }
+      await queryRunner.rollbackTransaction();
       throw err;
     } finally {
-      if (!transactional) {
-        await queryRunner.query('RESET search_path');
-      }
       await queryRunner.release();
     }
   }

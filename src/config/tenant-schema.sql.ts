@@ -636,6 +636,80 @@ CREATE TABLE IF NOT EXISTS "job_tracking" (
 );
 CREATE INDEX IF NOT EXISTS "idx_job_tracking_jobNo" ON "job_tracking" ("jobNo");
 
+-- Warehouse: add readStatusW to house_manifests for existing tenants
+ALTER TABLE IF EXISTS "house_manifests" ADD COLUMN IF NOT EXISTS "readStatusW" boolean NOT NULL DEFAULT true;
+
+-- Rent Charges table (warehouse storage bracket pricing)
+CREATE TABLE IF NOT EXISTS "rent_charges" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "dayFrom" int NOT NULL,
+  "dayTo" int NOT NULL,
+  "unitCharge" decimal(10,2) NOT NULL DEFAULT 0,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+CREATE INDEX IF NOT EXISTS "idx_rent_charges_dayFrom" ON "rent_charges" ("dayFrom");
+
+-- Warehouse Jobs table (JobFiles_Rent)
+CREATE TABLE IF NOT EXISTS "warehouse_jobs" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "jobNo" varchar NOT NULL UNIQUE,
+  "hblNo" varchar(20) NOT NULL,
+  "houseManifestId" uuid NOT NULL,
+  "consigneeDetails" varchar(200) NOT NULL,
+  "noPkg" int NOT NULL DEFAULT 0,
+  "marksNum" varchar(225),
+  "containerNo" varchar(50),
+  "vessel" varchar(50),
+  "blNo" varchar(20),
+  "agentName" varchar(100),
+  "vehNo" varchar(50),
+  "declNo" varchar(50),
+  "description" text,
+  "transRemarks" text,
+  "weight" decimal(10,2) NOT NULL DEFAULT 0,
+  "totalCBM" decimal(10,2) NOT NULL DEFAULT 0,
+  "period" int NOT NULL DEFAULT 0,
+  "unitCharge" decimal(10,2) NOT NULL DEFAULT 0,
+  "rentCharge" decimal(10,2) NOT NULL DEFAULT 0,
+  "netRentCharge" decimal(10,2) NOT NULL DEFAULT 0,
+  "vatPer" decimal(5,2) NOT NULL DEFAULT 0,
+  "vatAmt" decimal(10,2) NOT NULL DEFAULT 0,
+  "nhilPer" decimal(5,2) NOT NULL DEFAULT 0,
+  "nhilAmt" decimal(10,2) NOT NULL DEFAULT 0,
+  "gfdPer" decimal(5,2) NOT NULL DEFAULT 0,
+  "gfdAmt" decimal(10,2) NOT NULL DEFAULT 0,
+  "covidPer" decimal(5,2) NOT NULL DEFAULT 0,
+  "covidAmt" decimal(10,2) NOT NULL DEFAULT 0,
+  "grandTotal" decimal(10,2) NOT NULL DEFAULT 0,
+  "cargoType" varchar(50),
+  "cargoTypeLevel" int NOT NULL DEFAULT 0,
+  "cargoTypeAmt" decimal(10,2) NOT NULL DEFAULT 0,
+  "fileDate" date,
+  "unstuffDate" date,
+  "deliveryDate" date,
+  "arrivalDate" date,
+  "paidDate" date,
+  "paidStatus" boolean NOT NULL DEFAULT false,
+  "calcStatus" boolean NOT NULL DEFAULT false,
+  "incvatStatus" boolean NOT NULL DEFAULT false,
+  "vatInvoice" varchar(50),
+  "version" int NOT NULL DEFAULT 1,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "deletedAt" timestamp,
+  "createdBy" varchar,
+  "updatedBy" varchar,
+  FOREIGN KEY ("houseManifestId") REFERENCES "house_manifests"("id") ON DELETE RESTRICT
+);
+
+CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_jobNo" ON "warehouse_jobs" ("jobNo");
+CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_hblNo" ON "warehouse_jobs" ("hblNo");
+CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_houseManifestId" ON "warehouse_jobs" ("houseManifestId");
+
 -- Migrate vatNhilStatus from varchar to boolean for existing tenants
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='jobs' AND column_name='vatNhilStatus' AND data_type='character varying') THEN

@@ -77,6 +77,9 @@ export class HouseManifest extends BaseEntity {
   @Column({ type: 'date', nullable: true })
   fileDate: Date;
 
+  @Column({ default: true })
+  readStatusW: boolean;
+
   @Column({ default: false })
   releaseStatus: boolean;
 

@@ -1,0 +1,17 @@
+#!/bin/sh
+echo "Running pre-push checks..."
+
+# 1. Scan commits being pushed for secrets
+echo "Scanning for secrets..."
+gitleaks git --pre-push || exit 1
+
+# 2. Check no .env files are tracked
+if git ls-files | grep -E "^\.env(\.|$)"; then
+  echo ".env file is tracked by git. Remove it with: git rm --cached .env"
+  exit 1
+fi
+
+npm run lint || exit 1
+npm run build || exit 1
+
+echo "Pre-push checks passed."

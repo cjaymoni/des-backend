@@ -162,10 +162,13 @@ export class JobService {
     company: any,
   ) {
     const job = rows[0].job;
-    const manifestJob = await manager.getRepository(ManifestJob).findOne({
-      where: { jobNo: job.jobNo },
-      relations: ['houseManifest', 'houseManifest.masterManifest'],
-    });
+    const manifestJob = await manager
+      .getRepository(ManifestJob)
+      .createQueryBuilder('mj')
+      .leftJoinAndSelect('mj.houseManifest', 'house')
+      .leftJoinAndSelect('house.masterManifest', 'master')
+      .where('mj.jobNo = :jobNo', { jobNo: job.jobNo })
+      .getOne();
     const grandTotal = rows.reduce(
       (sum, r) => sum + r.transAmount + r.vatAmount,
       0,

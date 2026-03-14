@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './user.entity';
 import { TenantService } from '../tenant/tenant.service';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
@@ -73,7 +69,8 @@ export class UsersService {
       });
       await manager.getRepository(User).save(user);
 
-      const { password, ...result } = user;
+      const { password: _p1, ...result } = user;
+      void _p1;
       return result;
     });
   }
@@ -86,7 +83,8 @@ export class UsersService {
       Object.assign(user, data);
       await manager.getRepository(User).save(user);
 
-      const { password, ...result } = user;
+      const { password: _p2, ...result } = user;
+      void _p2;
       return result;
     });
   }

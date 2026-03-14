@@ -1,5 +1,5 @@
 import { IsInt, IsNumber, IsOptional, Min } from 'class-validator';
-import { Type, Transform } from 'class-transformer';
+import { Type } from 'class-transformer';
 
 export class CreateRentChargeDto {
   @Type(() => Number)

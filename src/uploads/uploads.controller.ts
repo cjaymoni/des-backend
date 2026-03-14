@@ -9,7 +9,6 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { fileFilter, MAX_FILE_SIZE } from '../common/utils/file-filter.util';
 import { AuthGuard } from '@nestjs/passport';
 import { UploadsService } from './uploads.service';

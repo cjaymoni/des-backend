@@ -1,4 +1,3 @@
-import { decimalTransformer } from '../common/transformers/decimal.transformer';
 import { Entity, Column, Index } from 'typeorm';
 import { BaseEntity } from '../common/entities/base.entity';
 

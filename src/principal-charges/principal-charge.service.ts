@@ -169,7 +169,7 @@ export class PrincipalChargeService {
   }
 
   /** Used internally by the calculation engine */
-  async findSetupForCalculation(
+  findSetupForCalculation(
     principalId: string,
     manager: any,
   ): Promise<PrincipalChargeSetup | null> {

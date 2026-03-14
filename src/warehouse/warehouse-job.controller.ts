@@ -22,7 +22,7 @@ import { WarehouseJob } from './entities/warehouse-job.entity';
 import { HouseManifest } from '../manifests/entities/house-manifest.entity';
 import { RentChargeResult } from './rent-charge.engine';
 import { Type } from 'class-transformer';
-import { IsDate, IsOptional } from 'class-validator';
+import { IsDate } from 'class-validator';
 
 class PreviewRentDto {
   @Type(() => Date)

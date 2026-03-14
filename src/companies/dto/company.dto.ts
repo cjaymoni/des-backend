@@ -1,5 +1,4 @@
 import { IsString, IsEmail, IsOptional, IsDecimal } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export class CreateCompanyDto {
   @IsString()

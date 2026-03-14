@@ -1,6 +1,6 @@
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import DailyRotateFile = require('winston-daily-rotate-file');
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 const logFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -13,7 +13,10 @@ const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.printf(({ timestamp, level, message, context, ...meta }) => {
-    return `${timestamp} [${context || 'App'}] ${level}: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+    const ctx = typeof context === 'string' ? context : 'App';
+    const ts = typeof timestamp === 'string' ? timestamp : String(timestamp);
+    const msg = typeof message === 'string' ? message : String(message);
+    return `${ts} [${ctx}] ${level}: ${msg} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
   }),
 );
 

@@ -58,7 +58,7 @@ export class CurrencyService {
     );
   }
 
-  async findActiveByCode(code: string, manager: any): Promise<Currency | null> {
+  findActiveByCode(code: string, manager: any): Promise<Currency | null> {
     return manager.getRepository(Currency).findOne({
       where: { code: code.toUpperCase(), isActive: true },
     });

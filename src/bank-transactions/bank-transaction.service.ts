@@ -306,7 +306,9 @@ export class BankTransactionService {
         existing.transactionType === TransactionType.DEPOSIT
           ? existing.creditAmt
           : -existing.debitAmt;
+      void oldAmount;
       const oldCharges = existing.bankCharges ?? 0;
+      void oldCharges;
 
       const payload = Object.fromEntries(
         Object.entries({ ...data, updatedBy: userId }).filter(

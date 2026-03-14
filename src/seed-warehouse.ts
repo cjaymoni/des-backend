@@ -141,7 +141,9 @@ async function seed() {
       );
       house2Id = existing[0].id;
     }
-    console.log(`✅ House manifests: HBL-WH-001 (${house1Id}), HBL-WH-002 (${house2Id})`);
+    console.log(
+      `✅ House manifests: HBL-WH-001 (${house1Id}), HBL-WH-002 (${house2Id})`,
+    );
 
     // ── 4. Warehouse Job for HBL-WH-001 ─────────────────────────────────────
     // unstuffDate=2024-11-22, deliveryDate=2025-01-02 → 42 days
@@ -194,7 +196,9 @@ async function seed() {
       UPDATE house_manifests SET "readStatusW" = false
       WHERE "hblNo" = 'HBL-WH-001'
     `);
-    console.log('✅ Warehouse job WH-2024-001 inserted (HBL-WH-001 marked processed)');
+    console.log(
+      '✅ Warehouse job WH-2024-001 inserted (HBL-WH-001 marked processed)',
+    );
 
     await q.commitTransaction();
 
@@ -207,7 +211,9 @@ async function seed() {
     console.log('  # List available HBLs (should return HBL-WH-002 only)');
     console.log('  GET  /warehouse/jobs/available-hbls\n');
     console.log('  # Preview rent for 42-day stay');
-    console.log('  GET  /warehouse/jobs/preview-rent?unstuffDate=2024-11-22&deliveryDate=2025-01-02\n');
+    console.log(
+      '  GET  /warehouse/jobs/preview-rent?unstuffDate=2024-11-22&deliveryDate=2025-01-02\n',
+    );
     console.log('  # List warehouse jobs (should return WH-2024-001)');
     console.log('  GET  /warehouse/jobs\n');
     console.log('  # Create a new job using HBL-WH-002:');

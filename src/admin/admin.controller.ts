@@ -14,12 +14,16 @@ export class AdminController {
   constructor(private adminService: AdminService) {}
 
   @Get('companies')
-  getAllCompanies(@Query() pagination: PaginationDto): Promise<PaginatedResult<Company>> {
+  getAllCompanies(
+    @Query() pagination: PaginationDto,
+  ): Promise<PaginatedResult<Company>> {
     return this.adminService.getAllCompanies(pagination);
   }
 
   @Get('users')
-  getAllUsers(@Query() pagination: PaginationDto): Promise<PaginatedResult<Partial<User>>> {
+  getAllUsers(
+    @Query() pagination: PaginationDto,
+  ): Promise<PaginatedResult<Partial<User>>> {
     return this.adminService.getAllUsers(pagination);
   }
 

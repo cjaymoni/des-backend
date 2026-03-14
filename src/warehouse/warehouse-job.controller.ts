@@ -55,10 +55,11 @@ export class WarehouseJobController {
   }
 
   @Get('preview-rent')
-  previewRentCharge(
-    @Query() query: PreviewRentDto,
-  ): Promise<RentChargeResult> {
-    return this.service.previewRentCharge(query.unstuffDate, query.deliveryDate);
+  previewRentCharge(@Query() query: PreviewRentDto): Promise<RentChargeResult> {
+    return this.service.previewRentCharge(
+      query.unstuffDate,
+      query.deliveryDate,
+    );
   }
 
   @Get(':id')
@@ -84,10 +85,7 @@ export class WarehouseJobController {
   }
 
   @Post(':id/post-to-income')
-  postToIncome(
-    @Param('id') id: string,
-    @Req() req: { user: { id: string } },
-  ) {
+  postToIncome(@Param('id') id: string, @Req() req: { user: { id: string } }) {
     return this.service.postToIncome(id, req.user.id);
   }
 

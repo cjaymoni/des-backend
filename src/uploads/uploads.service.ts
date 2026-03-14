@@ -52,7 +52,9 @@ export class UploadsService {
     publicId: string,
     resourceType: 'image' | 'raw' | 'video' = 'image',
   ) {
-    this.logger.log(`Attempting to delete from Cloudinary: ${publicId} type: ${resourceType}`);
+    this.logger.log(
+      `Attempting to delete from Cloudinary: ${publicId} type: ${resourceType}`,
+    );
     const result = await cloudinary.uploader.destroy(publicId, {
       invalidate: true,
       resource_type: resourceType,

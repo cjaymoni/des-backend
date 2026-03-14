@@ -72,10 +72,9 @@ export class WarehouseJobService {
   }
 
   async findOne(id: string): Promise<WarehouseJob> {
-    return this.tenantService.withManager(
-      (m) => this.fetchOne(m, id),
-      { transactional: false },
-    );
+    return this.tenantService.withManager((m) => this.fetchOne(m, id), {
+      transactional: false,
+    });
   }
 
   /** Returns HBLs available for warehouse processing (readStatusW = true) */
@@ -110,7 +109,11 @@ export class WarehouseJobService {
         const brackets = await m
           .getRepository(RentCharge)
           .find({ order: { dayFrom: 'ASC' } });
-        return this.rentChargeEngine.compute(unstuffDate, deliveryDate, brackets);
+        return this.rentChargeEngine.compute(
+          unstuffDate,
+          deliveryDate,
+          brackets,
+        );
       },
       { transactional: false },
     );
@@ -126,7 +129,9 @@ export class WarehouseJobService {
         .getRepository(WarehouseJob)
         .findOne({ where: { jobNo: data.jobNo } });
       if (existing)
-        throw new ConflictException(`Job number "${data.jobNo}" already exists`);
+        throw new ConflictException(
+          `Job number "${data.jobNo}" already exists`,
+        );
 
       // Validate HBL exists and is available
       const house = await m

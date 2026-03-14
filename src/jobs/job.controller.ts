@@ -1,9 +1,22 @@
 import {
-  Controller, Get, Post, Put, Delete,
-  Body, Param, Query, Req, UseGuards,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { JobService, JobTrackingService, CreateJobTrackingDto, UpdateJobTrackingDto } from './job.service';
+import {
+  JobService,
+  JobTrackingService,
+  CreateJobTrackingDto,
+  UpdateJobTrackingDto,
+} from './job.service';
 import { CreateJobDto, UpdateJobDto, SearchJobDto } from './job.dto';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
 import { Job } from './job.entity';
@@ -84,7 +97,11 @@ export class JobTrackingController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: UpdateJobTrackingDto, @Req() req) {
+  update(
+    @Param('id') id: string,
+    @Body() data: UpdateJobTrackingDto,
+    @Req() req,
+  ) {
     return this.service.update(id, data, req.user.id);
   }
 

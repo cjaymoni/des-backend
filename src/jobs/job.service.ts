@@ -297,12 +297,10 @@ export class JobTrackingService {
       await m
         .getRepository(JobTracking)
         .update(id, { ...data, updatedBy: userId });
-      return m
-        .getRepository(JobTracking)
-        .findOne({
-          where: { id },
-          relations: ['detail'],
-        }) as Promise<JobTracking>;
+      return m.getRepository(JobTracking).findOne({
+        where: { id },
+        relations: ['detail'],
+      }) as Promise<JobTracking>;
     });
   }
 

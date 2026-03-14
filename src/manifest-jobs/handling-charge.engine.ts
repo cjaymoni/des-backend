@@ -13,10 +13,23 @@ export interface HandlingChargeResult {
 export class HandlingChargeEngine {
   constructor(private principalChargeService: PrincipalChargeService) {}
 
-  async compute(principalId: string, cbm: number, manager: any): Promise<HandlingChargeResult> {
-    const setup = await this.principalChargeService.findSetupForCalculation(principalId, manager);
-    if (!setup) throw new BadRequestException('No handling charge setup found for this principal');
-    if (!setup.currency.isActive) throw new BadRequestException('Currency for this principal is not active');
+  async compute(
+    principalId: string,
+    cbm: number,
+    manager: any,
+  ): Promise<HandlingChargeResult> {
+    const setup = await this.principalChargeService.findSetupForCalculation(
+      principalId,
+      manager,
+    );
+    if (!setup)
+      throw new BadRequestException(
+        'No handling charge setup found for this principal',
+      );
+    if (!setup.currency.isActive)
+      throw new BadRequestException(
+        'Currency for this principal is not active',
+      );
 
     // Sort by sortOrder, cap at 10 per doc section 2.4.1
     const chargeTypes = [...setup.chargeTypes]
@@ -28,7 +41,11 @@ export class HandlingChargeEngine {
 
     for (const ct of chargeTypes) {
       const sub = this.computeSub(ct, cbm);
-      breakdown.push({ chargeType: ct.chargeType, calcMode: ct.calcMode, subCharge: sub });
+      breakdown.push({
+        chargeType: ct.chargeType,
+        calcMode: ct.calcMode,
+        subCharge: sub,
+      });
       handCharge += sub;
     }
 
@@ -39,7 +56,10 @@ export class HandlingChargeEngine {
       handCharge: Math.round(handCharge * 100) / 100,
       currencyRate: Math.round(currencyRate * 100) / 100,
       totalHandCharge,
-      breakdown: breakdown.map(b => ({ ...b, subCharge: Math.round(b.subCharge * 100) / 100 })),
+      breakdown: breakdown.map((b) => ({
+        ...b,
+        subCharge: Math.round(b.subCharge * 100) / 100,
+      })),
     };
   }
 

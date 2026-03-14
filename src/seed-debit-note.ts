@@ -88,7 +88,9 @@ async function seed() {
     console.log(`   3 tracking rows inserted`);
     console.log(`\nTest the endpoint:`);
     console.log(`  GET http://localhost:5000/jobs/debit-note/TEST-JOB-001`);
-    console.log(`  Headers: x-org-name: ${subdomain}, Authorization: Bearer <token>`);
+    console.log(
+      `  Headers: x-org-name: ${subdomain}, Authorization: Bearer <token>`,
+    );
   } catch (err) {
     await q.rollbackTransaction();
     console.error('❌ Seed failed:', err);

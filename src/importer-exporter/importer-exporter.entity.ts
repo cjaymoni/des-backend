@@ -5,7 +5,6 @@ import { BaseEntity } from '../common/entities/base.entity';
 @Index(['ieName'])
 @Index(['code'])
 export class ImporterExporter extends BaseEntity {
-
   @Column({ unique: true })
   code: string;
 

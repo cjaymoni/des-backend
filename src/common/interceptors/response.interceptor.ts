@@ -10,8 +10,14 @@ import { map } from 'rxjs/operators';
 import { ServiceResponseDto } from '../dto/service-response.dto';
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<T, ServiceResponseDto<T>> {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<ServiceResponseDto<T>> {
+export class ResponseInterceptor<T> implements NestInterceptor<
+  T,
+  ServiceResponseDto<T>
+> {
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Observable<ServiceResponseDto<T>> {
     return next.handle().pipe(
       map((data) => {
         const response = context.switchToHttp().getResponse();

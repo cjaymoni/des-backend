@@ -1,4 +1,12 @@
-import { Entity, Column, Index, DeleteDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  Index,
+  DeleteDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { BaseEntity } from '../common/entities/base.entity';
 import { Principal } from '../principals/principal.entity';
 import { Currency } from '../currencies/currency.entity';
@@ -21,7 +29,10 @@ export class PrincipalChargeSetup extends BaseEntity {
   @JoinColumn({ name: 'currencyId' })
   currency: Currency;
 
-  @OneToMany(() => PrincipalChargeType, (ct) => ct.setup, { cascade: true, eager: true })
+  @OneToMany(() => PrincipalChargeType, (ct) => ct.setup, {
+    cascade: true,
+    eager: true,
+  })
   chargeTypes: PrincipalChargeType[];
 
   @DeleteDateColumn()

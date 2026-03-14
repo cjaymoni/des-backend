@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { WeightChargeService } from '../services/weight-charge.service';
 import { WeightCharge } from '../entities/weight-charge.entity';
@@ -14,7 +22,9 @@ export class WeightChargeController {
   }
 
   @Post()
-  create(@Body() data: { weightFrom: number; weightTo: number; charges: number }): Promise<WeightCharge> {
+  create(
+    @Body() data: { weightFrom: number; weightTo: number; charges: number },
+  ): Promise<WeightCharge> {
     return this.service.create(data.weightFrom, data.weightTo, data.charges);
   }
 

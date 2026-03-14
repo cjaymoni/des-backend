@@ -1,7 +1,13 @@
 import { decimalTransformer } from '../common/transformers/decimal.transformer';
 import {
-  Entity, Column, Index, DeleteDateColumn, VersionColumn,
-  ManyToOne, OneToMany, JoinColumn,
+  Entity,
+  Column,
+  Index,
+  DeleteDateColumn,
+  VersionColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { BaseEntity } from '../common/entities/base.entity';
 import { BankName } from './bank-name.entity';
@@ -9,7 +15,10 @@ import { BankTransaction } from './bank-transaction.entity';
 import { Currency } from '../currencies/currency.entity';
 import { AccountType } from './account-type.entity';
 
-const dec = { to: (v: any) => v, from: (v: any) => (v === null ? null : parseFloat(v)) };
+const dec = {
+  to: (v: any) => v,
+  from: (v: any) => (v === null ? null : parseFloat(v)),
+};
 
 @Entity('bank_accounts')
 @Index(['acctNumber'], { unique: true })
@@ -18,7 +27,10 @@ export class BankAccount extends BaseEntity {
   @Column({ nullable: true })
   bankNameId: string;
 
-  @ManyToOne(() => BankName, (bn) => bn.accounts, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => BankName, (bn) => bn.accounts, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'bankNameId' })
   bankName: BankName;
 
@@ -42,13 +54,31 @@ export class BankAccount extends BaseEntity {
   @JoinColumn({ name: 'currencyId' })
   currency: Currency;
 
-  @Column({ type: 'decimal', precision: 14, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 14,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   balance: number;
 
-  @Column({ type: 'decimal', precision: 14, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 14,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   availableBalance: number;
 
-  @Column({ type: 'decimal', precision: 14, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 14,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   totalBankCharges: number;
 
   @Column({ length: 255, nullable: true })

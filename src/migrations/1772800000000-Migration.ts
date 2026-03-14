@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class Migration1772800000000 implements MigrationInterface {
   name = 'Migration1772800000000';
@@ -16,7 +16,9 @@ export class Migration1772800000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_shipping_lines_name" ON "shipping_lines" ("name")`);
+    await queryRunner.query(
+      `CREATE INDEX IF NOT EXISTS "idx_shipping_lines_name" ON "shipping_lines" ("name")`,
+    );
 
     // Migrate existing shippingLine string values into the new table
     await queryRunner.query(`
@@ -27,7 +29,9 @@ export class Migration1772800000000 implements MigrationInterface {
       ON CONFLICT ("name") DO NOTHING
     `);
 
-    await queryRunner.query(`ALTER TABLE "master_manifests" ADD COLUMN IF NOT EXISTS "shippingLineId" uuid`);
+    await queryRunner.query(
+      `ALTER TABLE "master_manifests" ADD COLUMN IF NOT EXISTS "shippingLineId" uuid`,
+    );
 
     await queryRunner.query(`
       UPDATE "master_manifests" mm
@@ -37,7 +41,9 @@ export class Migration1772800000000 implements MigrationInterface {
         AND mm."shippingLine" IS NOT NULL
     `);
 
-    await queryRunner.query(`ALTER TABLE "master_manifests" DROP COLUMN IF EXISTS "shippingLine"`);
+    await queryRunner.query(
+      `ALTER TABLE "master_manifests" DROP COLUMN IF EXISTS "shippingLine"`,
+    );
 
     await queryRunner.query(`
       ALTER TABLE "master_manifests"
@@ -45,20 +51,30 @@ export class Migration1772800000000 implements MigrationInterface {
       FOREIGN KEY ("shippingLineId") REFERENCES "shipping_lines"("id") ON DELETE SET NULL
     `);
 
-    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_master_manifests_shippingLineId" ON "master_manifests" ("shippingLineId")`);
+    await queryRunner.query(
+      `CREATE INDEX IF NOT EXISTS "idx_master_manifests_shippingLineId" ON "master_manifests" ("shippingLineId")`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP INDEX IF EXISTS "idx_master_manifests_shippingLineId"`);
-    await queryRunner.query(`ALTER TABLE "master_manifests" DROP CONSTRAINT IF EXISTS "fk_master_manifests_shippingLineId"`);
-    await queryRunner.query(`ALTER TABLE "master_manifests" ADD COLUMN IF NOT EXISTS "shippingLine" varchar(50)`);
+    await queryRunner.query(
+      `DROP INDEX IF EXISTS "idx_master_manifests_shippingLineId"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "master_manifests" DROP CONSTRAINT IF EXISTS "fk_master_manifests_shippingLineId"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "master_manifests" ADD COLUMN IF NOT EXISTS "shippingLine" varchar(50)`,
+    );
     await queryRunner.query(`
       UPDATE "master_manifests" mm
       SET "shippingLine" = sl."name"
       FROM "shipping_lines" sl
       WHERE mm."shippingLineId" = sl."id"
     `);
-    await queryRunner.query(`ALTER TABLE "master_manifests" DROP COLUMN IF EXISTS "shippingLineId"`);
+    await queryRunner.query(
+      `ALTER TABLE "master_manifests" DROP COLUMN IF EXISTS "shippingLineId"`,
+    );
     await queryRunner.query(`DROP INDEX IF EXISTS "idx_shipping_lines_name"`);
     await queryRunner.query(`DROP TABLE IF EXISTS "shipping_lines"`);
   }

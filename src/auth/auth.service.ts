@@ -140,7 +140,8 @@ export class AuthService {
   async getUserById(userId: string) {
     const systemUser = await this.findPublicUser('id', userId);
     if (systemUser && systemUser.role === 'system_admin') {
-      const { password, ...userWithoutPassword } = systemUser;
+      const { password: _pw1, ...userWithoutPassword } = systemUser;
+      void _pw1;
       return userWithoutPassword;
     }
 
@@ -153,7 +154,8 @@ export class AuthService {
       async (manager) => {
         const user = await manager.findOne(User, { where: { id: userId } });
         if (!user) throw new NotFoundException('User not found');
-        const { password, ...userWithoutPassword } = user;
+        const { password: _pw2, ...userWithoutPassword } = user;
+        void _pw2;
         return userWithoutPassword;
       },
       { transactional: false },

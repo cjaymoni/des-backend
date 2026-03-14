@@ -5,7 +5,6 @@ import { BaseEntity } from '../common/entities/base.entity';
 @Entity({ schema: 'public' })
 @Index(['appSubdomain'])
 export class Company extends BaseEntity {
-
   @Column({ unique: true })
   @Index()
   appSubdomain: string; // Used as tenant identifier

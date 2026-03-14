@@ -1,6 +1,15 @@
 import {
-  IsUUID, IsString, IsOptional, IsNumber, IsIn, IsArray,
-  ValidateNested, ArrayMaxSize, Min, MaxLength, IsInt,
+  IsUUID,
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsIn,
+  IsArray,
+  ValidateNested,
+  ArrayMaxSize,
+  Min,
+  MaxLength,
+  IsInt,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import type { CalcMode } from './principal-charge-type.entity';

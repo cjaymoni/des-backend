@@ -25,7 +25,9 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  findAll(@Query() pagination: PaginationDto): Promise<PaginatedResult<Partial<User>>> {
+  findAll(
+    @Query() pagination: PaginationDto,
+  ): Promise<PaginatedResult<Partial<User>>> {
     return this.usersService.findAll(pagination);
   }
 

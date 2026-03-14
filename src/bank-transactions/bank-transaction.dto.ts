@@ -1,6 +1,12 @@
 import {
-  IsString, IsOptional, IsNumber, IsDate, IsEnum, IsUUID,
-  MaxLength, Min,
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsDate,
+  IsEnum,
+  IsUUID,
+  MaxLength,
+  Min,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { TransactionType } from './bank-transaction.entity';

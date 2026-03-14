@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsBoolean, IsNumber, MaxLength, Min } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsNumber,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateCurrencyDto {
@@ -53,6 +60,8 @@ export class SearchCurrencyDto {
 
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => (value === undefined ? undefined : value === 'true' || value === true))
+  @Transform(({ value }) =>
+    value === undefined ? undefined : value === 'true' || value === true,
+  )
   isActive?: boolean;
 }

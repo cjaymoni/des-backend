@@ -5,7 +5,6 @@ import { BaseEntity } from '../common/entities/base.entity';
 @Index(['email'])
 @Index(['role'])
 export class User extends BaseEntity {
-
   @Column({ unique: true })
   @Index()
   email: string;

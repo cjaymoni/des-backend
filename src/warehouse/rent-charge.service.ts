@@ -13,8 +13,7 @@ export class RentChargeService {
 
   findAll(): Promise<RentCharge[]> {
     return this.tenantService.withManager(
-      (m) =>
-        m.getRepository(RentCharge).find({ order: { dayFrom: 'ASC' } }),
+      (m) => m.getRepository(RentCharge).find({ order: { dayFrom: 'ASC' } }),
       { transactional: false },
     );
   }
@@ -25,7 +24,8 @@ export class RentChargeService {
         const record = await m
           .getRepository(RentCharge)
           .findOne({ where: { id } });
-        if (!record) throw new NotFoundException('Rent charge bracket not found');
+        if (!record)
+          throw new NotFoundException('Rent charge bracket not found');
         return record;
       },
       { transactional: false },
@@ -48,7 +48,8 @@ export class RentChargeService {
       const existing = await m
         .getRepository(RentCharge)
         .findOne({ where: { id } });
-      if (!existing) throw new NotFoundException('Rent charge bracket not found');
+      if (!existing)
+        throw new NotFoundException('Rent charge bracket not found');
 
       const dayFrom = data.dayFrom ?? existing.dayFrom;
       const dayTo = data.dayTo ?? existing.dayTo;
@@ -68,7 +69,8 @@ export class RentChargeService {
       const existing = await m
         .getRepository(RentCharge)
         .findOne({ where: { id } });
-      if (!existing) throw new NotFoundException('Rent charge bracket not found');
+      if (!existing)
+        throw new NotFoundException('Rent charge bracket not found');
       await m.getRepository(RentCharge).delete(id);
     });
   }

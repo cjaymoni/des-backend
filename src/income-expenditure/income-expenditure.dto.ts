@@ -1,5 +1,11 @@
 import {
-  IsString, IsOptional, IsNumber, IsDate, IsBoolean, MaxLength, Min,
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsDate,
+  IsBoolean,
+  MaxLength,
+  Min,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 

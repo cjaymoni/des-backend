@@ -12,7 +12,12 @@ import { HouseManifestAttachmentsController } from './controllers/house-manifest
 @Module({
   imports: [TenantModule, UploadsModule],
   providers: [MasterManifestService, HouseManifestService, WeightChargeService],
-  controllers: [MasterManifestController, HouseManifestController, WeightChargeController, HouseManifestAttachmentsController],
+  controllers: [
+    MasterManifestController,
+    HouseManifestController,
+    WeightChargeController,
+    HouseManifestAttachmentsController,
+  ],
   exports: [MasterManifestService, HouseManifestService, WeightChargeService],
 })
 export class ManifestsModule {}

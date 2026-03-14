@@ -1,7 +1,13 @@
 import {
-  Entity, Column, PrimaryGeneratedColumn,
-  CreateDateColumn, UpdateDateColumn, DeleteDateColumn,
-  Index, ManyToOne, JoinColumn,
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { BankAccount } from './bank-account.entity';
 import { decimalTransformer } from '../common/transformers/decimal.transformer';
@@ -21,7 +27,10 @@ export class BankTransaction {
   @Column({ nullable: true })
   bankAccountId: string;
 
-  @ManyToOne(() => BankAccount, (ba) => ba.transactions, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => BankAccount, (ba) => ba.transactions, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'bankAccountId' })
   bankAccount: BankAccount;
 
@@ -34,16 +43,40 @@ export class BankTransaction {
   @Column({ type: 'enum', enum: TransactionType })
   transactionType: TransactionType;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, transformer: decimalTransformer })
+  @Column({
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: decimalTransformer,
+  })
   creditAmt: number;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, transformer: decimalTransformer })
+  @Column({
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: decimalTransformer,
+  })
   debitAmt: number;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, transformer: decimalTransformer })
+  @Column({
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: decimalTransformer,
+  })
   bankCharges: number;
 
-  @Column({ type: 'decimal', precision: 14, scale: 2, default: 0, transformer: decimalTransformer })
+  @Column({
+    type: 'decimal',
+    precision: 14,
+    scale: 2,
+    default: 0,
+    transformer: decimalTransformer,
+  })
   balance: number;
 
   @Column({ type: 'date' })

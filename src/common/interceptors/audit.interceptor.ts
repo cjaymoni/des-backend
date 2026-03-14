@@ -15,11 +15,11 @@ export class AuditInterceptor implements NestInterceptor {
 
     if (user && request.body) {
       const method = request.method;
-      
+
       if (method === 'POST' && !request.body.createdBy) {
         request.body.createdBy = user.userId || user.sub;
       }
-      
+
       if ((method === 'PUT' || method === 'PATCH') && !request.body.updatedBy) {
         request.body.updatedBy = user.userId || user.sub;
       }

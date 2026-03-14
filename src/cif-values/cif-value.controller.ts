@@ -1,10 +1,22 @@
 import {
-  Controller, Get, Post, Put, Delete,
-  Body, Param, Query, Req, UseGuards,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CifValueService } from './cif-value.service';
-import { UpsertCifSettingsDto, CreateCifValueDto, UpdateCifValueDto } from './cif-value.dto';
+import {
+  UpsertCifSettingsDto,
+  CreateCifValueDto,
+  UpdateCifValueDto,
+} from './cif-value.dto';
 
 @Controller('cif-values')
 @UseGuards(AuthGuard('jwt'))

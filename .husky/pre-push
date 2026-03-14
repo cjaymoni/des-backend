@@ -3,7 +3,7 @@ echo "Running pre-push checks..."
 
 # 1. Scan commits being pushed for secrets
 echo "Scanning for secrets..."
-gitleaks git --pre-push || exit 1
+gitleaks git --log-opts="origin/HEAD..HEAD" || exit 1
 
 # 2. Check no .env files are tracked
 if git ls-files | grep -E "^\.env(\.|$)"; then

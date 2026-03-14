@@ -1,7 +1,22 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PrincipalService } from './principal.service';
-import { CreatePrincipalDto, UpdatePrincipalDto, SearchPrincipalDto } from './principal.dto';
+import {
+  CreatePrincipalDto,
+  UpdatePrincipalDto,
+  SearchPrincipalDto,
+} from './principal.dto';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
 import { Principal } from './principal.entity';
 
@@ -11,7 +26,10 @@ export class PrincipalController {
   constructor(private service: PrincipalService) {}
 
   @Get()
-  findAll(@Query() pagination: PaginationDto, @Query() search: SearchPrincipalDto): Promise<PaginatedResult<Principal>> {
+  findAll(
+    @Query() pagination: PaginationDto,
+    @Query() search: SearchPrincipalDto,
+  ): Promise<PaginatedResult<Principal>> {
     return this.service.findAll(pagination, search);
   }
 
@@ -21,12 +39,19 @@ export class PrincipalController {
   }
 
   @Post()
-  create(@Body() data: CreatePrincipalDto, @Req() req: { user: { id: string } }): Promise<Principal> {
+  create(
+    @Body() data: CreatePrincipalDto,
+    @Req() req: { user: { id: string } },
+  ): Promise<Principal> {
     return this.service.create(data, req.user.id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: UpdatePrincipalDto, @Req() req: { user: { id: string } }): Promise<Principal> {
+  update(
+    @Param('id') id: string,
+    @Body() data: UpdatePrincipalDto,
+    @Req() req: { user: { id: string } },
+  ): Promise<Principal> {
     return this.service.update(id, data, req.user.id);
   }
 

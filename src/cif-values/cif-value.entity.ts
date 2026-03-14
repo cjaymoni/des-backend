@@ -1,12 +1,21 @@
 import { decimalTransformer } from '../common/transformers/decimal.transformer';
 import {
-  Entity, Column, PrimaryGeneratedColumn,
-  CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Index,
-  ManyToOne, JoinColumn,
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Job } from '../jobs/job.entity';
 
-const dec = { to: (v: any) => v, from: (v: any) => v === null ? null : parseFloat(v) };
+const dec = {
+  to: (v: any) => v,
+  from: (v: any) => (v === null ? null : parseFloat(v)),
+};
 
 @Entity('cif_values')
 @Index(['refNo'])
@@ -25,25 +34,67 @@ export class CifValue {
   @Column({ length: 100 })
   refNo: string;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   cifValue: number;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   fobValue: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   fobP: number;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   frtValue: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   frtP: number;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   insValue: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0, transformer: dec })
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+    transformer: dec,
+  })
   insP: number;
 
   @CreateDateColumn()

@@ -91,7 +91,7 @@ export class PrincipalChargeService {
       // Insert new charge types
       const chargeTypes = data.chargeTypes.map((ct, i) =>
         manager.create(PrincipalChargeType, {
-          setupId: setup!.id,
+          setupId: setup.id,
           chargeType: ct.chargeType.toUpperCase(),
           calcMode: ct.calcMode,
           minValue: ct.minValue ?? null,

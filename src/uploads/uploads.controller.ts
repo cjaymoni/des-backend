@@ -24,7 +24,12 @@ export class UploadsController {
   ) {}
 
   @Post('image')
-  @UseInterceptors(FileInterceptor('file', { fileFilter, limits: { fileSize: MAX_FILE_SIZE } }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter,
+      limits: { fileSize: MAX_FILE_SIZE },
+    }),
+  )
   async uploadImage(@UploadedFile() file: any) {
     const orgName = this.tenantContext.getTenant();
     if (!orgName) throw new Error('Tenant context not set');
@@ -36,7 +41,9 @@ export class UploadsController {
     const orgName = this.tenantContext.getTenant();
     if (!orgName) throw new Error('Tenant context not set');
     if (!publicId?.startsWith(`des/${orgName}/`)) {
-      throw new ForbiddenException('You do not have permission to delete this file');
+      throw new ForbiddenException(
+        'You do not have permission to delete this file',
+      );
     }
     return this.uploadsService.deleteImage(publicId);
   }

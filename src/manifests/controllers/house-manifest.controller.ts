@@ -25,7 +25,10 @@ import {
   UpdateHouseManifestDto,
   SearchHouseManifestDto,
 } from '../dto/house/house-manifest.dto';
-import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
+import {
+  PaginationDto,
+  PaginatedResult,
+} from '../../common/dto/pagination.dto';
 import { HouseManifest } from '../entities/house-manifest.entity';
 import { TenantContext } from '../../tenant/tenant.context';
 
@@ -33,7 +36,10 @@ const multerOptions = {
   storage: diskStorage({
     destination: './temp-uploads',
     filename: (req, file, cb) => {
-      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`);
+      cb(
+        null,
+        `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`,
+      );
     },
   }),
   limits: { fileSize: 10 * 1024 * 1024 },
@@ -96,21 +102,36 @@ export class HouseManifestController {
     return this.service.delete(id);
   }
 
-  private async uploadFiles(files: Express.Multer.File[]): Promise<{ url: string; publicId: string; filename: string }[]> {
+  private async uploadFiles(
+    files: Express.Multer.File[],
+  ): Promise<{ url: string; publicId: string; filename: string }[]> {
     if (!files || files.length === 0) return [];
     const orgName = this.tenantContext.getTenant();
     if (!orgName) throw new Error('Tenant context not set');
-    const attachments: { url: string; publicId: string; filename: string }[] = [];
+    const attachments: { url: string; publicId: string; filename: string }[] =
+      [];
     try {
       for (const file of files) {
         const result = await this.uploadsService.uploadImage(file, orgName);
-        attachments.push({ url: result.data.url, publicId: result.data.publicId, filename: file.originalname });
+        attachments.push({
+          url: result.data.url,
+          publicId: result.data.publicId,
+          filename: file.originalname,
+        });
       }
     } catch (err) {
       for (const file of files) {
-        try { unlinkSync(file.path); } catch { /* already deleted */ }
+        try {
+          unlinkSync(file.path);
+        } catch {
+          /* already deleted */
+        }
       }
-      throw new Error(typeof err === 'object' ? (err as any).message ?? JSON.stringify(err) : String(err));
+      throw new Error(
+        typeof err === 'object'
+          ? (err.message ?? JSON.stringify(err))
+          : String(err),
+      );
     }
     return attachments;
   }

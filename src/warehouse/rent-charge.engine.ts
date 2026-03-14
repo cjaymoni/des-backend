@@ -28,11 +28,17 @@ export class RentChargeEngine {
    *     daysInRange     = applicableEnd - applicableStart + 1
    *     charge         += daysInRange * unitCharge  (if daysInRange > 0)
    */
-  compute(unstuffDate: Date, deliveryDate: Date, brackets: RentCharge[]): RentChargeResult {
+  compute(
+    unstuffDate: Date,
+    deliveryDate: Date,
+    brackets: RentCharge[],
+  ): RentChargeResult {
     const totalDays = this.daysBetween(unstuffDate, deliveryDate);
 
     if (totalDays < 0)
-      throw new BadRequestException('Delivery date must be after unstuffing date');
+      throw new BadRequestException(
+        'Delivery date must be after unstuffing date',
+      );
 
     if (brackets.length === 0)
       throw new BadRequestException('No rent charge brackets configured');

@@ -1,5 +1,12 @@
 import { decimalTransformer } from '../common/transformers/decimal.transformer';
-import { Entity, Column, ManyToOne, JoinColumn, Index, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  Index,
+  DeleteDateColumn,
+} from 'typeorm';
 import { BaseEntity } from '../common/entities/base.entity';
 import { Job } from './job.entity';
 import { TransactionPurposeDetail } from '../transaction-purposes/transaction-purpose-detail.entity';
@@ -17,13 +24,19 @@ export class JobTracking extends BaseEntity {
   detailCode: string;
 
   @Column({
-    type: 'decimal', precision: 12, scale: 2, default: 0,
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
     transformer: { to: (v) => v, from: (v) => parseFloat(v) },
   })
   transAmount: number;
 
   @Column({
-    type: 'decimal', precision: 12, scale: 2, default: 0,
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    default: 0,
     transformer: { to: (v) => v, from: (v) => parseFloat(v) },
   })
   vatAmount: number;

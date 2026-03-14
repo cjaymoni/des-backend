@@ -1,6 +1,12 @@
 import {
-  IsString, IsOptional, IsNumber, IsBoolean, IsDate,
-  MaxLength, Min, IsInt,
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+  IsDate,
+  MaxLength,
+  Min,
+  IsInt,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
@@ -321,6 +327,8 @@ export class SearchJobDto {
   strYear?: string;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' ? true : value === 'false' ? false : undefined)
+  @Transform(({ value }) =>
+    value === 'true' ? true : value === 'false' ? false : undefined,
+  )
   paidStatus?: boolean;
 }

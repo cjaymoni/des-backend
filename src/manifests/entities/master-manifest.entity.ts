@@ -1,4 +1,12 @@
-import { Entity, Column, Index, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  Index,
+  DeleteDateColumn,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { HouseManifest } from './house-manifest.entity';
 import { ShippingLine } from '../../shipping-lines/shipping-line.entity';
@@ -10,7 +18,6 @@ import { Principal } from '../../principals/principal.entity';
 @Index(['shippingLineId'])
 @Index(['containerNo'])
 export class MasterManifest extends BaseEntity {
-
   @Column({ length: 20 })
   blNo: string;
 
@@ -61,7 +68,7 @@ export class MasterManifest extends BaseEntity {
   @Column({ length: 50, nullable: true })
   rptNo: string;
 
-  @OneToMany(() => HouseManifest, house => house.masterManifest)
+  @OneToMany(() => HouseManifest, (house) => house.masterManifest)
   houseManifests: HouseManifest[];
 
   @DeleteDateColumn()

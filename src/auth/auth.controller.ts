@@ -14,7 +14,6 @@ import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, AuthResponseDto } from './dto/auth.dto';
-import { ServiceResponseDto } from '../common/dto/service-response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -63,14 +62,17 @@ export class AuthController {
   @Post('login')
   @Throttle({ default: { ttl: 60000, limit: 5 } })
   @HttpCode(HttpStatus.OK)
-  async login(@Body() body: LoginDto, @Request() req): Promise<AuthResponseDto> {
-    const orgName = req.headers['x-org-name'] as string;
+  async login(
+    @Body() body: LoginDto,
+    @Request() req: { headers: Record<string, string> },
+  ): Promise<AuthResponseDto> {
+    const orgName = req.headers['x-org-name'];
     return this.authService.login(body.email, body.password, orgName);
   }
 
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
-  async getCurrentUser(@Request() req) {
+  async getCurrentUser(@Request() req: { user: { id: string } }) {
     return this.authService.getUserById(req.user.id);
   }
 }

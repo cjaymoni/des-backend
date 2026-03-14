@@ -31,68 +31,134 @@ export class IncomeExpenditure {
   detailCode: string;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   incomeAmt: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   netIncome: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   netIncVat: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   expenseAmt: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   netExpense: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   netExpVat: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   bbfAmt: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   incCheqAmt: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   expCheqAmt: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   incCheqVat: number;
 
   @Column({
-    type: 'decimal', precision: 10, scale: 2, default: 0,
-    transformer: { to: v => v, from: v => v === null ? null : parseFloat(v) },
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (v) => v,
+      from: (v) => (v === null ? null : parseFloat(v)),
+    },
   })
   expCheqVat: number;
 

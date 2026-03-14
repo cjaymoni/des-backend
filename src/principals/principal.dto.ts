@@ -30,6 +30,8 @@ export class SearchPrincipalDto {
 
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => (value === undefined ? undefined : value === 'true' || value === true))
+  @Transform(({ value }) =>
+    value === undefined ? undefined : value === 'true' || value === true,
+  )
   isActive?: boolean;
 }

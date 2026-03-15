@@ -18,4 +18,31 @@ export class RentCharge extends BaseEntity {
     transformer: decimalTransformer,
   })
   unitCharge: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: decimalTransformer,
+  })
+  totalCharge: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0.5,
+    transformer: decimalTransformer,
+  })
+  dangerousCargoI: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 1,
+    transformer: decimalTransformer,
+  })
+  dangerousCargoII: number;
 }

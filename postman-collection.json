@@ -4866,7 +4866,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"dayFrom\": 1,\n  \"dayTo\": 7,\n  \"unitCharge\": 0\n}",
+                  "raw": "{\n  \"dayFrom\": 1,\n  \"dayTo\": 7,\n  \"unitCharge\": 0,\n  \"totalCharge\": 0,\n  \"dangerousCargoI\": 0.5,\n  \"dangerousCargoII\": 1\n}",
                   "options": { "raw": { "language": "json" } }
                 },
                 "url": {
@@ -4887,7 +4887,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"unitCharge\": 11.64\n}",
+                  "raw": "{\n  \"unitCharge\": 11.64,\n  \"totalCharge\": 0,\n  \"dangerousCargoI\": 0.5,\n  \"dangerousCargoII\": 1\n}",
                   "options": { "raw": { "language": "json" } }
                 },
                 "url": {

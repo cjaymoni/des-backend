@@ -16,6 +16,24 @@ export class CreateRentChargeDto {
   @IsNumber()
   @Min(0)
   unitCharge: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  totalCharge?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  dangerousCargoI?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  dangerousCargoII?: number;
 }
 
 export class UpdateRentChargeDto {
@@ -36,4 +54,22 @@ export class UpdateRentChargeDto {
   @IsNumber()
   @Min(0)
   unitCharge?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  totalCharge?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  dangerousCargoI?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  dangerousCargoII?: number;
 }

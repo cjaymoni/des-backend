@@ -645,6 +645,9 @@ CREATE TABLE IF NOT EXISTS "rent_charges" (
   "dayFrom" int NOT NULL,
   "dayTo" int NOT NULL,
   "unitCharge" decimal(10,2) NOT NULL DEFAULT 0,
+  "totalCharge" decimal(10,2) NOT NULL DEFAULT 0,
+  "dangerousCargoI" decimal(10,2) NOT NULL DEFAULT 0.5,
+  "dangerousCargoII" decimal(10,2) NOT NULL DEFAULT 1,
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "updatedAt" timestamp NOT NULL DEFAULT now(),
   "createdBy" varchar,
@@ -652,6 +655,11 @@ CREATE TABLE IF NOT EXISTS "rent_charges" (
 );
 
 CREATE INDEX IF NOT EXISTS "idx_rent_charges_dayFrom" ON "rent_charges" ("dayFrom");
+
+-- Migrate existing rent_charges for existing tenants
+ALTER TABLE IF EXISTS "rent_charges" ADD COLUMN IF NOT EXISTS "totalCharge" decimal(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE IF EXISTS "rent_charges" ADD COLUMN IF NOT EXISTS "dangerousCargoI" decimal(10,2) NOT NULL DEFAULT 0.5;
+ALTER TABLE IF EXISTS "rent_charges" ADD COLUMN IF NOT EXISTS "dangerousCargoII" decimal(10,2) NOT NULL DEFAULT 1;
 
 -- Warehouse Jobs table (JobFiles_Rent)
 CREATE TABLE IF NOT EXISTS "warehouse_jobs" (

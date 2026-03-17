@@ -12,28 +12,27 @@ async function bootstrap() {
   app.use(helmet());
 
   app.enableCors({
-    // origin: (origin, callback) => {
-    //   if (!origin) {
-    //     callback(null, true);
-    //     return;
-    //   }
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
 
-    //   const allowedPatterns: RegExp[] = [
-    //     /^https?:\/\/([a-z0-9-]+\.)*optimumitsolutiongh\.com$/,
-    //     /^http:\/\/localhost:3000$/,
-    //     ...(process.env.ALLOWED_ORIGINS?.split(',').map(
-    //       (o: string) =>
-    //         new RegExp(`^${o.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
-    //     ) || []),
-    //   ];
+      const allowedPatterns: RegExp[] = [
+        /^https?:\/\/([a-z0-9-]+\.)*optimumitsolutiongh\.com$/,
+        /^http:\/\/localhost:3000$/,
+        ...(process.env.ALLOWED_ORIGINS?.split(',').map(
+          (o: string) =>
+            new RegExp(`^${o.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
+        ) || []),
+      ];
 
-    //   if (allowedPatterns.some((pattern) => pattern.test(origin))) {
-    //     callback(null, true);
-    //   } else {
-    //     callback(new Error('Not allowed by CORS'));
-    //   }
-    // },
-    origin: '*',
+      if (allowedPatterns.some((pattern) => pattern.test(origin))) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',

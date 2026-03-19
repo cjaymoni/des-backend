@@ -27,6 +27,7 @@ import { TransactionPurposeDetail } from 'src/transaction-purposes/transaction-p
 import { JobTracking } from 'src/jobs/job-tracking.entity';
 import { RentCharge } from '../warehouse/entities/rent-charge.entity';
 import { WarehouseJob } from '../warehouse/entities/warehouse-job.entity';
+import { EmailLog } from '../email/email-log.entity';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -65,6 +66,7 @@ export const getDatabaseConfig = (
     JobTracking,
     RentCharge,
     WarehouseJob,
+    EmailLog,
   ],
   synchronize: false,
   // schema: 'public',

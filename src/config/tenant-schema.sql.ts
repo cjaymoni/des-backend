@@ -718,6 +718,25 @@ CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_jobNo" ON "warehouse_jobs" ("jobN
 CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_hblNo" ON "warehouse_jobs" ("hblNo");
 CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_houseManifestId" ON "warehouse_jobs" ("houseManifestId");
 
+-- Email Logs table
+CREATE TABLE IF NOT EXISTS "email_logs" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "recipient" varchar NOT NULL,
+  "subject" varchar NOT NULL,
+  "body" text NOT NULL,
+  "module" varchar NOT NULL,
+  "userId" varchar,
+  "status" varchar NOT NULL DEFAULT 'pending',
+  "error" text,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "updatedAt" timestamp NOT NULL DEFAULT now(),
+  "createdBy" varchar,
+  "updatedBy" varchar
+);
+
+CREATE INDEX IF NOT EXISTS "idx_email_logs_userId" ON "email_logs" ("userId");
+CREATE INDEX IF NOT EXISTS "idx_email_logs_module" ON "email_logs" ("module");
+
 -- Migrate vatNhilStatus from varchar to boolean for existing tenants
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='jobs' AND column_name='vatNhilStatus' AND data_type='character varying') THEN

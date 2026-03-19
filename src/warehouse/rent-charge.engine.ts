@@ -35,7 +35,7 @@ export class RentChargeEngine {
   ): RentChargeResult {
     const totalDays = this.daysBetween(unstuffDate, deliveryDate);
 
-    if (totalDays < 0)
+    if (totalDays < 1)
       throw new BadRequestException(
         'Delivery date must be after unstuffing date',
       );
@@ -79,6 +79,6 @@ export class RentChargeEngine {
     const msPerDay = 1000 * 60 * 60 * 24;
     const fromMs = new Date(from).setHours(0, 0, 0, 0);
     const toMs = new Date(to).setHours(0, 0, 0, 0);
-    return Math.round((toMs - fromMs) / msPerDay);
+    return Math.round((toMs - fromMs) / msPerDay) + 1;
   }
 }

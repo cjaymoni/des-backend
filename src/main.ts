@@ -21,6 +21,7 @@ async function bootstrap() {
       const allowedPatterns: RegExp[] = [
         /^https?:\/\/([a-z0-9-]+\.)*optimumitsolutiongh\.com$/,
         /^http:\/\/localhost:3000$/,
+        /^http:\/\/[a-z0-9-]+\.localhost:3000$/,
         ...(process.env.ALLOWED_ORIGINS?.split(',').map(
           (o: string) =>
             new RegExp(`^${o.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),

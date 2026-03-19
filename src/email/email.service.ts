@@ -44,41 +44,45 @@ export class EmailService {
 
   async send(options: SendEmailOptions): Promise<EmailLog[]> {
     const recipients = Array.isArray(options.to) ? options.to : [options.to];
-    return Promise.all(recipients.map((recipient) =>
-      this.tenantService.withManager(async (m) => {
-        const repo = m.getRepository(EmailLog);
-        const log = repo.create({
-          recipient,
-          subject: options.subject,
-          body: JSON.stringify(options.body),
-          module: options.module,
-          userId: options.userId,
-          status: 'pending',
-        });
-
-        await repo.save(log);
-
-        try {
-          await this.transporter.sendMail({
-            from: this.config.get<string>('SMTP_FROM'),
-            to: recipient,
+    return Promise.all(
+      recipients.map((recipient) =>
+        this.tenantService.withManager(async (m) => {
+          const repo = m.getRepository(EmailLog);
+          const log = repo.create({
+            recipient,
             subject: options.subject,
-            html: options.body,
-            attachments: options.attachments?.map((a) => ({
-              filename: a.filename,
-              content: Buffer.from(a.content, 'base64'),
-              contentType: a.contentType ?? 'application/pdf',
-            })),
+            body: JSON.stringify(options.body),
+            module: options.module,
+            userId: options.userId,
+            status: 'pending',
           });
-          log.status = 'sent';
-        } catch (err) {
-          log.status = 'failed';
-          log.error = err instanceof Error ? err.message : String(err);
-          this.logger.error(`Failed to send email to ${recipient}: ${log.error}`);
-        }
 
-        return repo.save(log);
-      }),
-    ));
+          await repo.save(log);
+
+          try {
+            await this.transporter.sendMail({
+              from: this.config.get<string>('SMTP_FROM'),
+              to: recipient,
+              subject: options.subject,
+              html: options.body,
+              attachments: options.attachments?.map((a) => ({
+                filename: a.filename,
+                content: Buffer.from(a.content, 'base64'),
+                contentType: a.contentType ?? 'application/pdf',
+              })),
+            });
+            log.status = 'sent';
+          } catch (err) {
+            log.status = 'failed';
+            log.error = err instanceof Error ? err.message : String(err);
+            this.logger.error(
+              `Failed to send email to ${recipient}: ${log.error}`,
+            );
+          }
+
+          return repo.save(log);
+        }),
+      ),
+    );
   }
 }

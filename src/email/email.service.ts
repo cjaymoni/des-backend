@@ -1,10 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { Options } from 'nodemailer/lib/smtp-transport';
 import { EmailLog } from './email-log.entity';
+import { TenantService } from '../tenant/tenant.service';
 
 export interface SendEmailOptions {
   to: string;
@@ -21,8 +20,7 @@ export class EmailService {
 
   constructor(
     private readonly config: ConfigService,
-    @InjectRepository(EmailLog)
-    private readonly emailLogRepo: Repository<EmailLog>,
+    private readonly tenantService: TenantService,
   ) {
     this.transporter = nodemailer.createTransport(<Options>{
       host: this.config.get<string>('SMTP_HOST'),
@@ -38,32 +36,34 @@ export class EmailService {
   }
 
   async send(options: SendEmailOptions): Promise<EmailLog> {
-    const log = this.emailLogRepo.create({
-      recipient: options.to,
-      subject: options.subject,
-      body: JSON.stringify(options.body),
-      module: options.module,
-      userId: options.userId,
-      status: 'pending',
-    });
-
-    await this.emailLogRepo.save(log);
-
-    try {
-      await this.transporter.sendMail({
-        from: this.config.get<string>('SMTP_FROM'),
-        to: options.to,
+    return this.tenantService.withManager(async (m) => {
+      const repo = m.getRepository(EmailLog);
+      const log = repo.create({
+        recipient: options.to,
         subject: options.subject,
-        html: options.body,
+        body: JSON.stringify(options.body),
+        module: options.module,
+        userId: options.userId,
+        status: 'pending',
       });
 
-      log.status = 'sent';
-    } catch (err) {
-      log.status = 'failed';
-      log.error = err instanceof Error ? err.message : String(err);
-      this.logger.error(`Failed to send email to ${options.to}: ${log.error}`);
-    }
+      await repo.save(log);
 
-    return this.emailLogRepo.save(log);
+      try {
+        await this.transporter.sendMail({
+          from: this.config.get<string>('SMTP_FROM'),
+          to: options.to,
+          subject: options.subject,
+          html: options.body,
+        });
+        log.status = 'sent';
+      } catch (err) {
+        log.status = 'failed';
+        log.error = err instanceof Error ? err.message : String(err);
+        this.logger.error(`Failed to send email to ${options.to}: ${log.error}`);
+      }
+
+      return repo.save(log);
+    });
   }
 }

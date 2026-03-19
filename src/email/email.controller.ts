@@ -14,6 +14,7 @@ export class EmailController {
       body: dto.body,
       module: dto.module,
       userId: dto.userId,
+      attachments: dto.attachments,
     });
   }
 }

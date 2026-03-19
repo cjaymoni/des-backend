@@ -5,12 +5,19 @@ import { Options } from 'nodemailer/lib/smtp-transport';
 import { EmailLog } from './email-log.entity';
 import { TenantService } from '../tenant/tenant.service';
 
+export interface EmailAttachment {
+  filename: string;
+  content: string; // base64
+  contentType?: string;
+}
+
 export interface SendEmailOptions {
-  to: string;
+  to: string | string[];
   subject: string;
   body: string;
   module: string;
   userId?: string;
+  attachments?: EmailAttachment[];
 }
 
 @Injectable()
@@ -35,35 +42,43 @@ export class EmailService {
     });
   }
 
-  async send(options: SendEmailOptions): Promise<EmailLog> {
-    return this.tenantService.withManager(async (m) => {
-      const repo = m.getRepository(EmailLog);
-      const log = repo.create({
-        recipient: options.to,
-        subject: options.subject,
-        body: JSON.stringify(options.body),
-        module: options.module,
-        userId: options.userId,
-        status: 'pending',
-      });
-
-      await repo.save(log);
-
-      try {
-        await this.transporter.sendMail({
-          from: this.config.get<string>('SMTP_FROM'),
-          to: options.to,
+  async send(options: SendEmailOptions): Promise<EmailLog[]> {
+    const recipients = Array.isArray(options.to) ? options.to : [options.to];
+    return Promise.all(recipients.map((recipient) =>
+      this.tenantService.withManager(async (m) => {
+        const repo = m.getRepository(EmailLog);
+        const log = repo.create({
+          recipient,
           subject: options.subject,
-          html: options.body,
+          body: JSON.stringify(options.body),
+          module: options.module,
+          userId: options.userId,
+          status: 'pending',
         });
-        log.status = 'sent';
-      } catch (err) {
-        log.status = 'failed';
-        log.error = err instanceof Error ? err.message : String(err);
-        this.logger.error(`Failed to send email to ${options.to}: ${log.error}`);
-      }
 
-      return repo.save(log);
-    });
+        await repo.save(log);
+
+        try {
+          await this.transporter.sendMail({
+            from: this.config.get<string>('SMTP_FROM'),
+            to: recipient,
+            subject: options.subject,
+            html: options.body,
+            attachments: options.attachments?.map((a) => ({
+              filename: a.filename,
+              content: Buffer.from(a.content, 'base64'),
+              contentType: a.contentType ?? 'application/pdf',
+            })),
+          });
+          log.status = 'sent';
+        } catch (err) {
+          log.status = 'failed';
+          log.error = err instanceof Error ? err.message : String(err);
+          this.logger.error(`Failed to send email to ${recipient}: ${log.error}`);
+        }
+
+        return repo.save(log);
+      }),
+    ));
   }
 }

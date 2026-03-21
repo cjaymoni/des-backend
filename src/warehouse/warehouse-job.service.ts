@@ -15,6 +15,7 @@ import {
   CreateWarehouseJobDto,
   UpdateWarehouseJobDto,
   SearchWarehouseJobDto,
+  AdditionalRentDto,
 } from './warehouse-job.dto';
 
 @Injectable()
@@ -259,6 +260,65 @@ export class WarehouseJobService {
       }
 
       return m.save(record);
+    });
+  }
+
+  /**
+   * Creates an additional rent record linked to the parent job.
+   * Uses the parent's cumulative period to determine the correct unit charge
+   * bracket for the new days (§1.4).
+   */
+  async createAdditionalRent(
+    parentId: string,
+    data: AdditionalRentDto,
+    userId: string,
+  ): Promise<WarehouseJob> {
+    return this.tenantService.withManager(async (m) => {
+      const parent = await this.fetchOne(m, parentId);
+
+      const brackets = await m
+        .getRepository(RentCharge)
+        .find({ order: { dayFrom: 'ASC' } });
+
+      const result = this.rentChargeEngine.computeAdditional(
+        data.unstuffDate,
+        data.deliveryDate,
+        brackets,
+        parent.period,
+      );
+
+      // Generate unique jobNo: WH-2024-001/A1, /A2, etc.
+      const existingAddl = await m
+        .getRepository(WarehouseJob)
+        .count({ where: { parentJobId: parent.id } });
+      const additionalJobNo = `${parent.jobNo}/A${existingAddl + 1}`;
+
+      const job = m.create(WarehouseJob, {
+        jobNo: additionalJobNo,
+        hblNo: parent.hblNo,
+        houseManifestId: parent.houseManifestId,
+        consigneeDetails: parent.consigneeDetails,
+        weight: parent.weight,
+        totalCBM: parent.totalCBM,
+        vatPer: parent.vatPer,
+        nhilPer: parent.nhilPer,
+        gfdPer: parent.gfdPer,
+        covidPer: parent.covidPer,
+        cargoType: parent.cargoType,
+        cargoTypeLevel: parent.cargoTypeLevel,
+        unstuffDate: data.unstuffDate,
+        deliveryDate: data.deliveryDate,
+        paidDate: data.paidDate,
+        period: result.totalDays,
+        unitCharge: result.breakdown[0]?.unitCharge ?? 0,
+        rentCharge: result.rentCharge,
+        calcStatus: true,
+        transactionType: 'Additional',
+        parentJobId: parent.id,
+        createdBy: userId,
+      });
+
+      return m.save(job);
     });
   }
 

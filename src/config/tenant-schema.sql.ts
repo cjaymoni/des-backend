@@ -705,6 +705,8 @@ CREATE TABLE IF NOT EXISTS "warehouse_jobs" (
   "calcStatus" boolean NOT NULL DEFAULT false,
   "incvatStatus" boolean NOT NULL DEFAULT false,
   "vatInvoice" varchar(50),
+  "transactionType" varchar(20) NOT NULL DEFAULT 'Normal',
+  "parentJobId" uuid,
   "version" int NOT NULL DEFAULT 1,
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "updatedAt" timestamp NOT NULL DEFAULT now(),
@@ -717,6 +719,23 @@ CREATE TABLE IF NOT EXISTS "warehouse_jobs" (
 CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_jobNo" ON "warehouse_jobs" ("jobNo");
 CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_hblNo" ON "warehouse_jobs" ("hblNo");
 CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_houseManifestId" ON "warehouse_jobs" ("houseManifestId");
+
+-- Migrate existing warehouse_jobs for existing tenants (additional rent support)
+ALTER TABLE IF EXISTS "warehouse_jobs" ADD COLUMN IF NOT EXISTS "transactionType" varchar(20) NOT NULL DEFAULT 'Normal';
+ALTER TABLE IF EXISTS "warehouse_jobs" ADD COLUMN IF NOT EXISTS "parentJobId" uuid;
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE table_schema = current_schema()
+      AND table_name = 'warehouse_jobs'
+      AND constraint_name = 'fk_warehouse_jobs_parentJobId'
+  ) THEN
+    ALTER TABLE "warehouse_jobs"
+      ADD CONSTRAINT "fk_warehouse_jobs_parentJobId"
+      FOREIGN KEY ("parentJobId") REFERENCES "warehouse_jobs"("id") ON DELETE SET NULL;
+  END IF;
+END $$;
+CREATE INDEX IF NOT EXISTS "idx_warehouse_jobs_parentJobId" ON "warehouse_jobs" ("parentJobId");
 
 -- Email Logs table
 CREATE TABLE IF NOT EXISTS "email_logs" (

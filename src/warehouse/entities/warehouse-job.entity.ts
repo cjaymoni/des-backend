@@ -238,6 +238,14 @@ export class WarehouseJob extends BaseEntity {
   @Column({ length: 50, nullable: true })
   vatInvoice: string;
 
+  /** 'Normal' for first-time rent, 'Additional' for surplus rent days */
+  @Column({ length: 20, default: 'Normal' })
+  transactionType: string;
+
+  /** Points to the original job when transactionType = 'Additional' */
+  @Column({ type: 'uuid', nullable: true })
+  parentJobId: string;
+
   @VersionColumn()
   version: number;
 

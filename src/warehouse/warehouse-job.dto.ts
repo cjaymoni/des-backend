@@ -364,6 +364,27 @@ export class UpdateWarehouseJobDto {
   vatInvoice?: string;
 }
 
+export class AdditionalRentDto {
+  @Type(() => Date)
+  @IsDate()
+  unstuffDate: Date;
+
+  @Type(() => Date)
+  @IsDate()
+  deliveryDate: Date;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  paidDate?: Date;
+
+  /** CBM or Weight — determines rent tariff multiplier */
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  rentBasis?: string; // 'CBM' | 'Weight'
+}
+
 export class SearchWarehouseJobDto {
   @IsOptional()
   @IsString()

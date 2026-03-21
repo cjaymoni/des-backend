@@ -75,6 +75,52 @@ export class RentChargeEngine {
     };
   }
 
+  /**
+   * Calculates rent for additional days only.
+   * Finds the bracket that covers (previousDays + 1) and uses its unit charge
+   * for all new days — matching the DES behaviour shown in §1.4 where
+   * 1 extra day after 42 days uses the day-15+ bracket at GHC 23.27.
+   */
+  computeAdditional(
+    unstuffDate: Date,
+    deliveryDate: Date,
+    brackets: RentCharge[],
+    previousDays: number,
+  ): RentChargeResult {
+    const newDays = this.daysBetween(unstuffDate, deliveryDate);
+    if (newDays < 1)
+      throw new BadRequestException(
+        'Delivery date must be after unstuffing date',
+      );
+    if (brackets.length === 0)
+      throw new BadRequestException('No rent charge brackets configured');
+
+    const sorted = [...brackets].sort((a, b) => a.dayFrom - b.dayFrom);
+    const firstAdditionalDay = previousDays + 1;
+
+    // Find the bracket that covers the first additional day
+    const bracket =
+      sorted.find(
+        (b) => b.dayFrom <= firstAdditionalDay && b.dayTo >= firstAdditionalDay,
+      ) ?? sorted[sorted.length - 1]; // fall back to last bracket
+
+    const charge = Math.round(newDays * bracket.unitCharge * 100) / 100;
+
+    return {
+      totalDays: newDays,
+      rentCharge: charge,
+      breakdown: [
+        {
+          dayFrom: bracket.dayFrom,
+          dayTo: bracket.dayTo,
+          daysApplied: newDays,
+          unitCharge: bracket.unitCharge,
+          charge,
+        },
+      ],
+    };
+  }
+
   private daysBetween(from: Date, to: Date): number {
     const msPerDay = 1000 * 60 * 60 * 24;
     const fromMs = new Date(from).setHours(0, 0, 0, 0);

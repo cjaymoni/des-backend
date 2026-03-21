@@ -16,6 +16,7 @@ import {
   CreateWarehouseJobDto,
   UpdateWarehouseJobDto,
   SearchWarehouseJobDto,
+  AdditionalRentDto,
 } from './warehouse-job.dto';
 import { PaginationDto, PaginatedResult } from '../common/dto/pagination.dto';
 import { WarehouseJob } from './entities/warehouse-job.entity';
@@ -82,6 +83,15 @@ export class WarehouseJobController {
     @Req() req: { user: { id: string } },
   ): Promise<WarehouseJob> {
     return this.service.update(id, data, req.user.id);
+  }
+
+  @Post(':id/additional-rent')
+  createAdditionalRent(
+    @Param('id') id: string,
+    @Body() data: AdditionalRentDto,
+    @Req() req: { user: { id: string } },
+  ): Promise<WarehouseJob> {
+    return this.service.createAdditionalRent(id, data, req.user.id);
   }
 
   @Post(':id/post-to-income')
